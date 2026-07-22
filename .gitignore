@@ -1,0 +1,53 @@
+# 📦 Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# 🚀 Build outputs (for apps and packages)
+dist/
+build/
+out/
+/.next/
+
+# 🧪 Testing and Coverage
+coverage/
+.nyc_output/
+
+# 🔐 Environment Variables (CRITICAL)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# 🐛 Logs and Debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 💻 IDE and Editor configurations
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# 🐧 OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ☁️ Vercel / Deployment (if you deploy frontend here)
+.vercel/

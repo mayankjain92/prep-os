@@ -15,7 +15,7 @@ export interface IProblem extends Document {
 
 const problemSchema = new Schema<IProblem>(
   {
-    userId: { type: Schema.Types.ObjectId, required: true, index: true },
+    userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     title: { type: String, required: true, trim: true },
     difficulty: { type: String, enum: ["Easy", "Medium", "Hard"], required: true },
     topics: { type: [String], default: [] },
@@ -30,5 +30,7 @@ const problemSchema = new Schema<IProblem>(
   },
   { timestamps: true }
 );
+
+problemSchema.index({ userId: 1, createdAt: -1 });
 
 export const Problem = mongoose.model<IProblem>("Problem", problemSchema);

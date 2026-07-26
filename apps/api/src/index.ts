@@ -3,12 +3,15 @@ import express from "express";
 import cors from "cors";
 import { authStub } from "./middleware/auth.stub";
 import { connectDB } from "./config/db";
-import { validate } from "./middleware/validate";
-import { createProblemSchema } from "@prep-os/shared";
+// import './models/Problem';
+import problemRoutes from "./routes/ProblemRoutes";
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/problems", problemRoutes);
 
 app.use(authStub);
 

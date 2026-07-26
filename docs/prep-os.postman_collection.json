@@ -1,0 +1,281 @@
+{
+  "info": {
+    "_postman_id": "5dd90f03-0730-4527-9228-c9ca88161fe6",
+    "name": "prep-os",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49739439",
+    "_collection_link": "https://go.postman.co/collection/49739439-5dd90f03-0730-4527-9228-c9ca88161fe6?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Create Problem",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();",
+              "pm.collectionVariables.set(\"problemId\", res._id);",
+              "",
+              "pm.test(\"Status is 201\", function () {",
+              "  pm.response.to.have.status(201);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "x-user-id",
+            "value": "{{userA}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Two Sum\",\n  \"difficulty\": \"Easy\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/problems",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "problems"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Problem by ID (as userA)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "x-user-id",
+            "value": "{{userA}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/problems",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "problems"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Problems (as userA)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "x-user-id",
+            "value": "{{userA}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/problems",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "problems"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Problems (as userB)",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "x-user-id",
+            "value": "{{userB}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/problems",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "problems"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update to solved (as userA)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "x-user-id",
+            "value": "{{userA}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"status\": \"solved\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/problems/{{problemId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "problems",
+            "{{problemId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete as userA",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "x-user-id",
+            "value": "{{userA}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/problems",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "problems"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "userA",
+      "value": ""
+    },
+    {
+      "key": "userB",
+      "value": ""
+    },
+    {
+      "key": "problemId",
+      "value": ""
+    }
+  ]
+}

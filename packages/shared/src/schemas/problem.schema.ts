@@ -1,7 +1,7 @@
 import {z} from "zod"
 
 export const difficultyEnum = z.enum(["Easy", "Medium", "Hard"]);
-export const statusEnum = z.enum(["todo", "attempted", "solved", "revist"]);
+export const statusEnum = z.enum(["todo", "attempted", "solved", "revisit"]);
 
 export const createProblemSchema = z.object({
   title: z.string().trim().min(1, "title is required"),

@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import { authStub } from "./middleware/auth.stub";
 import { connectDB } from "./config/db";
+import { validate } from "./middleware/validate";
+import { createProblemSchema } from "@prep-os/shared";
 
 const app = express();
 app.use(cors());
@@ -11,6 +13,7 @@ app.use(express.json());
 app.use(authStub);
 
 app.get("/health", (req, res) => res.json({status : "ok", userId: req.userId}));
+
 
 const PORT = process.env.PORT || 4000;
 

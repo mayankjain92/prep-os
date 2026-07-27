@@ -1,12 +1,51 @@
+version: "3.8"
+
 services:
   mongo:
-    image: mongo:7
-    ports: ["27017:27017"]
-    volumes: ["mongo-data:/data/db"]
+    image: mongo:7.0
+    container_name: prep-os-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
 
   redis:
     image: redis:7-alpine
-    ports: ["6379:6379"]
+    container_name: prep-os-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: prep-os-api
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://mongo:27017/prep-os
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=prep-os-super-secret-key-12345
+    depends_on:
+      - mongo
+      - redis
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: prep-os-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+    depends_on:
+      - api
 
 volumes:
   mongo-data:

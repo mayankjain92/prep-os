@@ -2,10 +2,13 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IDoubt extends Document {
   userId: Types.ObjectId;
+  title: string;
+  type: "leetcode" | "topic";
   topic: string;
-  problemNumber: number | null;
-  description: string;
-  status: "open" | "resolved";
+  url?: string;
+  priority: "high" | "medium" | "low";
+  notes?: string;
+  resolved: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,10 +16,13 @@ export interface IDoubt extends Document {
 const doubtSchema = new Schema<IDoubt>(
   {
     userId: { type: Schema.Types.ObjectId, required: true, index: true },
+    title: { type: String, required: true, trim: true },
+    type: { type: String, enum: ["leetcode", "topic"], required: true },
     topic: { type: String, required: true, trim: true },
-    problemNumber: { type: Number, default: null },
-    description: { type: String, required: true, trim: true },
-    status: { type: String, enum: ["open", "resolved"], default: "open" },
+    url: { type: String, trim: true, default: "" },
+    priority: { type: String, enum: ["high", "medium", "low"], default: "medium" },
+    notes: { type: String, trim: true, default: "" },
+    resolved: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

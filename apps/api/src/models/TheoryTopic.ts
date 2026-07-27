@@ -1,7 +1,7 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
 export interface ITheoryTopic extends Document {
-  userId: Types.ObjectId;
+  userId: string;
   subject: "OS" | "DBMS" | "CN" | "Aptitude";
   topicName: string;
   status: "not-started" | "in-progress" | "completed";
@@ -12,17 +12,36 @@ export interface ITheoryTopic extends Document {
 
 const theoryTopicSchema = new Schema<ITheoryTopic>(
   {
-    userId: { type: Schema.Types.ObjectId, required: true, index: true },
-    subject: { type: String, enum: ["OS", "DBMS", "CN", "Aptitude"], required: true },
-    topicName: { type: String, required: true, trim: true },
+    userId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    subject: {
+      type: String,
+      enum: ["OS", "DBMS", "CN", "Aptitude"],
+      required: true,
+    },
+    topicName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     status: {
       type: String,
       enum: ["not-started", "in-progress", "completed"],
       default: "not-started",
     },
-    notes: { type: String, default: "" },
+    notes: {
+      type: String,
+      default: "",
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-export const TheoryTopic = mongoose.model<ITheoryTopic>("TheoryTopic", theoryTopicSchema);
+theoryTopicSchema.index({ userId: 1, subject: 1 });
+
+export const TheoryTopic = model<ITheoryTopic>("TheoryTopic", theoryTopicSchema);

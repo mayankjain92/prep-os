@@ -1,19 +1,24 @@
 import { Router } from "express";
-import { authStub } from "../middleware/auth.stub";
-import { validate } from "../middleware/validate";
-import { createProblemSchema, updateProblemSchema } from "@prep-os/shared";
-import * as problemController from "../controllers/problemControllers";
+import {
+  createProblem,
+  listProblems,
+  getProblem,
+  updateProblem,
+  deleteProblem,
+  syncLeetCodeProblems,
+} from "../controllers/problemControllers.js";
 
+const router = Router();
 
-const router = Router()
+router.route("/")
+  .get(listProblems)
+  .post(createProblem);
 
-router.use(authStub);
+router.post("/sync", syncLeetCodeProblems);
 
-router.post("/", validate(createProblemSchema, "body"), problemController.createProblem);
-router.get("/", problemController.listProblems);
-router.get("/:id", problemController.getProblem);
-router.patch("/:id", validate(updateProblemSchema, "body"), problemController.updateProblem);
-router.delete("/:id", problemController.deleteProblem);
- 
+router.route("/:id")
+  .get(getProblem)
+  .patch(updateProblem)
+  .delete(deleteProblem);
+
 export default router;
- 

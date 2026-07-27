@@ -1,16 +1,37 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Code2, BookOpen, FolderKanban, LogOut, User, Sun, Moon, Sparkles } from "lucide-react";
+import { ScrollToTop } from "@/components/shared/ScrollToTop";
+import { LayoutDashboard, Code2, BookOpen, FolderKanban, LogOut, User, Sun, Moon, Sparkles, Loader2 } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const router = useRouter();
+  const { user, isLoading, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-xblue" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   const navItems = [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -109,6 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main Content Area */}
       <main className="flex-1 bg-background text-foreground">{children}</main>
+      <ScrollToTop />
     </div>
   );
 }

@@ -25,18 +25,5 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     }
   }
 
-  // Dev / Testing fallback stub header
-  const stubUserId = req.headers["x-user-id"] as string;
-  if (stubUserId) {
-    req.userId = stubUserId;
-    return next();
-  }
-
-  // Fallback for unauthenticated dev mode requests
-  if (process.env.NODE_ENV !== "production") {
-    req.userId = "000000000000000000000001";
-    return next();
-  }
-
   return res.status(401).json({ error: "Authentication required" });
 }

@@ -1,8 +1,23 @@
 import { Schema, model, Document } from "mongoose";
 
+export interface ILeetCodeProfile {
+  username: string;
+  totalSolved: number;
+  easySolved: number;
+  mediumSolved: number;
+  hardSolved: number;
+  ranking: number;
+  userAvatar?: string;
+  syncedAt?: Date;
+}
+
 export interface IUser extends Document {
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
+  authProvider?: "email" | "google" | "github";
+  providerId?: string;
+  avatarUrl?: string;
+  leetcodeProfile?: ILeetCodeProfile;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,7 +34,30 @@ const userSchema = new Schema<IUser>(
     },
     passwordHash: {
       type: String,
-      required: true,
+      required: false,
+    },
+    authProvider: {
+      type: String,
+      enum: ["email", "google", "github"],
+      default: "email",
+    },
+    providerId: {
+      type: String,
+      default: null,
+    },
+    avatarUrl: {
+      type: String,
+      default: "",
+    },
+    leetcodeProfile: {
+      username: { type: String },
+      totalSolved: { type: Number, default: 0 },
+      easySolved: { type: Number, default: 0 },
+      mediumSolved: { type: Number, default: 0 },
+      hardSolved: { type: Number, default: 0 },
+      ranking: { type: Number, default: 0 },
+      userAvatar: { type: String },
+      syncedAt: { type: Date },
     },
   },
   {

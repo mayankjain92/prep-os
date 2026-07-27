@@ -2,7 +2,7 @@ import { Schema, model, Document } from "mongoose";
 
 export interface ITheoryTopic extends Document {
   userId: string;
-  subject: "OS" | "DBMS" | "CN" | "Aptitude";
+  subject: "OS" | "DBMS" | "CN" | "OOP" | "Aptitude";
   topicName: string;
   status: "not-started" | "in-progress" | "completed";
   notes: string;
@@ -19,7 +19,7 @@ const theoryTopicSchema = new Schema<ITheoryTopic>(
     },
     subject: {
       type: String,
-      enum: ["OS", "DBMS", "CN", "Aptitude"],
+      enum: ["OS", "DBMS", "CN", "OOP", "Aptitude"],
       required: true,
     },
     topicName: {

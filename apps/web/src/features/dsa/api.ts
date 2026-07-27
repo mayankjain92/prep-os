@@ -68,3 +68,8 @@ export async function syncLeetCode(username?: string): Promise<SyncLeetCodeResul
     body: JSON.stringify({ username }),
   });
 }
+
+export async function fetchLeetCodeProfile(): Promise<LeetCodeProfileStats | null> {
+  const res = await apiFetch<{ profile: LeetCodeProfileStats | null }>("/api/problems/leetcode-profile");
+  return res.profile;
+}

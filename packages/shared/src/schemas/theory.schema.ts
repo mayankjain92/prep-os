@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const THEORY_SUBJECTS = ["OS", "DBMS", "CN", "Aptitude"] as const;
+export const THEORY_SUBJECTS = ["OS", "DBMS", "CN", "OOP", "Aptitude"] as const;
 export const THEORY_STATUSES = ["not-started", "in-progress", "completed"] as const;
 
 export const createTheoryTopicSchema = z.object({

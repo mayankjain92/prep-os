@@ -6,8 +6,12 @@ import {
   createTheoryTopic,
   updateTheoryTopic,
   deleteTheoryTopic,
+  type TheoryTopic,
 } from "./api";
-import type { CreateTheoryTopicInput, UpdateTheoryTopicInput } from "@prep-os/shared";
+import type {
+  CreateTheoryTopicInput,
+  UpdateTheoryTopicInput,
+} from "@prep-os/shared";
 
 export function useTheoryTopics(subject?: string) {
   return useQuery({
@@ -29,6 +33,50 @@ function invalidateTheory(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: ["theoryStats"] });
 }
 
+function upsertTheoryTopicInCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  topic: TheoryTopic,
+) {
+  const cachedQueries = queryClient.getQueriesData<TheoryTopic[]>({
+    queryKey: ["theoryTopics"],
+    exact: false,
+  });
+
+  cachedQueries.forEach(([queryKey, old = []]) => {
+    const querySubject =
+      typeof queryKey[1] === "string" ? queryKey[1] : undefined;
+
+    queryClient.setQueryData<TheoryTopic[]>(queryKey, () => {
+      const nextList = old.filter((item) => item._id !== topic._id);
+
+      if (!querySubject || querySubject === topic.subject) {
+        return [...nextList, topic].sort((a, b) =>
+          a.createdAt.localeCompare(b.createdAt),
+        );
+      }
+
+      return nextList;
+    });
+  });
+}
+
+function removeTheoryTopicFromCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  topicId: string,
+) {
+  const cachedQueries = queryClient.getQueriesData<TheoryTopic[]>({
+    queryKey: ["theoryTopics"],
+    exact: false,
+  });
+
+  cachedQueries.forEach(([queryKey, old = []]) => {
+    queryClient.setQueryData<TheoryTopic[]>(
+      queryKey,
+      old.filter((item) => item._id !== topicId),
+    );
+  });
+}
+
 export function useSeedRoadmap() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -41,7 +89,10 @@ export function useCreateTheoryTopic() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateTheoryTopicInput) => createTheoryTopic(data),
-    onSuccess: () => invalidateTheory(queryClient),
+    onSuccess: (topic) => {
+      upsertTheoryTopicInCache(queryClient, topic);
+      invalidateTheory(queryClient);
+    },
   });
 }
 
@@ -50,7 +101,10 @@ export function useUpdateTheoryTopic() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTheoryTopicInput }) =>
       updateTheoryTopic(id, data),
-    onSuccess: () => invalidateTheory(queryClient),
+    onSuccess: (topic) => {
+      upsertTheoryTopicInCache(queryClient, topic);
+      invalidateTheory(queryClient);
+    },
   });
 }
 
@@ -58,6 +112,9 @@ export function useDeleteTheoryTopic() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteTheoryTopic(id),
-    onSuccess: () => invalidateTheory(queryClient),
+    onSuccess: (_data, topicId) => {
+      removeTheoryTopicFromCache(queryClient, topicId);
+      invalidateTheory(queryClient);
+    },
   });
 }

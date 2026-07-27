@@ -6,7 +6,9 @@ import {
   updateProblem,
   deleteProblem,
   syncLeetCode,
+  fetchLeetCodeProfile,
   Problem,
+  LeetCodeProfileStats,
   SyncLeetCodeResult,
 } from "./api";
 import type { CreateProblemInput, UpdateProblemInput } from "@prep-os/shared";
@@ -23,6 +25,13 @@ export function useProblem(id: string) {
     queryKey: ["problems", id],
     queryFn: () => fetchProblem(id),
     enabled: Boolean(id),
+  });
+}
+
+export function useLeetCodeProfile() {
+  return useQuery<LeetCodeProfileStats | null, Error>({
+    queryKey: ["leetcodeProfile"],
+    queryFn: fetchLeetCodeProfile,
   });
 }
 
@@ -67,6 +76,7 @@ export function useSyncLeetCode() {
     mutationFn: syncLeetCode,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["problems"] });
+      queryClient.invalidateQueries({ queryKey: ["leetcodeProfile"] });
     },
   });
 }

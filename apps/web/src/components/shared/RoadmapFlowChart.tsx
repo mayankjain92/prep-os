@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckCircle2, Circle, Clock, Sparkles, Filter, Info, ChevronRight, RotateCcw } from "lucide-react";
+import { CheckCircle2, Circle, Clock, Sparkles, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useRoadmapProgress, useUpdateRoadmapProgress } from "@/features/roadmap/useRoadmap";
+import {
+  useRoadmapProgress,
+  useUpdateRoadmapProgress,
+} from "@/features/roadmap/useRoadmap";
 import type { NodeStatus } from "@/features/roadmap/api";
 
 export interface RoadmapNodeItem {
@@ -33,17 +36,29 @@ interface RoadmapFlowChartProps {
   storageKey: string;
 }
 
-export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowChartProps) {
-  const { data: nodeStatus = {}, isLoading, error } = useRoadmapProgress(storageKey);
+export function RoadmapFlowChart({
+  title,
+  sections,
+  storageKey,
+}: RoadmapFlowChartProps) {
+  const {
+    data: nodeStatus = {},
+    isLoading,
+    error,
+  } = useRoadmapProgress(storageKey);
   const updateMutation = useUpdateRoadmapProgress();
-  
-  const [filter, setFilter] = useState<"all" | "done" | "in-progress" | "pending">("all");
-  const [selectedNode, setSelectedNode] = useState<RoadmapNodeItem | null>(null);
+
+  const [filter, setFilter] = useState<
+    "all" | "done" | "in-progress" | "pending"
+  >("all");
+  const [selectedNode, setSelectedNode] = useState<RoadmapNodeItem | null>(
+    null,
+  );
 
   const saveStatuses = (newMap: Record<string, NodeStatus>) => {
     updateMutation.mutate({
       key: storageKey,
-      data: { nodeStatuses: newMap }
+      data: { nodeStatuses: newMap },
     });
   };
 
@@ -62,8 +77,22 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
     saveStatuses({ ...nodeStatus, [id]: status });
   };
 
+  const matchesActiveFilter = (status: NodeStatus) =>
+    filter === "all" || status === filter;
+
+  const hasMatchingDescendant = (node: RoadmapNodeItem): boolean => {
+    if (!node.subNodes || node.subNodes.length === 0) {
+      return false;
+    }
+
+    return node.subNodes.some((child) => {
+      const childStatus = nodeStatus[child.id] || "pending";
+      return matchesActiveFilter(childStatus) || hasMatchingDescendant(child);
+    });
+  };
+
   // Calculate metrics
-  let allNodesList: RoadmapNodeItem[] = [];
+  const allNodesList: RoadmapNodeItem[] = [];
   const gatherNodes = (nodes?: RoadmapNodeItem[]) => {
     if (!nodes) return;
     nodes.forEach((n) => {
@@ -77,37 +106,50 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
   });
 
   const totalNodesCount = allNodesList.length;
-  const doneCount = allNodesList.filter((n) => nodeStatus[n.id] === "done").length;
-  const inProgressCount = allNodesList.filter((n) => nodeStatus[n.id] === "in-progress").length;
+  const doneCount = allNodesList.filter(
+    (n) => nodeStatus[n.id] === "done",
+  ).length;
+  const inProgressCount = allNodesList.filter(
+    (n) => nodeStatus[n.id] === "in-progress",
+  ).length;
   const pendingCount = totalNodesCount - doneCount - inProgressCount;
-  const progressPercentage = totalNodesCount > 0 ? Math.round((doneCount / totalNodesCount) * 100) : 0;
+  const progressPercentage =
+    totalNodesCount > 0 ? Math.round((doneCount / totalNodesCount) * 100) : 0;
 
-  const renderNodeTree = (node: RoadmapNodeItem, isSubNode = false): React.ReactNode => {
+  const renderNodeTree = (
+    node: RoadmapNodeItem,
+    isSubNode = false,
+  ): React.ReactNode => {
     const st = nodeStatus[node.id] || "pending";
-    
-    // Only apply filter hiding to top-level nodes to avoid breaking tree structure, 
-    // or apply to all but if parent is hidden, children are hidden.
-    if (filter === "done" && st !== "done" && !isSubNode) return null;
-    if (filter === "in-progress" && st !== "in-progress" && !isSubNode) return null;
-    if (filter === "pending" && st !== "pending" && !isSubNode) return null;
+    const shouldShowNode =
+      matchesActiveFilter(st) || hasMatchingDescendant(node);
+
+    if (!shouldShowNode) {
+      return null;
+    }
 
     const isDone = st === "done";
     const isInProg = st === "in-progress";
 
     return (
-      <div key={node.id} className={`flex flex-col ${isSubNode ? "mt-3 relative before:absolute before:-left-4 before:top-6 before:h-px before:w-4 before:bg-border" : "space-y-3"}`}>
+      <div
+        key={node.id}
+        className={`flex flex-col ${isSubNode ? "mt-3 relative before:absolute before:-left-4 before:top-6 before:h-px before:w-4 before:bg-border" : "space-y-3"}`}
+      >
         <div
           onClick={() => setSelectedNode(node)}
-          className={`group relative flex items-center justify-between rounded-2xl border ${isSubNode ? 'p-3 ml-4' : 'p-4'} cursor-pointer transition shadow-sm ${
+          className={`group relative flex items-center justify-between rounded-2xl border ${isSubNode ? "p-3 ml-4" : "p-4"} cursor-pointer transition shadow-sm ${
             isDone
               ? "border-emerald-500/40 bg-emerald-500/10 hover:border-emerald-500/60"
               : isInProg
-              ? "border-xblue/40 bg-xblue/10 hover:border-xblue/60"
-              : "border-border bg-background hover:border-xblue/40"
+                ? "border-xblue/40 bg-xblue/10 hover:border-xblue/60"
+                : "border-border bg-background hover:border-xblue/40"
           }`}
         >
           <div className="space-y-1 pr-3">
-            <span className={`${isSubNode ? 'text-xs' : 'text-sm'} font-black block ${isDone ? "text-muted-foreground line-through" : "text-foreground"}`}>
+            <span
+              className={`${isSubNode ? "text-xs" : "text-sm"} font-black block ${isDone ? "text-muted-foreground line-through" : "text-foreground"}`}
+            >
               {node.title}
             </span>
             {node.description && (
@@ -121,18 +163,27 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
           <button
             onClick={(e) => cycleNodeStatus(node.id, e)}
             title="Click to cycle status"
-            className="flex-shrink-0"
+            className="shrink-0"
           >
             {isDone ? (
-              <Badge variant="outline" className="border-emerald-500/40 text-emerald-500 bg-emerald-500/10 font-bold gap-1 text-[10px] rounded-full px-2 py-1">
+              <Badge
+                variant="outline"
+                className="border-emerald-500/40 text-emerald-500 bg-emerald-500/10 font-bold gap-1 text-[10px] rounded-full px-2 py-1"
+              >
                 <CheckCircle2 className="h-3.5 w-3.5" /> Done
               </Badge>
             ) : isInProg ? (
-              <Badge variant="outline" className="border-xblue/40 text-xblue bg-xblue/10 font-bold gap-1 text-[10px] rounded-full px-2 py-1">
+              <Badge
+                variant="outline"
+                className="border-xblue/40 text-xblue bg-xblue/10 font-bold gap-1 text-[10px] rounded-full px-2 py-1"
+              >
                 <Clock className="h-3.5 w-3.5" /> Learning
               </Badge>
             ) : (
-              <Badge variant="outline" className="border-border text-muted-foreground bg-background hover:bg-card font-bold gap-1 text-[10px] rounded-full px-2 py-1">
+              <Badge
+                variant="outline"
+                className="border-border text-muted-foreground bg-background hover:bg-card font-bold gap-1 text-[10px] rounded-full px-2 py-1"
+              >
                 <Circle className="h-3.5 w-3.5" /> Pending
               </Badge>
             )}
@@ -141,7 +192,7 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
 
         {node.subNodes && node.subNodes.length > 0 && (
           <div className="relative border-l-2 border-border ml-8">
-            {node.subNodes.map(sn => renderNodeTree(sn, true))}
+            {node.subNodes.map((sn) => renderNodeTree(sn, true))}
           </div>
         )}
       </div>
@@ -149,11 +200,19 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
   };
 
   if (isLoading) {
-    return <div className="text-center py-12 text-sm font-semibold text-muted-foreground animate-pulse">Loading Roadmap Data...</div>;
+    return (
+      <div className="text-center py-12 text-sm font-semibold text-muted-foreground animate-pulse">
+        Loading Roadmap Data...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center py-12 text-sm font-semibold text-destructive">Error loading roadmap: {error.message}</div>;
+    return (
+      <div className="text-center py-12 text-sm font-semibold text-destructive">
+        Error loading roadmap: {error.message}
+      </div>
+    );
   }
 
   return (
@@ -166,7 +225,8 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
             <h2 className="text-xl font-black text-foreground">{title}</h2>
           </div>
           <p className="text-xs text-muted-foreground">
-            Click any node box to toggle status (⚪ Pending ➔ 🔵 Learning ➔ 🟢 Done).
+            Click any node box to toggle status (⚪ Pending ➔ 🔵 Learning ➔ 🟢
+            Done).
           </p>
 
           <div className="flex items-center gap-2 pt-1">
@@ -176,7 +236,9 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
-            <span className="text-xs font-bold text-xblue">{progressPercentage}% Complete</span>
+            <span className="text-xs font-bold text-xblue">
+              {progressPercentage}% Complete
+            </span>
           </div>
         </div>
 
@@ -185,7 +247,9 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
           <button
             onClick={() => setFilter("all")}
             className={`px-4 py-1.5 rounded-full text-xs font-bold transition ${
-              filter === "all" ? "bg-xblue text-white shadow-sm" : "text-muted-foreground hover:text-foreground"
+              filter === "all"
+                ? "bg-xblue text-white shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             All ({totalNodesCount})
@@ -194,7 +258,9 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
           <button
             onClick={() => setFilter("done")}
             className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition ${
-              filter === "done" ? "bg-emerald-500 text-white shadow-sm" : "text-emerald-500 hover:bg-emerald-500/10"
+              filter === "done"
+                ? "bg-emerald-500 text-white shadow-sm"
+                : "text-emerald-500 hover:bg-emerald-500/10"
             }`}
           >
             <CheckCircle2 className="h-3.5 w-3.5" /> Done ({doneCount})
@@ -203,7 +269,9 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
           <button
             onClick={() => setFilter("in-progress")}
             className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition ${
-              filter === "in-progress" ? "bg-xblue text-white shadow-sm" : "text-xblue hover:bg-xblue/10"
+              filter === "in-progress"
+                ? "bg-xblue text-white shadow-sm"
+                : "text-xblue hover:bg-xblue/10"
             }`}
           >
             <Clock className="h-3.5 w-3.5" /> Learning ({inProgressCount})
@@ -212,7 +280,9 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
           <button
             onClick={() => setFilter("pending")}
             className={`px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition ${
-              filter === "pending" ? "bg-foreground text-background shadow-sm" : "text-muted-foreground hover:bg-card"
+              filter === "pending"
+                ? "bg-foreground text-background shadow-sm"
+                : "text-muted-foreground hover:bg-card"
             }`}
           >
             <Circle className="h-3.5 w-3.5" /> Pending ({pendingCount})
@@ -231,9 +301,13 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
               {/* Central Section Main Milestone Box */}
               <div className="flex justify-center">
                 <div className="w-full max-w-md rounded-2xl border border-border bg-card p-5 text-center shadow-sm transform transition hover:border-xblue/50">
-                  <h3 className="text-lg font-black tracking-wide text-foreground">{sec.mainTitle}</h3>
+                  <h3 className="text-lg font-black tracking-wide text-foreground">
+                    {sec.mainTitle}
+                  </h3>
                   {sec.description && (
-                    <p className="text-xs text-muted-foreground font-semibold mt-1 opacity-90">{sec.description}</p>
+                    <p className="text-xs text-muted-foreground font-semibold mt-1 opacity-90">
+                      {sec.description}
+                    </p>
                   )}
                 </div>
               </div>
@@ -284,25 +358,42 @@ export function RoadmapFlowChart({ title, sections, storageKey }: RoadmapFlowCha
             )}
 
             <div className="space-y-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Set Progress Status</span>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                Set Progress Status
+              </span>
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   onClick={() => setExplicitStatus(selectedNode.id, "pending")}
-                  variant={nodeStatus[selectedNode.id] === "pending" || !nodeStatus[selectedNode.id] ? "default" : "outline"}
+                  variant={
+                    nodeStatus[selectedNode.id] === "pending" ||
+                    !nodeStatus[selectedNode.id]
+                      ? "default"
+                      : "outline"
+                  }
                   className={`w-full text-xs font-bold rounded-full ${nodeStatus[selectedNode.id] === "pending" || !nodeStatus[selectedNode.id] ? "bg-foreground text-background" : "border-border text-muted-foreground"}`}
                 >
                   Pending
                 </Button>
                 <Button
-                  onClick={() => setExplicitStatus(selectedNode.id, "in-progress")}
-                  variant={nodeStatus[selectedNode.id] === "in-progress" ? "default" : "outline"}
+                  onClick={() =>
+                    setExplicitStatus(selectedNode.id, "in-progress")
+                  }
+                  variant={
+                    nodeStatus[selectedNode.id] === "in-progress"
+                      ? "default"
+                      : "outline"
+                  }
                   className={`w-full text-xs font-bold rounded-full ${nodeStatus[selectedNode.id] === "in-progress" ? "bg-xblue text-white" : "border-border text-muted-foreground"}`}
                 >
                   Learning
                 </Button>
                 <Button
                   onClick={() => setExplicitStatus(selectedNode.id, "done")}
-                  variant={nodeStatus[selectedNode.id] === "done" ? "default" : "outline"}
+                  variant={
+                    nodeStatus[selectedNode.id] === "done"
+                      ? "default"
+                      : "outline"
+                  }
                   className={`w-full text-xs font-bold rounded-full ${nodeStatus[selectedNode.id] === "done" ? "bg-emerald-500 text-white" : "border-border text-muted-foreground"}`}
                 >
                   Done

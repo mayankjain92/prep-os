@@ -10,7 +10,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { FolderKanban, ExternalLink, Plus, Trash2, Code } from "lucide-react";
+import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
+import { PageTransition, FadeInCard } from "@/components/shared/PageTransition";
+import { GitHubSyncModal, GitHubRepo } from "@/features/projects/components/GitHubSyncModal";
+import { FolderKanban, ExternalLink, Plus, Trash2, Code, Sparkles, CheckCircle2 } from "lucide-react";
+
+function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+    </svg>
+  );
+}
 
 export default function ProjectsDashboardPage() {
   const { data: projects = [], isPending } = useProjects();
@@ -23,6 +34,8 @@ export default function ProjectsDashboardPage() {
   const [repoUrl, setRepoUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [githubModalOpen, setGithubModalOpen] = useState(false);
+  const [importNotification, setImportNotification] = useState("");
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,8 +61,36 @@ export default function ProjectsDashboardPage() {
     setDialogOpen(false);
   };
 
+  const handleGitHubImport = (items: { repo: GitHubRepo; status: "in-progress" | "completed" }[]) => {
+    let count = 0;
+    items.forEach(({ repo, status }) => {
+      // Build tech stack list from primary language and GitHub topics
+      const stackSet = new Set<string>();
+      if (repo.language) stackSet.add(repo.language);
+      if (repo.topics) {
+        repo.topics.forEach((t) => stackSet.add(t.charAt(0).toUpperCase() + t.slice(1)));
+      }
+
+      createMutation.mutate({
+        name: repo.name,
+        techStack: Array.from(stackSet),
+        status,
+        repoUrl: repo.html_url,
+        notes: repo.description || `Synced public GitHub repository: ${repo.full_name}`,
+      });
+      count++;
+    });
+
+    setImportNotification(`Successfully imported ${count} GitHub repository project(s)!`);
+    setTimeout(() => setImportNotification(""), 4000);
+  };
+
+  const existingRepoUrls = projects.map((p) => p.repoUrl).filter(Boolean);
+  const inProgressCount = projects.filter((p) => p.status === "in-progress").length;
+  const completedCount = projects.filter((p) => p.status === "completed").length;
+
   return (
-    <div className="min-h-screen bg-background p-6 sm:p-10 text-foreground transition-colors duration-200">
+    <PageTransition className="min-h-screen bg-background p-6 sm:p-10 text-foreground transition-colors duration-200">
       <div className="mx-auto max-w-6xl space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -62,14 +103,55 @@ export default function ProjectsDashboardPage() {
             </p>
           </div>
 
-          <Button onClick={() => setDialogOpen(!dialogOpen)} className="rounded-full bg-xblue hover:bg-xhover text-white font-bold text-xs px-5">
-            <Plus className="h-4 w-4 mr-2" /> Log Project
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setGithubModalOpen(true)}
+              variant="outline"
+              className="rounded-full border-border bg-card hover:bg-background text-foreground font-bold text-xs px-4 h-9"
+            >
+              <GitHubIcon className="h-4 w-4 mr-2 text-foreground" /> Sync GitHub Repos
+            </Button>
+            <Button
+              onClick={() => setDialogOpen(!dialogOpen)}
+              className="rounded-full bg-xblue hover:bg-xhover text-white font-bold text-xs px-5 h-9"
+            >
+              <Plus className="h-4 w-4 mr-2" /> Log Project
+            </Button>
+          </div>
         </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-3 gap-4">
+          <FadeInCard delay={0.05} className="rounded-2xl border border-border bg-card p-4 text-center">
+            <span className="text-2xl font-black text-foreground">
+              <AnimatedNumber value={projects.length} />
+            </span>
+            <p className="text-xs text-muted-foreground font-semibold mt-0.5">Total Projects</p>
+          </FadeInCard>
+          <FadeInCard delay={0.1} className="rounded-2xl border border-border bg-card p-4 text-center">
+            <span className="text-2xl font-black text-amber-500">
+              <AnimatedNumber value={inProgressCount} />
+            </span>
+            <p className="text-xs text-muted-foreground font-semibold mt-0.5">In Progress</p>
+          </FadeInCard>
+          <FadeInCard delay={0.15} className="rounded-2xl border border-border bg-card p-4 text-center">
+            <span className="text-2xl font-black text-emerald-500">
+              <AnimatedNumber value={completedCount} />
+            </span>
+            <p className="text-xs text-muted-foreground font-semibold mt-0.5">Completed</p>
+          </FadeInCard>
+        </div>
+
+        {importNotification && (
+          <div className="flex items-center gap-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-xs text-emerald-500 font-medium">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+            <span>{importNotification}</span>
+          </div>
+        )}
 
         {/* Create Dialog Form */}
         {dialogOpen && (
-          <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-md">
+          <FadeInCard className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-md">
             <h3 className="text-lg font-black text-foreground">Add New Project</h3>
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -123,23 +205,34 @@ export default function ProjectsDashboardPage() {
                 </Button>
               </div>
             </form>
-          </div>
+          </FadeInCard>
         )}
 
         {/* Project Grid */}
         {isPending ? (
           <div className="py-12 text-center text-sm text-muted-foreground">Loading projects...</div>
         ) : projects.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card py-16 text-center">
-            <p className="text-muted-foreground text-sm font-semibold">No projects logged yet.</p>
-            <p className="text-xs text-muted-foreground mt-1">Click "Log Project" above to track your first software build!</p>
+          <div className="rounded-2xl border border-border bg-card py-16 text-center space-y-3">
+            <FolderKanban className="h-10 w-10 text-xblue mx-auto opacity-70" />
+            <div>
+              <p className="text-muted-foreground text-sm font-semibold">No projects logged yet.</p>
+              <p className="text-xs text-muted-foreground mt-1">Click "Sync GitHub Repos" to select public repos or "Log Project" to manually add one!</p>
+            </div>
+            <Button
+              onClick={() => setGithubModalOpen(true)}
+              size="sm"
+              className="rounded-full bg-xblue text-white font-bold text-xs px-5"
+            >
+              <GitHubIcon className="h-4 w-4 mr-2" /> Select From GitHub Repos
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {projects.map((proj) => (
-              <div
+            {projects.map((proj, i) => (
+              <FadeInCard
                 key={proj._id}
-                className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-sm transition hover:border-xblue/50"
+                delay={0.05 * i}
+                className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-sm"
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -197,11 +290,19 @@ export default function ProjectsDashboardPage() {
                     <Trash2 className="h-4 w-4 mr-1" /> Delete
                   </Button>
                 </div>
-              </div>
+              </FadeInCard>
             ))}
           </div>
         )}
+
+        {/* GitHub Sync Modal */}
+        <GitHubSyncModal
+          isOpen={githubModalOpen}
+          onClose={() => setGithubModalOpen(false)}
+          onImport={handleGitHubImport}
+          existingRepoUrls={existingRepoUrls}
+        />
       </div>
-    </div>
+    </PageTransition>
   );
 }

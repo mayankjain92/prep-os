@@ -13,8 +13,6 @@ export async function apiFetch<T>(
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
-  } else {
-    headers["x-user-id"] = "000000000000000000000001";
   }
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {

@@ -204,6 +204,14 @@ export const STANDARD_THEORY_ROADMAPS: Record<string, string[]> = {
     "WebSockets vs HTTP Polling/Long-Polling",
     "Network Security (Symmetric/Asymmetric Cryptography, SSL/TLS, Firewalls)",
   ],
+  OOP: [
+    "The 4 Pillars (Encapsulation, Abstraction, Inheritance, Polymorphism)",
+    "Classes, Objects, Interfaces & Abstract Classes",
+    "SOLID Principles (Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion)",
+    "Design Patterns: Creational (Singleton, Factory, Builder)",
+    "Design Patterns: Structural (Adapter, Decorator, Facade, Proxy)",
+    "Design Patterns: Behavioral (Observer, Strategy, Command, Iterator)",
+  ],
   Aptitude: [
     "Quantitative: Number Systems, HCF/LCM, Percentages, Profit & Loss",
     "Quantitative: Time, Speed & Distance, Boats & Streams",

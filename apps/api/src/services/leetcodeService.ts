@@ -63,7 +63,9 @@ async function fetchFromExternalLeetCode(username: string): Promise<LeetCodeUser
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://leetcode.com",
+        "Origin": "https://leetcode.com",
       },
       body: JSON.stringify({
         query,
@@ -107,31 +109,38 @@ async function fetchFromExternalLeetCode(username: string): Promise<LeetCodeUser
     console.warn("[leetcodeService] Direct LeetCode GraphQL fetch failed:", err.message);
   }
 
-  // If GraphQL stats missing, fallback to Alfa LeetCode API
+  // Fallback to Alfa LeetCode API if totalSolved is still 0
   if (profileStats.totalSolved === 0) {
     try {
-      const res = await fetch(`https://alfa-leetcode-api.onrender.com/${username}/solved`);
+      const res = await fetch(`https://alfa-leetcode-api.onrender.com/userProfile/${username}`);
       if (res.ok) {
         const data = await res.json();
-        if (data && typeof data.solvedProblem === "number") {
-          profileStats.totalSolved = data.solvedProblem;
+        if (data && typeof data.totalSolved === "number") {
+          profileStats.totalSolved = data.totalSolved;
           profileStats.easySolved = data.easySolved || 0;
           profileStats.mediumSolved = data.mediumSolved || 0;
           profileStats.hardSolved = data.hardSolved || 0;
+          profileStats.ranking = data.ranking || 0;
+        }
+        if (solvedProblems.length === 0 && Array.isArray(data?.recentSubmissions)) {
+          const seen = new Set<string>();
+          for (const sub of data.recentSubmissions) {
+            if (sub.statusDisplay === "Accepted" && sub.titleSlug && !seen.has(sub.titleSlug)) {
+              seen.add(sub.titleSlug);
+              solvedProblems.push({
+                title: sub.title || sub.titleSlug,
+                titleSlug: sub.titleSlug,
+                difficulty: "Medium",
+                status: "solved",
+                url: `https://leetcode.com/problems/${sub.titleSlug}/`,
+              });
+            }
+          }
         }
       }
     } catch (err: any) {
       console.warn("[leetcodeService] Alfa solved stats fallback failed:", err.message);
     }
-  }
-
-  if (solvedProblems.length === 0) {
-    solvedProblems = [
-      { title: "Two Sum", titleSlug: "two-sum", difficulty: "Easy", status: "solved", url: "https://leetcode.com/problems/two-sum/" },
-      { title: "Best Time to Buy and Sell Stock", titleSlug: "best-time-to-buy-and-sell-stock", difficulty: "Easy", status: "solved", url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/" },
-      { title: "Contains Duplicate", titleSlug: "contains-duplicate", difficulty: "Easy", status: "solved", url: "https://leetcode.com/problems/contains-duplicate/" },
-      { title: "Valid Anagram", titleSlug: "valid-anagram", difficulty: "Easy", status: "solved", url: "https://leetcode.com/problems/valid-anagram/" },
-    ];
   }
 
   return { profile: profileStats, solvedProblems };

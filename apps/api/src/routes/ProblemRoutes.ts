@@ -6,9 +6,12 @@ import {
   updateProblem,
   deleteProblem,
   syncLeetCodeProblems,
+  getLeetCodeProfile,
 } from "../controllers/problemControllers.js";
 
 const router = Router();
+
+router.get("/leetcode-profile", getLeetCodeProfile);
 
 router.route("/")
   .get(listProblems)

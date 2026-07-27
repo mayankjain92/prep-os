@@ -1,12 +1,22 @@
 import { Request, Response } from "express";
 import { Types } from "mongoose";
 import { Problem } from "../models/Problem.js";
+import { User } from "../models/User.js";
 import { getLeetCodeUserData, invalidateLeetCodeCache } from "../services/leetcodeService.js";
 import { STANDARD_DSA_ROADMAP } from "@prep-os/shared";
 
 function getParamId(req: Request): string {
   const { id } = req.params;
   return Array.isArray(id) ? id[0] : id;
+}
+
+export async function getLeetCodeProfile(req: Request, res: Response) {
+  const userId = req.userId;
+  const user = await User.findById(userId);
+  if (!user || !user.leetcodeProfile) {
+    return res.json({ profile: null });
+  }
+  res.json({ profile: user.leetcodeProfile });
 }
 
 export async function createProblem(req: Request, res: Response) {
@@ -103,7 +113,11 @@ export async function deleteProblem(req: Request, res: Response) {
 
 export async function syncLeetCodeProblems(req: Request, res: Response) {
   const userId = req.userId;
-  const username = (req.body.username as string) || "mayankjain92";
+  const username = req.body.username as string;
+
+  if (!username) {
+    return res.status(400).json({ error: "LeetCode username is required" });
+  }
 
   await invalidateLeetCodeCache(userId, username);
   const dataResult = await getLeetCodeUserData(userId, username);
@@ -137,6 +151,14 @@ export async function syncLeetCodeProblems(req: Request, res: Response) {
       updatedCount++;
     }
   }
+
+  // Persist synced profile into User document
+  await User.findByIdAndUpdate(userId, {
+    leetcodeProfile: {
+      ...dataResult.profile,
+      syncedAt: new Date(),
+    },
+  });
 
   res.json({
     message: `Successfully synced LeetCode profile for @${username}`,

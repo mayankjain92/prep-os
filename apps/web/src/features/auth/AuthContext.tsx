@@ -8,6 +8,14 @@ import type { LoginInput, RegisterInput } from "@prep-os/shared";
 interface User {
   id: string;
   email: string;
+  avatarUrl?: string;
+}
+
+interface OAuthInput {
+  email: string;
+  provider: "google" | "github";
+  providerId?: string;
+  avatarUrl?: string;
 }
 
 interface AuthContextType {
@@ -16,6 +24,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (credentials: LoginInput) => Promise<void>;
   register: (credentials: RegisterInput) => Promise<void>;
+  oauthLogin: (providerData: OAuthInput) => Promise<void>;
   logout: () => void;
 }
 
@@ -68,6 +77,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/dashboard");
   };
 
+  const oauthLogin = async (providerData: OAuthInput) => {
+    const data = await apiFetch<{ token: string; user: User }>("/api/auth/oauth", {
+      method: "POST",
+      body: JSON.stringify(providerData),
+    });
+
+    setToken(data.token);
+    setUser(data.user);
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    router.push("/dashboard");
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -77,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, oauthLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );

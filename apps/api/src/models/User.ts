@@ -12,18 +12,35 @@ export interface ILeetCodeProfile {
 }
 
 export interface IUser extends Document {
+  username?: string;
   email: string;
   passwordHash?: string;
   authProvider?: "email" | "google" | "github";
   providerId?: string;
   avatarUrl?: string;
   leetcodeProfile?: ILeetCodeProfile;
+  neetcodeProgress?: {
+    solved: string[];
+    starred: string[];
+  };
+  loginDates?: string[];
+  currentStreak?: number;
+  longestStreak?: number;
+  lastLoginDate?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>(
   {
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
     email: {
       type: String,
       required: true,
@@ -58,6 +75,26 @@ const userSchema = new Schema<IUser>(
       ranking: { type: Number, default: 0 },
       userAvatar: { type: String },
       syncedAt: { type: Date },
+    },
+    neetcodeProgress: {
+      solved: { type: [String], default: [] },
+      starred: { type: [String], default: [] },
+    },
+    loginDates: {
+      type: [String],
+      default: [],
+    },
+    currentStreak: {
+      type: Number,
+      default: 0,
+    },
+    longestStreak: {
+      type: Number,
+      default: 0,
+    },
+    lastLoginDate: {
+      type: String,
+      default: "",
     },
   },
   {

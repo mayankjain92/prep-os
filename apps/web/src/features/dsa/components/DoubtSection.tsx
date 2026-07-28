@@ -283,7 +283,7 @@ export function DoubtSection() {
           <HelpCircle className="h-10 w-10 text-muted-foreground mx-auto" />
           <h3 className="text-sm font-black text-foreground">No doubts found in queue</h3>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            Click "Add Doubt" to add topics or LeetCode questions you want to solve in the future.
+            Click &quot;Add Doubt&quot; to add topics or LeetCode questions you want to solve in the future.
           </p>
         </div>
       ) : (

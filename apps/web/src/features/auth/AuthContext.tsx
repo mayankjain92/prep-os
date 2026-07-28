@@ -5,10 +5,40 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api-client";
 import type { LoginInput, RegisterInput } from "@prep-os/shared";
 
-interface User {
+export interface UserStats {
+  dsaSolved: number;
+  theoryCompleted: number;
+  projectsTotal: number;
+  projectsCompleted: number;
+}
+
+export interface LeetCodeProfile {
+  username?: string;
+  totalSolved?: number;
+  easySolved?: number;
+  mediumSolved?: number;
+  hardSolved?: number;
+  ranking?: number;
+  userAvatar?: string;
+}
+
+export interface User {
   id: string;
+  username?: string;
   email: string;
+  authProvider?: string;
   avatarUrl?: string;
+  leetcodeProfile?: LeetCodeProfile;
+  neetcodeProgress?: {
+    solved: string[];
+    starred: string[];
+  };
+  loginDates?: string[];
+  currentStreak?: number;
+  longestStreak?: number;
+  lastLoginDate?: string;
+  createdAt?: string;
+  stats?: UserStats;
 }
 
 interface OAuthInput {
@@ -25,6 +55,8 @@ interface AuthContextType {
   login: (credentials: LoginInput) => Promise<void>;
   register: (credentials: RegisterInput) => Promise<void>;
   oauthLogin: (providerData: OAuthInput) => Promise<void>;
+  refreshProfile: () => Promise<void>;
+  saveNeetcodeProgress: (solved: string[], starred: string[]) => Promise<void>;
   logout: () => void;
 }
 
@@ -36,19 +68,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
+  const fetchProfile = async () => {
+    try {
+      const data = await apiFetch<{ user: User }>("/api/auth/profile");
+      if (data?.user) {
+        setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+    } catch (err) {
+      console.error("Failed to fetch user profile:", err);
+    }
+  };
+
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
 
-    if (savedToken && savedUser) {
+    if (savedToken) {
+      // eslint-disable-next-line
       setToken(savedToken);
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem("user");
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch {
+          localStorage.removeItem("user");
+        }
       }
+      fetchProfile().finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   const login = async (credentials: LoginInput) => {
@@ -61,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+    fetchProfile();
     router.push("/dashboard");
   };
 
@@ -74,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+    fetchProfile();
     router.push("/dashboard");
   };
 
@@ -87,7 +138,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+    fetchProfile();
     router.push("/dashboard");
+  };
+
+  const refreshProfile = async () => {
+    await fetchProfile();
+  };
+
+  const saveNeetcodeProgress = async (solved: string[], starred: string[]) => {
+    try {
+      const data = await apiFetch<{ message: string; neetcodeProgress: { solved: string[]; starred: string[] } }>(
+        "/api/auth/neetcode-progress",
+        {
+          method: "PUT",
+          body: JSON.stringify({ solved, starred }),
+        }
+      );
+
+      if (data?.neetcodeProgress && user) {
+        const updatedUser = { ...user, neetcodeProgress: data.neetcodeProgress };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+    } catch (err) {
+      console.error("Failed to save NeetCode progress to server:", err);
+    }
   };
 
   const logout = () => {
@@ -99,7 +175,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, oauthLogin, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, isLoading, login, register, oauthLogin, refreshProfile, saveNeetcodeProgress, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

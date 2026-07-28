@@ -1,23 +1,25 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useProblems, useSyncLeetCode, useLeetCodeProfile } from "@/features/dsa/useProblems";
 import { RoadmapFlowChart } from "@/components/shared/RoadmapFlowChart";
 import { DSA_ROADMAP_SECTIONS } from "@/data/dsa-roadmap";
 import { DoubtSection } from "@/features/dsa/components/DoubtSection";
+import { Neetcode150Section } from "@/features/dsa/components/Neetcode150Section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { PageTransition, FadeInCard } from "@/components/shared/PageTransition";
-import { AlertCircle, Sparkles, UserCheck, GitBranch, HelpCircle, Code2, RefreshCw } from "lucide-react";
+import { AlertCircle, UserCheck, GitBranch, HelpCircle, Code2, RefreshCw, Trophy } from "lucide-react";
 
 export default function DsaDashboardPage() {
-  const { data: problems = [], isPending, isError, error, refetch } = useProblems();
+  const { data: problems = [] } = useProblems();
   const { data: dbLeetcodeProfile } = useLeetCodeProfile();
   const syncMutation = useSyncLeetCode();
   const [leetcodeUsername, setLeetcodeUsername] = useState("");
-  const [activeTab, setActiveTab] = useState<"flowchart" | "doubts">("flowchart");
+  const [activeTab, setActiveTab] = useState<"flowchart" | "neetcode" | "doubts">("flowchart");
 
   const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
 
@@ -34,7 +36,6 @@ export default function DsaDashboardPage() {
   const mediumSolved = activeProfile?.mediumSolved ?? solvedFromDb.filter((p) => p.difficulty === "Medium").length;
   const hardSolved = activeProfile?.hardSolved ?? solvedFromDb.filter((p) => p.difficulty === "Hard").length;
 
-
   return (
     <PageTransition className="min-h-screen bg-background p-6 sm:p-10 text-foreground transition-colors duration-200">
       <div className="mx-auto max-w-6xl space-y-8">
@@ -45,7 +46,7 @@ export default function DsaDashboardPage() {
               <Code2 className="h-8 w-8 text-xblue" /> Data Structures & Algorithms Roadmap
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Interactive roadmap.sh style flowchart, doubts queue, and live LeetCode sync.
+              Interactive roadmap.sh style flowchart, NeetCode 150 tracker, doubts queue, and live LeetCode sync.
             </p>
           </div>
         </div>
@@ -53,7 +54,7 @@ export default function DsaDashboardPage() {
         {/* LeetCode Sync Bar */}
         <FadeInCard delay={0.05} className="rounded-2xl border border-border bg-card p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <Sparkles className="h-6 w-6 text-xblue flex-shrink-0" />
+            <img src="/logo.svg" alt="PrepOS Logo" className="h-6 w-6 object-contain flex-shrink-0" />
             <div>
               <h3 className="text-sm font-bold text-foreground">Live LeetCode Profile Integration</h3>
               <p className="text-xs text-muted-foreground">
@@ -89,7 +90,7 @@ export default function DsaDashboardPage() {
         )}
         {syncMutation.isSuccess && syncMutation.data && (
           <div className="flex items-center gap-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-xs text-emerald-500 font-medium">
-            <Sparkles className="h-4 w-4 shrink-0 text-emerald-500" />
+            <img src="/logo.svg" alt="PrepOS Logo" className="h-4 w-4 shrink-0 object-contain" />
             <span>{syncMutation.data.message} ({syncMutation.data.synced} problem records updated)</span>
           </div>
         )}
@@ -163,6 +164,18 @@ export default function DsaDashboardPage() {
           </button>
 
           <button
+            onClick={() => setActiveTab("neetcode")}
+            className={`px-4 py-2 text-xs font-extrabold rounded-full transition-all whitespace-nowrap ${
+              activeTab === "neetcode"
+                ? "bg-xblue text-white shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-card"
+            }`}
+          >
+            <Trophy className="inline-block mr-1.5 h-3.5 w-3.5 text-amber-400" />
+            NeetCode 150 Tracker
+          </button>
+
+          <button
             onClick={() => setActiveTab("doubts")}
             className={`px-4 py-2 text-xs font-extrabold rounded-full transition-all whitespace-nowrap ${
               activeTab === "doubts"
@@ -176,13 +189,19 @@ export default function DsaDashboardPage() {
         </div>
 
         {/* Tab Content */}
-        {activeTab === "flowchart" ? (
+        {activeTab === "flowchart" && (
           <RoadmapFlowChart
             title="Data Structures & Algorithms Flowchart"
             sections={DSA_ROADMAP_SECTIONS}
             storageKey="prep_os_dsa_roadmap_v2"
           />
-        ) : (
+        )}
+
+        {activeTab === "neetcode" && (
+          <Neetcode150Section />
+        )}
+
+        {activeTab === "doubts" && (
           <DoubtSection />
         )}
       </div>

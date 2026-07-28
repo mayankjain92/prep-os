@@ -31,6 +31,7 @@ export function ProblemFormDialog({
 
   useEffect(() => {
     if (problemToEdit) {
+      // eslint-disable-next-line
       setTitle(problemToEdit.title);
       setDifficulty(problemToEdit.difficulty);
       setStatus(problemToEdit.status);
@@ -96,7 +97,7 @@ export function ProblemFormDialog({
             <select
               className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
               value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value as any)}
+              onChange={(e) => setDifficulty(e.target.value as "Easy" | "Medium" | "Hard")}
             >
               <option value="Easy">Easy</option>
               <option value="Medium">Medium</option>
@@ -109,7 +110,7 @@ export function ProblemFormDialog({
             <select
               className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
               value={status}
-              onChange={(e) => setStatus(e.target.value as any)}
+              onChange={(e) => setStatus(e.target.value as "todo" | "attempted" | "solved" | "revisit")}
             >
               <option value="todo">Todo</option>
               <option value="attempted">Attempted</option>

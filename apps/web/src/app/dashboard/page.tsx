@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useProblems, useLeetCodeProfile } from "@/features/dsa/useProblems";
@@ -17,14 +17,10 @@ import {
   Code2,
   BookOpen,
   FolderKanban,
-  ArrowRight,
   Trophy,
-  Layers,
   ExternalLink,
   Clock,
-  CheckCircle2,
   Zap,
-  Target,
   ChevronRight,
   TrendingUp,
   RefreshCw,
@@ -119,88 +115,94 @@ export default function UnifiedDashboardPage() {
   };
 
   // ── DSA ────────────────────────────────────────────────────────────────
-  let totalDsaNodes = 0;
-  let doneDsaNodes = 0;
-  const inProgressDsaNodes: { title: string; section: string }[] = [];
+  const { totalDsaNodes, doneDsaNodes, inProgressDsaNodes, categoryProgress } = useMemo(() => {
+    const inProgressDsaNodes: { title: string; section: string }[] = [];
 
-  const gatherNodeStats = (nodes?: RoadmapNodeItem[], sectionName = "") => {
-    if (!nodes) return { total: 0, completed: 0 };
-    let t = 0, c = 0;
-    const traverse = (list: RoadmapNodeItem[]) => {
-      list.forEach((n) => {
-        t++;
-        const st = dsaFlowchartStatus[n.id];
-        if (st === "done") c++;
-        if (st === "in-progress") inProgressDsaNodes.push({ title: n.title, section: sectionName });
-        if (n.subNodes) traverse(n.subNodes);
-      });
+    const gatherNodeStats = (nodes?: RoadmapNodeItem[], sectionName = "") => {
+      if (!nodes) return { total: 0, completed: 0 };
+      let t = 0, c = 0;
+      const traverse = (list: RoadmapNodeItem[]) => {
+        list.forEach((n) => {
+          t++;
+          const st = dsaFlowchartStatus[n.id];
+          if (st === "done") c++;
+          if (st === "in-progress") inProgressDsaNodes.push({ title: n.title, section: sectionName });
+          if (n.subNodes) traverse(n.subNodes);
+        });
+      };
+      traverse(nodes);
+      return { total: t, completed: c };
     };
-    traverse(nodes);
-    return { total: t, completed: c };
-  };
 
-  const categoryProgress = DSA_ROADMAP_SECTIONS.map((sec) => {
-    const name = sec.mainTitle.replace(/^\d+\.\s*/, "");
-    const l = gatherNodeStats(sec.leftNodes, name);
-    const r = gatherNodeStats(sec.rightNodes, name);
-    const tot = l.total + r.total;
-    const com = l.completed + r.completed;
-    totalDsaNodes += tot;
-    doneDsaNodes += com;
-    return {
-      title: name,
-      total: tot,
-      completed: com,
-      pct: tot > 0 ? Math.round((com / tot) * 100) : 0,
-    };
-  });
+    const categoryProgress = DSA_ROADMAP_SECTIONS.map((sec) => {
+      const name = sec.mainTitle.replace(/^\d+\.\s*/, "");
+      const l = gatherNodeStats(sec.leftNodes, name);
+      const r = gatherNodeStats(sec.rightNodes, name);
+      const tot = l.total + r.total;
+      const com = l.completed + r.completed;
+      return {
+        title: name,
+        total: tot,
+        completed: com,
+        pct: tot > 0 ? Math.round((com / tot) * 100) : 0,
+      };
+    });
+
+    const totalDsaNodes = categoryProgress.reduce((acc, curr) => acc + curr.total, 0);
+    const doneDsaNodes = categoryProgress.reduce((acc, curr) => acc + curr.completed, 0);
+
+    return { totalDsaNodes, doneDsaNodes, inProgressDsaNodes, categoryProgress };
+  }, [dsaFlowchartStatus]);
 
   const dsaPct = totalDsaNodes > 0 ? Math.round((doneDsaNodes / totalDsaNodes) * 100) : 0;
 
   // ── Theory ─────────────────────────────────────────────────────────────
-  let totalTheory = 0;
-  let doneTheory = 0;
-  const inProgressTheory: { title: string; subject: string }[] = [];
+  const { totalTheory, doneTheory, inProgressTheory, theorySubjectStats } = useMemo(() => {
+    const inProgressTheory: { title: string; subject: string }[] = [];
 
-  const SUBJECT_MAP: Record<string, string> = {
-    "theory-os": "OS",
-    "theory-dbms": "DBMS",
-    "theory-cn": "CN",
-    "theory-oop": "OOP",
-    "theory-aptitude": "Aptitude",
-  };
-
-  const theorySubjectStats = THEORY_ROADMAP_SECTIONS.map((sec) => {
-    const subjectName = SUBJECT_MAP[sec.mainId] || sec.mainTitle;
-    let sTotal = 0;
-    let sCompleted = 0;
-
-    const traverse = (nodes?: RoadmapNodeItem[]) => {
-      nodes?.forEach((n) => {
-        sTotal++;
-        totalTheory++;
-        const st = theoryFlowchartStatus[n.id];
-        if (st === "done") {
-          sCompleted++;
-          doneTheory++;
-        }
-        if (st === "in-progress") {
-          inProgressTheory.push({ title: n.title, subject: subjectName });
-        }
-        if (n.subNodes) traverse(n.subNodes);
-      });
+    const SUBJECT_MAP: Record<string, string> = {
+      "theory-os": "OS",
+      "theory-dbms": "DBMS",
+      "theory-cn": "CN",
+      "theory-oop": "OOP",
+      "theory-aptitude": "Aptitude",
     };
 
-    traverse(sec.leftNodes);
-    traverse(sec.rightNodes);
+    const theorySubjectStats = THEORY_ROADMAP_SECTIONS.map((sec) => {
+      const subjectName = SUBJECT_MAP[sec.mainId] || sec.mainTitle;
+      let sTotal = 0;
+      let sCompleted = 0;
 
-    return {
-      subject: subjectName,
-      total: sTotal,
-      completed: sCompleted,
-      percentage: sTotal > 0 ? Math.round((sCompleted / sTotal) * 100) : 0,
-    };
-  });
+      const traverse = (nodes?: RoadmapNodeItem[]) => {
+        nodes?.forEach((n) => {
+          sTotal++;
+          const st = theoryFlowchartStatus[n.id];
+          if (st === "done") {
+            sCompleted++;
+          }
+          if (st === "in-progress") {
+            inProgressTheory.push({ title: n.title, subject: subjectName });
+          }
+          if (n.subNodes) traverse(n.subNodes);
+        });
+      };
+
+      traverse(sec.leftNodes);
+      traverse(sec.rightNodes);
+
+      return {
+        subject: subjectName,
+        total: sTotal,
+        completed: sCompleted,
+        percentage: sTotal > 0 ? Math.round((sCompleted / sTotal) * 100) : 0,
+      };
+    });
+
+    const totalTheory = theorySubjectStats.reduce((acc, curr) => acc + curr.total, 0);
+    const doneTheory = theorySubjectStats.reduce((acc, curr) => acc + curr.completed, 0);
+
+    return { totalTheory, doneTheory, inProgressTheory, theorySubjectStats };
+  }, [theoryFlowchartStatus]);
 
   const theoryPct = totalTheory > 0 ? Math.round((doneTheory / totalTheory) * 100) : 0;
 

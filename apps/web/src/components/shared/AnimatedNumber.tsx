@@ -47,6 +47,7 @@ export function AnimatedNumber({
     animationFrameId = requestAnimationFrame(step);
 
     return () => cancelAnimationFrame(animationFrameId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, duration]);
 
   return <span className={className}>{formatter(displayValue)}</span>;

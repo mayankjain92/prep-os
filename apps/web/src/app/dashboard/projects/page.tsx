@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   useProjects,
   useCreateProject,
-  useUpdateProject,
   useDeleteProject,
 } from "@/features/projects/useProjects";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { PageTransition, FadeInCard } from "@/components/shared/PageTransition";
 import { GitHubSyncModal, GitHubRepo } from "@/features/projects/components/GitHubSyncModal";
-import { FolderKanban, ExternalLink, Plus, Trash2, Code, Sparkles, CheckCircle2 } from "lucide-react";
+import { FolderKanban, ExternalLink, Plus, Trash2, Code, CheckCircle2 } from "lucide-react";
 
 function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -26,7 +25,7 @@ function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
 export default function ProjectsDashboardPage() {
   const { data: projects = [], isPending } = useProjects();
   const createMutation = useCreateProject();
-  const updateMutation = useUpdateProject();
+
   const deleteMutation = useDeleteProject();
 
   const [name, setName] = useState("");
@@ -216,7 +215,7 @@ export default function ProjectsDashboardPage() {
             <FolderKanban className="h-10 w-10 text-xblue mx-auto opacity-70" />
             <div>
               <p className="text-muted-foreground text-sm font-semibold">No projects logged yet.</p>
-              <p className="text-xs text-muted-foreground mt-1">Click "Sync GitHub Repos" to select public repos or "Log Project" to manually add one!</p>
+              <p className="text-xs text-muted-foreground mt-1">Click &quot;Sync GitHub Repos&quot; to select public repos or &quot;Log Project&quot; to manually add one!</p>
             </div>
             <Button
               onClick={() => setGithubModalOpen(true)}

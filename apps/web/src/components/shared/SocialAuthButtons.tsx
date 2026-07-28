@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     google?: any;
   }
 }
@@ -49,13 +50,15 @@ export function SocialAuthButtons({ onError }: { onError?: (err: string) => void
 
       window.google.accounts.id.initialize({
         client_id: clientId,
-        callback: async (response: any) => {
+        callback: async (response: { credential?: string }) => {
           if (response.credential) {
             setLoading(true);
             try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               await oauthLogin({ credential: response.credential, provider: "google" } as any);
-            } catch (err: any) {
-              if (onError) onError(err.message || "Google Sign In failed");
+            } catch (err: unknown) {
+              const error = err as Error;
+              if (onError) onError(error.message || "Google Sign In failed");
             } finally {
               setLoading(false);
             }
@@ -95,12 +98,14 @@ export function SocialAuthButtons({ onError }: { onError?: (err: string) => void
     if (window.google?.accounts?.id) {
       window.google.accounts.id.initialize({
         client_id: clientId,
-        callback: async (response: any) => {
+        callback: async (response: { credential?: string }) => {
           if (response.credential) {
             try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               await oauthLogin({ credential: response.credential, provider: "google" } as any);
-            } catch (err: any) {
-              if (onError) onError(err.message || "Google Sign In failed");
+            } catch (err: unknown) {
+              const error = err as Error;
+              if (onError) onError(error.message || "Google Sign In failed");
             } finally {
               setLoading(false);
             }

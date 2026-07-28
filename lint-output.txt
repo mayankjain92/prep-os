@@ -1,0 +1,190 @@
+Scope: 3 of 4 workspace projects
+apps/web lint$ eslint
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/dashboard/dsa/page.tsx
+apps/web lint:    14:23  warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+apps/web lint:    56:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint:    92:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint:   102:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/dashboard/layout.tsx
+apps/web lint:   12:58  warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+apps/web lint:   12:68  warning  'Loader2' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+apps/web lint:   32:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/dashboard/page.tsx
+apps/web lint:    20:3  warning  'ArrowRight' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+apps/web lint:    22:3  warning  'Layers' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+apps/web lint:    25:3  warning  'CheckCircle2' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+apps/web lint:    27:3  warning  'Target' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+apps/web lint:   148:5  error    Error: Cannot reassign variable after render completes
+apps/web lint: Reassigning `totalDsaNodes` after render has completed can cause inconsistent behavior on subsequent renders. Consider using state instead.
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/dashboard/page.tsx:148:5
+apps/web lint:   146 |     const tot = l.total + r.total;
+apps/web lint:   147 |     const com = l.completed + r.completed;
+apps/web lint: > 148 |     totalDsaNodes += tot;
+apps/web lint:       |     ^^^^^^^^^^^^^ Cannot reassign `totalDsaNodes` after render completes
+apps/web lint:   149 |     doneDsaNodes += com;
+apps/web lint:   150 |     return {
+apps/web lint:   151 |       title: name,  react-hooks/immutability
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/dashboard/profile/page.tsx
+apps/web lint:     7:39  warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+apps/web lint:     9:10  warning  'Button' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+apps/web lint:    71:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint:    81:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint:   117:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/dashboard/projects/page.tsx
+apps/web lint:    16:58   warning  'Sparkles' is defined but never used                             @typescript-eslint/no-unused-vars
+apps/web lint:    29:9    warning  'updateMutation' is assigned a value but never used              @typescript-eslint/no-unused-vars
+apps/web lint:   219:71   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+apps/web lint:   219:89   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+apps/web lint:   219:117  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+apps/web lint:   219:129  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/loading.tsx
+apps/web lint:   20:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/login/page.tsx
+apps/web lint:   25:19  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+apps/web lint:   89:16  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/page.tsx
+apps/web lint:   16:3  warning  'Share2' is defined but never used      @typescript-eslint/no-unused-vars
+apps/web lint:   18:3  warning  'Sparkles' is defined but never used    @typescript-eslint/no-unused-vars
+apps/web lint:   19:3  warning  'TrendingUp' is defined but never used  @typescript-eslint/no-unused-vars
+apps/web lint:   21:3  warning  'RefreshCw' is defined but never used   @typescript-eslint/no-unused-vars
+apps/web lint:   23:3  warning  'MapPin' is defined but never used      @typescript-eslint/no-unused-vars
+apps/web lint:   24:3  warning  'Check' is defined but never used       @typescript-eslint/no-unused-vars
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/register/page.tsx
+apps/web lint:   28:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+apps/web lint: Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+apps/web lint: * Update external systems with the latest state from React.
+apps/web lint: * Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+apps/web lint: Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/app/register/page.tsx:28:7
+apps/web lint:   26 |     const cleanUsername = username.trim().toLowerCase();
+apps/web lint:   27 |     if (!cleanUsername) {
+apps/web lint: > 28 |       setUsernameStatus("idle");
+apps/web lint:      |       ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+apps/web lint:   29 |       setUsernameMsg("");
+apps/web lint:   30 |       return;
+apps/web lint:   31 |     }  react-hooks/set-state-in-effect
+apps/web lint:   60:16  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+apps/web lint:   82:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/ThemeProvider.tsx
+apps/web lint:   21:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+apps/web lint: Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+apps/web lint: * Update external systems with the latest state from React.
+apps/web lint: * Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+apps/web lint: Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/ThemeProvider.tsx:21:7
+apps/web lint:   19 |     const saved = localStorage.getItem("prep_os_theme") as Theme | null;
+apps/web lint:   20 |     if (saved === "light" || saved === "dark") {
+apps/web lint: > 21 |       setThemeState(saved);
+apps/web lint:      |       ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+apps/web lint:   22 |       if (saved === "dark") {
+apps/web lint:   23 |         document.documentElement.classList.add("dark");
+apps/web lint:   24 |       } else {  react-hooks/set-state-in-effect
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/profile/ProfileDropdown.tsx
+apps/web lint:    7:10  warning  'Button' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+apps/web lint:   46:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint:   72:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/profile/ProfileModal.tsx
+apps/web lint:    7:31  warning  'Sun' is defined but never used                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+apps/web lint:    7:36  warning  'Moon' is defined but never used                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+apps/web lint:   16:11  warning  'theme' is assigned a value but never used                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+apps/web lint:   16:18  warning  'toggleTheme' is assigned a value but never used                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+apps/web lint:   55:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/profile/ShareableProgressCard.tsx
+apps/web lint:     8:3   warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+apps/web lint:    16:3   warning  'Trophy' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+apps/web lint:   260:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint:   283:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint:   396:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/shared/AnimatedNumber.tsx
+apps/web lint:   50:6  warning  React Hook useEffect has a missing dependency: 'displayValue'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/shared/Logo.tsx
+apps/web lint:   25:7  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/shared/SocialAuthButtons.tsx
+apps/web lint:    10:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+apps/web lint:    52:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+apps/web lint:    56:91  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+apps/web lint:    57:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+apps/web lint:    98:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+apps/web lint:   101:91  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+apps/web lint:   102:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/components/ui/input.tsx
+apps/web lint:   4:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/auth/AuthContext.tsx
+apps/web lint:   88:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+apps/web lint: Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+apps/web lint: * Update external systems with the latest state from React.
+apps/web lint: * Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+apps/web lint: Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/auth/AuthContext.tsx:88:7
+apps/web lint:   86 |
+apps/web lint:   87 |     if (savedToken) {
+apps/web lint: > 88 |       setToken(savedToken);
+apps/web lint:      |       ^^^^^^^^ Avoid calling setState() directly within an effect
+apps/web lint:   89 |       if (savedUser) {
+apps/web lint:   90 |         try {
+apps/web lint:   91 |           setUser(JSON.parse(savedUser));  react-hooks/set-state-in-effect
+apps/web lint:   92:18  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/dsa/components/DoubtSection.tsx
+apps/web lint:   286:19  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+apps/web lint:   286:29  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/dsa/components/Neetcode150Section.tsx
+apps/web lint:     7:3   warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+apps/web lint:    37:24  warning  'setStatusFilter' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+apps/web lint:    65:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+apps/web lint: Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+apps/web lint: * Update external systems with the latest state from React.
+apps/web lint: * Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+apps/web lint: Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/dsa/components/Neetcode150Section.tsx:65:7
+apps/web lint:   63 |       }
+apps/web lint:   64 |
+apps/web lint: > 65 |       setSolvedMap(mergedSolved);
+apps/web lint:      |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+apps/web lint:   66 |       setStarredMap(mergedStarred);
+apps/web lint:   67 |
+apps/web lint:   68 |       if (userId && userId !== "guest") {  react-hooks/set-state-in-effect
+apps/web lint:   142:22  error    Compilation Skipped: Existing memoization could not be preserved
+apps/web lint: React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This value was memoized in source but not in compilation output.
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/dsa/components/Neetcode150Section.tsx:142:22
+apps/web lint:   140 |
+apps/web lint:   141 |   // Categories list in order of appearance
+apps/web lint: > 142 |   const categories = useMemo(() => {
+apps/web lint:       |                      ^^^^^^^^^^^^^^^
+apps/web lint: > 143 |     const set = new Set<string>();
+apps/web lint:       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps/web lint: > 144 |     NEETCODE_150_PROBLEMS.forEach((p) => set.add(p.category));
+apps/web lint:       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps/web lint: > 145 |     return Array.from(set);
+apps/web lint:       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps/web lint: > 146 |   }, []);
+apps/web lint:       | ^^^^^^^^^ Could not preserve existing memoization
+apps/web lint:   147 |
+apps/web lint:   148 |   // Total Stats calculation
+apps/web lint:   149 |   const stats = useMemo(() => {                                                                                           react-hooks/preserve-manual-memoization
+apps/web lint:   298:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @next/next/no-img-element
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/dsa/components/ProblemFormDialog.tsx
+apps/web lint:    34:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+apps/web lint: Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+apps/web lint: * Update external systems with the latest state from React.
+apps/web lint: * Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+apps/web lint: Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/dsa/components/ProblemFormDialog.tsx:34:7
+apps/web lint:   32 |   useEffect(() => {
+apps/web lint:   33 |     if (problemToEdit) {
+apps/web lint: > 34 |       setTitle(problemToEdit.title);
+apps/web lint:      |       ^^^^^^^^ Avoid calling setState() directly within an effect
+apps/web lint:   35 |       setDifficulty(problemToEdit.difficulty);
+apps/web lint:   36 |       setStatus(problemToEdit.status);
+apps/web lint:   37 |       setTopicsStr(problemToEdit.topics?.join(", ") || "");  react-hooks/set-state-in-effect
+apps/web lint:    99:64  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+apps/web lint:   112:60  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/dsa/components/ProblemTable.tsx
+apps/web lint:   43:65  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+apps/web lint:   43:77  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+apps/web lint: /home/mayankjain/Documents/projects/prep-os/apps/web/src/features/projects/components/GitHubSyncModal.tsx
+apps/web lint:   73:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+apps/web lint: ✖ 74 problems (29 errors, 45 warnings)
+apps/web lint: Failed
+/home/mayankjain/Documents/projects/prep-os/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @prep-os/web@0.1.0 lint: `eslint`
+Exit status 1

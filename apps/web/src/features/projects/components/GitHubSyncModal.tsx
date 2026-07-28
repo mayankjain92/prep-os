@@ -70,8 +70,8 @@ export function GitHubSyncModal({
         initialStatus[r.id] = "completed";
       });
       setSelectedStatus(initialStatus);
-    } catch (err: any) {
-      setError(err.message || "An error occurred while fetching GitHub repositories.");
+    } catch (err: unknown) {
+      setError((err as Error).message || "An error occurred while fetching GitHub repositories.");
     } finally {
       setIsLoading(false);
     }

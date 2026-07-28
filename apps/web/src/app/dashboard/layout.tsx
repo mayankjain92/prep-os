@@ -1,19 +1,22 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/AuthContext";
-import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
-import { LayoutDashboard, Code2, BookOpen, FolderKanban, LogOut, User, Sun, Moon, Sparkles, Loader2 } from "lucide-react";
+import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
+import { ProfileModal } from "@/components/profile/ProfileModal";
+import { Logo } from "@/components/shared/Logo";
+import { LayoutDashboard, Code2, BookOpen, FolderKanban } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isLoading, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { user, isLoading } = useAuth();
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -23,8 +26,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-xblue" />
+      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center">
+        <div className="relative flex items-center justify-center">
+          <div className="h-16 w-16 rounded-full border-2 border-transparent border-t-xblue border-r-cyan-400 animate-spin" />
+          <div className="absolute flex items-center justify-center">
+            <img src="/logo.svg" alt="Loading" className="h-7 w-7 object-contain animate-pulse drop-shadow-[0_0_10px_rgba(0,212,255,0.7)]" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -46,10 +54,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
           <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="flex items-center gap-2 font-black text-xl tracking-tight text-xblue">
-              <Sparkles className="h-6 w-6 text-xblue" />
-              <span>Prep OS</span>
-            </Link>
+            <Logo href="/dashboard" size="md" />
 
             <nav className="hidden md:flex items-center gap-1.5">
               {navItems.map((item) => {
@@ -74,42 +79,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Dark / Light Mode Toggle Button */}
-            <Button
-              onClick={toggleTheme}
-              variant="outline"
-              size="sm"
-              className="rounded-full border-border bg-card hover:bg-accent text-foreground text-xs font-semibold gap-1.5 px-3"
-              title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
-            >
-              {theme === "dark" ? (
-                <>
-                  <Sun className="h-4 w-4 text-amber-400" />
-                  <span className="hidden sm:inline">Light</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="h-4 w-4 text-xblue" />
-                  <span className="hidden sm:inline">Dark</span>
-                </>
-              )}
-            </Button>
-
             {user ? (
-              <div className="flex items-center gap-3">
-                <span className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-card px-3 py-1.5 rounded-full border border-border">
-                  <User className="h-3.5 w-3.5 text-xblue" />
-                  {user.email}
-                </span>
-                <Button
-                  onClick={logout}
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full border-border hover:bg-card text-xs font-semibold"
-                >
-                  <LogOut className="h-4 w-4 mr-1" /> Logout
-                </Button>
-              </div>
+              <ProfileDropdown onOpenModal={() => setIsProfileModalOpen(true)} />
             ) : (
               <div className="flex items-center gap-2">
                 <Link href="/login">
@@ -131,6 +102,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content Area */}
       <main className="flex-1 bg-background text-foreground">{children}</main>
       <ScrollToTop />
+
+      {/* Profile Modal */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </div>
   );
 }

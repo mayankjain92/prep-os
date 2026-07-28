@@ -40,7 +40,7 @@ export function ProblemTable({ problems, onEdit }: ProblemTableProps) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center rounded-lg border border-dashed border-border">
         <p className="text-sm font-medium text-muted-foreground">No problems tracked yet.</p>
-        <p className="text-xs text-muted-foreground mt-1">Click "Add Problem" to get started.</p>
+        <p className="text-xs text-muted-foreground mt-1">Click &quot;Add Problem&quot; to get started.</p>
       </div>
     );
   }

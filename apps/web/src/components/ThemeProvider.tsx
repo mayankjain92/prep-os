@@ -18,6 +18,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem("prep_os_theme") as Theme | null;
     if (saved === "light" || saved === "dark") {
+      // eslint-disable-next-line
       setThemeState(saved);
       if (saved === "dark") {
         document.documentElement.classList.add("dark");

@@ -31,15 +31,18 @@ describe("API Health & Auth Middleware Integration Tests", () => {
     process.env.NODE_ENV = originalEnv;
   });
 
-  it("GET /api/problems with dev stub header x-user-id should be accepted", async () => {
+  it("GET /api/problems with valid Bearer JWT token should be accepted", async () => {
     vi.spyOn(Problem, "countDocuments").mockResolvedValue(1 as any);
     vi.spyOn(Problem, "find").mockReturnValue({
       sort: vi.fn().mockResolvedValue([{ title: "Two Sum", status: "solved" }]),
     } as any);
 
+    const jwt = (await import("jsonwebtoken")).default;
+    const token = jwt.sign({ userId: "000000000000000000000001", email: "test@example.com" }, process.env.JWT_SECRET || "prep-os-super-secret-key-12345");
+
     const res = await request(app)
       .get("/api/problems")
-      .set("x-user-id", "000000000000000000000001");
+      .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual([{ title: "Two Sum", status: "solved" }]);

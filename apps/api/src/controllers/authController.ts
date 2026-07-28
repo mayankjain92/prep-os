@@ -46,12 +46,47 @@ export async function register(req: Request, res: Response) {
   const cleanUsername = username.trim().toLowerCase();
   const cleanEmail = email.trim().toLowerCase();
 
+  const existingUsername = await User.findOne({ username: cleanUsername });
+
   const existingEmail = await User.findOne({ email: cleanEmail });
   if (existingEmail) {
-    return res.status(400).json({ error: "Email is already registered" });
+    if (existingUsername && existingUsername._id.toString() !== existingEmail._id.toString()) {
+      return res.status(400).json({ error: "Username is already taken" });
+    }
+
+    // Account exists (e.g., via OAuth) without password set
+    if (!existingEmail.passwordHash) {
+      const salt = await bcrypt.genSalt(10);
+      existingEmail.passwordHash = await bcrypt.hash(password, salt);
+      existingEmail.username = cleanUsername;
+      await existingEmail.save();
+
+      const updatedUser = await recordDailyLogin(existingEmail);
+      const token = jwt.sign(
+        { userId: (updatedUser._id as any).toString(), email: updatedUser.email },
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN }
+      );
+
+      return res.status(200).json({
+        message: "Password linked to account successfully",
+        token,
+        user: {
+          id: (updatedUser._id as any).toString(),
+          username: updatedUser.username,
+          email: updatedUser.email,
+          avatarUrl: updatedUser.avatarUrl,
+          loginDates: updatedUser.loginDates || [],
+          currentStreak: updatedUser.currentStreak || 0,
+          longestStreak: updatedUser.longestStreak || 0,
+          lastLoginDate: updatedUser.lastLoginDate || "",
+        },
+      });
+    }
+
+    return res.status(400).json({ error: "Email is already registered. Please sign in." });
   }
 
-  const existingUsername = await User.findOne({ username: cleanUsername });
   if (existingUsername) {
     return res.status(400).json({ error: "Username is already taken" });
   }
@@ -104,13 +139,19 @@ export async function login(req: Request, res: Response) {
     $or: [{ email: identifier }, { username: identifier }],
   });
 
-  if (!existingUser || !existingUser.passwordHash) {
-    return res.status(401).json({ error: "Invalid credentials" });
+  if (!existingUser) {
+    return res.status(401).json({ error: "Invalid username/email or password" });
+  }
+
+  if (!existingUser.passwordHash) {
+    return res.status(400).json({
+      error: `This account was registered via ${existingUser.authProvider || "Google/GitHub"}. Please sign in with ${existingUser.authProvider || "Google"} or register a password.`,
+    });
   }
 
   const isMatch = await bcrypt.compare(password, existingUser.passwordHash);
   if (!isMatch) {
-    return res.status(401).json({ error: "Invalid credentials" });
+    return res.status(401).json({ error: "Invalid username/email or password" });
   }
 
   const updatedUser = await recordDailyLogin(existingUser);
@@ -224,17 +265,35 @@ export async function oauthLogin(req: Request, res: Response) {
 
     let existingUser = await User.findOne({ email });
 
+    const generateUniqueUsername = async (userEmail: string) => {
+      let base = userEmail.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
+      if (base.length < 3) base = `user_${base}`;
+      if (base.length > 15) base = base.slice(0, 15);
+
+      let finalUsername = base;
+      let count = 1;
+      while (await User.findOne({ username: finalUsername })) {
+        finalUsername = `${base}${count}`;
+        count++;
+      }
+      return finalUsername;
+    };
+
     if (!existingUser) {
+      const username = await generateUniqueUsername(email);
       existingUser = await User.create({
+        username,
         email,
         authProvider: provider,
         providerId,
         avatarUrl,
       });
     } else {
-      existingUser.authProvider = provider;
+      if (!existingUser.username) {
+        existingUser.username = await generateUniqueUsername(email);
+      }
       if (providerId) existingUser.providerId = providerId;
-      if (avatarUrl) existingUser.avatarUrl = avatarUrl;
+      if (avatarUrl && !existingUser.avatarUrl) existingUser.avatarUrl = avatarUrl;
       await existingUser.save();
     }
 
@@ -251,6 +310,7 @@ export async function oauthLogin(req: Request, res: Response) {
       token,
       user: {
         id: (updatedUser._id as any).toString(),
+        username: updatedUser.username,
         email: updatedUser.email,
         avatarUrl: updatedUser.avatarUrl,
         loginDates: updatedUser.loginDates || [],

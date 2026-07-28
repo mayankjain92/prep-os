@@ -94,11 +94,14 @@ export default function ProjectsDashboardPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[11px] font-extrabold text-xblue uppercase tracking-widest">Portfolio & Engineering</span>
+            </div>
             <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
-              <FolderKanban className="h-8 w-8 text-xblue" /> Dev Project Logger
+              <FolderKanban className="h-8 w-8 text-xblue" /> Software Projects Portfolio
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Track portfolio software projects, tech stacks, GitHub repositories, & architecture notes.
+              Document software engineering projects, tech stack architecture, and sync directly with public GitHub repositories.
             </p>
           </div>
 

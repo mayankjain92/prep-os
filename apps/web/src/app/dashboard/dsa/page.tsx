@@ -42,11 +42,14 @@ export default function DsaDashboardPage() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[11px] font-extrabold text-xblue uppercase tracking-widest">Problem Solving</span>
+            </div>
             <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
-              <Code2 className="h-8 w-8 text-xblue" /> Data Structures & Algorithms Roadmap
+              <Code2 className="h-8 w-8 text-xblue" /> Data Structures & Algorithms
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Interactive roadmap.sh style flowchart, NeetCode 150 tracker, doubts queue, and live LeetCode sync.
+              Curated topic roadmaps, NeetCode 150 progress tracking, doubts queue, and live LeetCode stats synchronization.
             </p>
           </div>
         </div>
@@ -160,7 +163,7 @@ export default function DsaDashboardPage() {
             }`}
           >
             <GitBranch className="inline-block mr-1.5 h-3.5 w-3.5" />
-            Visual Roadmap Flowchart
+            Interactive DSA Roadmap
           </button>
 
           <button
@@ -191,7 +194,7 @@ export default function DsaDashboardPage() {
         {/* Tab Content */}
         {activeTab === "flowchart" && (
           <RoadmapFlowChart
-            title="Data Structures & Algorithms Flowchart"
+            title="Data Structures & Algorithms Roadmap"
             sections={DSA_ROADMAP_SECTIONS}
             storageKey="prep_os_dsa_roadmap_v2"
           />

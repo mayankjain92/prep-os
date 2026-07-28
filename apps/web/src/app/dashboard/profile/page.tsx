@@ -28,10 +28,10 @@ export default function ProfilePage() {
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
           </Link>
           <h1 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5">
-            <UserIcon className="h-7 w-7 text-xblue" /> User Profile & Activity
+            <UserIcon className="h-7 w-7 text-xblue" /> Student Profile & Placement Card
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Track your daily login streaks, heatmap calendar, and customize your shareable progress card
+            Track active study streaks, view your GitHub activity heatmap, and generate shareable placement progress cards.
           </p>
         </div>
 

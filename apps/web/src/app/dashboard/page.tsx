@@ -228,10 +228,10 @@ export default function UnifiedDashboardPage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Zap className="h-4 w-4 text-xblue" />
-              <span className="text-[11px] font-bold text-xblue uppercase tracking-widest">Prep-OS</span>
+              <span className="text-[11px] font-extrabold text-xblue uppercase tracking-widest">PrepOS Command Center</span>
             </div>
-            <h1 className="text-2xl font-black tracking-tight text-foreground">Progress Overview</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Your placement prep — all in one place.</p>
+            <h1 className="text-2xl font-black tracking-tight text-foreground">Placement Preparation Overview</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">Unified workspace for tracking LeetCode stats, CS core fundamentals, DSA roadmaps, and dev projects.</p>
           </div>
 
           <Button

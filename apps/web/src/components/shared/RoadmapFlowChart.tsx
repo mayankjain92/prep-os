@@ -62,6 +62,58 @@ export function RoadmapFlowChart({
     });
   };
 
+  const findNodeInTree = (nodes?: RoadmapNodeItem[], id?: string): RoadmapNodeItem | null => {
+    if (!nodes || !id) return null;
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      if (n.subNodes) {
+        const found = findNodeInTree(n.subNodes, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const findNodeById = (id: string): RoadmapNodeItem | null => {
+    for (const sec of sections) {
+      const foundLeft = findNodeInTree(sec.leftNodes, id);
+      if (foundLeft) return foundLeft;
+      const foundRight = findNodeInTree(sec.rightNodes, id);
+      if (foundRight) return foundRight;
+    }
+    return null;
+  };
+
+  const getAllDescendantIds = (node: RoadmapNodeItem): string[] => {
+    const ids: string[] = [];
+    if (node.subNodes) {
+      const traverse = (items: RoadmapNodeItem[]) => {
+        items.forEach((item) => {
+          ids.push(item.id);
+          if (item.subNodes) traverse(item.subNodes);
+        });
+      };
+      traverse(node.subNodes);
+    }
+    return ids;
+  };
+
+  const setExplicitStatus = (id: string, status: NodeStatus) => {
+    const newMap = { ...nodeStatus, [id]: status };
+    const targetNode = findNodeById(id);
+
+    if (targetNode && targetNode.subNodes && targetNode.subNodes.length > 0) {
+      const descendantIds = getAllDescendantIds(targetNode);
+      if (status === "done" || status === "pending") {
+        descendantIds.forEach((descId) => {
+          newMap[descId] = status;
+        });
+      }
+    }
+
+    saveStatuses(newMap);
+  };
+
   const cycleNodeStatus = (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     const current = nodeStatus[id] || "pending";
@@ -70,11 +122,7 @@ export function RoadmapFlowChart({
     else if (current === "in-progress") next = "done";
     else if (current === "done") next = "pending";
 
-    saveStatuses({ ...nodeStatus, [id]: next });
-  };
-
-  const setExplicitStatus = (id: string, status: NodeStatus) => {
-    saveStatuses({ ...nodeStatus, [id]: status });
+    setExplicitStatus(id, next);
   };
 
   const matchesActiveFilter = (status: NodeStatus) =>

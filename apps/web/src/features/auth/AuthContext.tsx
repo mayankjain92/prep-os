@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api-client";
 import type { LoginInput, RegisterInput } from "@prep-os/shared";
+import posthog from "posthog-js";
 
 export interface UserStats {
   dsaSolved: number;
@@ -89,7 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(savedToken);
       if (savedUser) {
         try {
-          setUser(JSON.parse(savedUser));
+          const parsed: User = JSON.parse(savedUser);
+          setUser(parsed);
+          posthog.identify(parsed.id, { username: parsed.username });
         } catch {
           localStorage.removeItem("user");
         }
@@ -110,6 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+    posthog.identify(data.user.id, { username: data.user.username });
+    posthog.capture("user_logged_in", { login_method: "email" });
     fetchProfile();
     router.push("/dashboard");
   };
@@ -124,6 +129,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+    posthog.identify(data.user.id, { username: data.user.username });
+    posthog.capture("user_registered");
     fetchProfile();
     router.push("/dashboard");
   };
@@ -138,6 +145,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+    posthog.identify(data.user.id, { username: data.user.username });
+    posthog.capture("user_oauth_logged_in", { provider: providerData.provider });
     fetchProfile();
     router.push("/dashboard");
   };
@@ -167,6 +176,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    posthog.capture("user_logged_out");
+    posthog.reset();
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");

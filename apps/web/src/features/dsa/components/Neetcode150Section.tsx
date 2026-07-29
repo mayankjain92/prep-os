@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { NEETCODE_150_PROBLEMS, NeetcodeProblem } from "@/data/neetcode150";
 import { useAuth } from "@/features/auth/AuthContext";
+import posthog from "posthog-js";
 
 const CATEGORIES = Array.from(
   new Set(NEETCODE_150_PROBLEMS.map((p) => p.category))
@@ -97,6 +98,14 @@ export function Neetcode150Section() {
     setSolvedMap(newSolvedMap);
     localStorage.setItem(solvedKey, JSON.stringify(newSolvedMap));
 
+    if (nextSolvedState) {
+      posthog.capture("neetcode_problem_solved", {
+        category: prob.category,
+        difficulty: prob.difficulty,
+        total_solved: getActiveArray(newSolvedMap).length,
+      });
+    }
+
     // 2. MongoDB Direct User Update
     const solvedList = getActiveArray(newSolvedMap);
     const starredList = getActiveArray(starredMap);
@@ -115,6 +124,13 @@ export function Neetcode150Section() {
     // 1. Optimistic Local Update
     setStarredMap(newStarredMap);
     localStorage.setItem(starredKey, JSON.stringify(newStarredMap));
+
+    if (nextStarredState) {
+      posthog.capture("neetcode_problem_starred", {
+        category: prob.category,
+        difficulty: prob.difficulty,
+      });
+    }
 
     // 2. MongoDB Direct User Update
     const solvedList = getActiveArray(solvedMap);

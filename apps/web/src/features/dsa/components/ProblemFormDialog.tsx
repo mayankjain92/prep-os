@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useCreateProblem, useUpdateProblem } from "../useProblems";
 import { Problem } from "../api";
 import { DSA_TOPICS } from "@prep-os/shared";
+import posthog from "posthog-js";
 
 interface ProblemFormDialogProps {
   open: boolean;
@@ -70,6 +71,11 @@ export function ProblemFormDialog({
       await updateMutation.mutateAsync({ id: problemToEdit._id, data: payload });
     } else {
       await createMutation.mutateAsync(payload);
+      posthog.capture("dsa_problem_added", {
+        difficulty: payload.difficulty,
+        status: payload.status,
+        topic_count: payload.topics.length,
+      });
     }
     onOpenChange(false);
   };

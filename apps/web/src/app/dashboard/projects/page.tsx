@@ -14,6 +14,7 @@ import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { PageTransition, FadeInCard } from "@/components/shared/PageTransition";
 import { GitHubSyncModal, GitHubRepo } from "@/features/projects/components/GitHubSyncModal";
 import { FolderKanban, ExternalLink, Plus, Trash2, Code, CheckCircle2, Pencil } from "lucide-react";
+import posthog from "posthog-js";
 
 function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -67,6 +68,10 @@ export default function ProjectsDashboardPage() {
         repoUrl: repoUrl.trim(),
         notes: notes.trim(),
       });
+      posthog.capture("project_created", {
+        has_repo_url: Boolean(repoUrl.trim()),
+        tag_count: customTags.length,
+      });
     }
 
     setName("");
@@ -113,6 +118,7 @@ export default function ProjectsDashboardPage() {
       count++;
     });
 
+    posthog.capture("github_repos_imported", { count });
     setImportNotification(`Successfully imported ${count} GitHub repository project(s)!`);
     setTimeout(() => setImportNotification(""), 4000);
   };

@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useUpdateProblem, useDeleteProblem } from "../useProblems";
 import { ExternalLink, Edit2, Trash2 } from "lucide-react";
+import posthog from "posthog-js";
 
 interface ProblemTableProps {
   problems: Problem[];
@@ -28,11 +29,17 @@ export function ProblemTable({ problems, onEdit }: ProblemTableProps) {
       id: problem._id,
       data: { status: newStatus },
     });
+    posthog.capture("dsa_problem_status_updated", {
+      previous_status: problem.status,
+      new_status: newStatus,
+      difficulty: problem.difficulty,
+    });
   };
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this problem?")) {
       deleteMutation.mutate(id);
+      posthog.capture("dsa_problem_deleted");
     }
   };
 

@@ -14,6 +14,7 @@ import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { PageTransition, FadeInCard, AnimatedProgressBar } from "@/components/shared/PageTransition";
 import { AlertCircle, UserCheck, GitBranch, HelpCircle, Code2, RefreshCw, Trophy, TrendingUp } from "lucide-react";
 import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
+import posthog from "posthog-js";
 
 export default function DsaDashboardPage() {
   const { data: problems = [] } = useProblems();
@@ -36,7 +37,14 @@ export default function DsaDashboardPage() {
     e.preventDefault();
     const handle = leetcodeUsername.trim();
     if (!handle) return;
-    syncMutation.mutate(handle);
+    syncMutation.mutate(handle, {
+      onSuccess: (data) => {
+        posthog.capture("leetcode_profile_synced", {
+          total_solved: data.profile?.totalSolved,
+          synced_count: data.synced,
+        });
+      },
+    });
   };
 
   const solvedFromDb = problems.filter((p) => p.status === "solved");

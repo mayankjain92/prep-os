@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Circle, Clock, Sparkles, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ export function RoadmapFlowChart({
   sections,
   storageKey,
 }: RoadmapFlowChartProps) {
+  const queryClient = useQueryClient();
   const {
     data: nodeStatus = {},
     isLoading,
@@ -55,11 +57,9 @@ export function RoadmapFlowChart({
     null,
   );
 
-  const saveStatuses = (newMap: Record<string, NodeStatus>) => {
-    updateMutation.mutate({
-      key: storageKey,
-      data: { nodeStatuses: newMap },
-    });
+  const getLatestNodeStatusMap = (): Record<string, NodeStatus> => {
+    const cached = queryClient.getQueryData<Record<string, NodeStatus>>(["roadmap", storageKey]);
+    return { ...nodeStatus, ...(cached || {}) };
   };
 
   const findNodeInTree = (nodes?: RoadmapNodeItem[], id?: string): RoadmapNodeItem | null => {
@@ -99,24 +99,28 @@ export function RoadmapFlowChart({
   };
 
   const setExplicitStatus = (id: string, status: NodeStatus) => {
-    const newMap = { ...nodeStatus, [id]: status };
+    const updates: Record<string, NodeStatus> = { [id]: status };
     const targetNode = findNodeById(id);
 
     if (targetNode && targetNode.subNodes && targetNode.subNodes.length > 0) {
       const descendantIds = getAllDescendantIds(targetNode);
       if (status === "done" || status === "pending") {
         descendantIds.forEach((descId) => {
-          newMap[descId] = status;
+          updates[descId] = status;
         });
       }
     }
 
-    saveStatuses(newMap);
+    updateMutation.mutate({
+      key: storageKey,
+      data: { nodeStatuses: updates },
+    });
   };
 
   const cycleNodeStatus = (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const current = nodeStatus[id] || "pending";
+    const latestMap = getLatestNodeStatusMap();
+    const current = latestMap[id] || "pending";
     let next: NodeStatus = "done";
     if (current === "pending") next = "in-progress";
     else if (current === "in-progress") next = "done";

@@ -33,7 +33,10 @@ export function useUpdateRoadmapProgress() {
       }
     },
     onSuccess: (data, variables) => {
-      queryClient.setQueryData(["roadmap", variables.key], data);
+      queryClient.setQueryData<Record<string, NodeStatus>>(["roadmap", variables.key], (old = {}) => ({
+        ...old,
+        ...data,
+      }));
     },
   });
 }

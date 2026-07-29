@@ -41,7 +41,9 @@ export async function updateRoadmapProgress(req: Request, res: Response) {
       });
       await progress.save();
     } else {
-      progress.nodeStatuses = new Map(Object.entries(parsed.data.nodeStatuses)) as any;
+      for (const [nodeId, status] of Object.entries(parsed.data.nodeStatuses)) {
+        progress.nodeStatuses.set(nodeId, status);
+      }
       progress.markModified("nodeStatuses");
       await progress.save();
     }

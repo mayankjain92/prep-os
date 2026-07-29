@@ -38,6 +38,8 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN: phc_urbbBTwB4aCZtjTcShe35WdTDbUjDLKssj2ejnnbN5Wt
     container_name: prep-os-web
     restart: always
     ports:

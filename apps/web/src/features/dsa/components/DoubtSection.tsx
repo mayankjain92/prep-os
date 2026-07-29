@@ -22,6 +22,7 @@ import {
   useDeleteDoubt,
 } from "../../doubts/useDoubts";
 import type { DoubtType, PriorityLevel } from "../../doubts/api";
+import posthog from "posthog-js";
 import { NEETCODE_150_PROBLEMS } from "@/data/neetcode150";
 
 const CANONICAL_TOPICS = Array.from(
@@ -59,6 +60,12 @@ export function DoubtSection() {
       notes: notes.trim() || undefined,
     });
 
+    posthog.capture("doubt_added", {
+      type,
+      priority,
+      has_url: Boolean(url.trim()),
+    });
+
     // Reset Form
     setTitle("");
     setUrl("");
@@ -71,6 +78,9 @@ export function DoubtSection() {
       id,
       data: { resolved: !currentResolved },
     });
+    if (!currentResolved) {
+      posthog.capture("doubt_resolved");
+    }
   };
 
   const handleDelete = (id: string) => {

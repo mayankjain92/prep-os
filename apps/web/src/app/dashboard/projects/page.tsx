@@ -377,7 +377,10 @@ export default function ProjectsDashboardPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => deleteMutation.mutate(proj._id)}
+                    onClick={() => {
+                      deleteMutation.mutate(proj._id);
+                      posthog.capture("project_deleted");
+                    }}
                     className="rounded-full text-muted-foreground hover:text-rose-500 hover:bg-background"
                   >
                     <Trash2 className="h-4 w-4 mr-1" /> Delete

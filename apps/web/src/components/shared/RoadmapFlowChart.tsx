@@ -10,6 +10,7 @@ import {
   useUpdateRoadmapProgress,
 } from "@/features/roadmap/useRoadmap";
 import type { NodeStatus } from "@/features/roadmap/api";
+import posthog from "posthog-js";
 
 export interface RoadmapNodeItem {
   id: string;
@@ -127,6 +128,11 @@ export function RoadmapFlowChart({
     else if (current === "done") next = "pending";
 
     setExplicitStatus(id, next);
+    posthog.capture("roadmap_node_status_changed", {
+      roadmap_key: storageKey,
+      previous_status: current,
+      new_status: next,
+    });
   };
 
   const matchesActiveFilter = (status: NodeStatus) =>

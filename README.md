@@ -16,12 +16,12 @@
 
 ## ✨ Key Features
 
-- 🧠 **DSA Problem Tracker:** Full lifecycle tracking with difficulty, topics, status pipelines, and direct LeetCode integration.
-- ⚡ **High-Performance Architecture:** Implements a Redis Cache-Aside pattern for LeetCode synchronization with automatic fallbacks and immediate invalidation on write.
-- 📊 **Theory Aggregation Engine:** Leverages powerful MongoDB aggregation pipelines to dynamically compute progress percentages per core subject (OS, DBMS, CN, Aptitude).
+- 🧠 **DSA Problem Tracker & NeetCode 150:** Full lifecycle tracking with difficulty filters, topic roadmaps, NeetCode 150 interactive checklist, and LeetCode profile synchronization.
+- ⚡ **High-Performance Architecture:** Implements a Redis Cache-Aside pattern for LeetCode synchronization with automatic fallbacks and write-through invalidation.
+- 📊 **Theory Aggregation Engine:** Leverages MongoDB aggregation pipelines to dynamically compute progress percentages across core CS subjects (OS, DBMS, CN, OOP, Aptitude).
+- 🎨 **Accessibility & Design System:** WCAG AA contrast compliant dark/light themes, card layering hierarchy, project tag management, and 6-month activity heatmaps.
 - 🔒 **Secure Authentication:** JWT-based secure user authentication with bcrypt password hashing and strict user-tenant data isolation.
-- 📈 **Unified Analytics Dashboard:** Modern, responsive dashboard powered by Recharts to visualize problem-solving trends and difficulty distribution.
-- 🏗️ **Monorepo Structure:** Built with `pnpm` workspaces for a seamless developer experience, featuring shared types across the frontend and backend to eliminate API type drift.
+- 📈 **Unified Analytics Dashboard:** Modern responsive dashboard powered by Next.js App Router, Recharts, Framer Motion, and Lucide React.
 
 ---
 

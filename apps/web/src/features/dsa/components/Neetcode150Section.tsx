@@ -300,10 +300,10 @@ export function Neetcode150Section() {
             <span className="text-xblue">{stats.solvedCount} of 150 Solved ({stats.percent}%)</span>
           </div>
 
-          <div className="h-2 w-full bg-card rounded-full overflow-hidden border border-border p-0.5 flex">
+          <div className="h-2.5 w-full bg-muted/60 rounded-full overflow-hidden border border-border">
             <div
               className="h-full bg-gradient-to-r from-xblue via-cyan-500 to-emerald-400 rounded-full transition-all duration-500"
-              style={{ width: `${stats.percent}%` }}
+              style={{ width: `${stats.percent > 0 ? Math.max(stats.percent, 4) : 0}%` }}
             />
           </div>
 
@@ -437,7 +437,7 @@ export function Neetcode150Section() {
                       <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-border p-0.2">
                         <div
                           className="h-full bg-emerald-500 rounded-full transition-all duration-300"
-                          style={{ width: `${group.percent}%` }}
+                          style={{ width: `${group.percent > 0 ? Math.max(group.percent, 4) : 0}%` }}
                         />
                       </div>
                     </div>
@@ -456,8 +456,8 @@ export function Neetcode150Section() {
                           key={prob.id}
                           className={`group rounded-lg border py-2 px-3.5 transition-all duration-150 flex items-center justify-between gap-3 text-xs ${
                             isDone
-                              ? "bg-emerald-500/5 border-emerald-500/25"
-                              : "bg-card border-border hover:border-xblue/40"
+                              ? "bg-emerald-500/10 dark:bg-emerald-950/40 border-emerald-500/25"
+                              : "bg-card dark:bg-zinc-900/60 border-border hover:border-xblue/40"
                           }`}
                         >
                           {/* Checkbox & Problem Info */}
@@ -476,7 +476,7 @@ export function Neetcode150Section() {
 
                             <span
                               className={`font-bold truncate text-xs sm:text-sm ${
-                                isDone ? "text-muted-foreground line-through font-normal" : "text-foreground"
+                                isDone ? "text-muted-foreground" : "text-foreground"
                               }`}
                               title={prob.title}
                             >
@@ -503,10 +503,10 @@ export function Neetcode150Section() {
                               variant="outline"
                               className={`text-[10px] font-bold rounded-full py-0.5 px-2 h-5 border ${
                                 prob.difficulty === "Easy"
-                                  ? "border-emerald-500/30 text-emerald-500 bg-emerald-500/10"
+                                  ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20"
                                   : prob.difficulty === "Medium"
-                                  ? "border-amber-500/30 text-amber-500 bg-amber-500/10"
-                                  : "border-rose-500/30 text-rose-500 bg-rose-500/10"
+                                  ? "border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-500/20"
+                                  : "border-rose-500/30 text-rose-600 dark:text-rose-400 bg-rose-500/10 dark:bg-rose-500/20"
                               }`}
                             >
                               {prob.difficulty}

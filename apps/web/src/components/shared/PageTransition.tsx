@@ -56,11 +56,12 @@ export function AnimatedProgressBar({
   color?: string;
   className?: string;
 }) {
+  const displayPct = pct > 0 ? Math.max(pct, 4) : 0;
   return (
     <div className={className}>
       <motion.div
         initial={false}
-        animate={{ width: `${Math.min(Math.max(pct, 0), 100)}%` }}
+        animate={{ width: `${Math.min(Math.max(displayPct, 0), 100)}%` }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={`h-full rounded-full transition-colors duration-300 ${color}`}
       />

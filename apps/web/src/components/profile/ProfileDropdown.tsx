@@ -84,8 +84,8 @@ export function ProfileDropdown({ onOpenModal }: ProfileDropdownProps) {
             </div>
           </div>
 
-          {/* Theme Toggle Section (Moved inside Profile Menu as requested!) */}
-          <div className="p-2 mb-2 rounded-xl border border-border bg-card flex items-center justify-between">
+          {/* Theme Toggle Section */}
+          <div className="p-2.5 mb-2 rounded-xl border border-border bg-card flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
               {theme === "dark" ? (
                 <Moon className="h-4 w-4 text-xblue" />
@@ -97,19 +97,22 @@ export function ProfileDropdown({ onOpenModal }: ProfileDropdownProps) {
 
             <button
               onClick={toggleTheme}
-              className="flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-muted hover:bg-accent text-foreground transition-colors cursor-pointer border border-border"
+              aria-label="Toggle Theme"
+              className={`relative inline-flex h-6 w-11 shrink-0 items-center cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                theme === "dark" ? "bg-xblue" : "bg-slate-300 dark:bg-zinc-700"
+              }`}
             >
-              {theme === "dark" ? (
-                <>
-                  <Moon className="h-3.5 w-3.5 text-xblue" />
-                  <span>Dark</span>
-                </>
-              ) : (
-                <>
-                  <Sun className="h-3.5 w-3.5 text-amber-500" />
-                  <span>Light</span>
-                </>
-              )}
+              <span
+                className={`pointer-events-none flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${
+                  theme === "dark" ? "translate-x-5" : "translate-x-0"
+                }`}
+              >
+                {theme === "dark" ? (
+                  <Moon className="h-3 w-3 text-slate-900 shrink-0" />
+                ) : (
+                  <Sun className="h-3 w-3 text-amber-500 shrink-0" />
+                )}
+              </span>
             </button>
           </div>
 
@@ -123,7 +126,7 @@ export function ProfileDropdown({ onOpenModal }: ProfileDropdownProps) {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl text-foreground hover:bg-accent transition-colors text-left cursor-pointer"
             >
               <UserIcon className="h-4 w-4 text-xblue" />
-              <span>View Full Profile & Stats</span>
+              <span>View Stats & Activity (Modal)</span>
             </button>
 
             <Link
@@ -132,7 +135,7 @@ export function ProfileDropdown({ onOpenModal }: ProfileDropdownProps) {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl text-foreground hover:bg-accent transition-colors text-left"
             >
               <Trophy className="h-4 w-4 text-amber-500" />
-              <span>Open Profile Page</span>
+              <span>Open Dedicated Profile Page</span>
               <ExternalLink className="h-3 w-3 text-muted-foreground ml-auto" />
             </Link>
 

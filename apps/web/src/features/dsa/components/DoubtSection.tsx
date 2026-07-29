@@ -22,6 +22,11 @@ import {
   useDeleteDoubt,
 } from "../../doubts/useDoubts";
 import type { DoubtType, PriorityLevel } from "../../doubts/api";
+import { NEETCODE_150_PROBLEMS } from "@/data/neetcode150";
+
+const CANONICAL_TOPICS = Array.from(
+  new Set(NEETCODE_150_PROBLEMS.map((p) => p.category))
+);
 
 export function DoubtSection() {
   const { data: doubts = [], isLoading, error } = useDoubts();
@@ -36,7 +41,7 @@ export function DoubtSection() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [type, setType] = useState<DoubtType>("leetcode");
-  const [topic, setTopic] = useState("Arrays & Hashing");
+  const [topic, setTopic] = useState(CANONICAL_TOPICS[0] || "Arrays & Hashing");
   const [url, setUrl] = useState("");
   const [priority, setPriority] = useState<PriorityLevel>("medium");
   const [notes, setNotes] = useState("");
@@ -172,14 +177,19 @@ export function DoubtSection() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">DSA Topic Tag</label>
-              <Input
-                autoComplete="off"
-                placeholder="e.g. Dynamic Programming, Trees, Graphs"
+              <label className="text-xs font-semibold text-muted-foreground">DSA Topic Tag *</label>
+              <select
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                className="bg-background border-border text-foreground text-xs rounded-full px-4"
-              />
+                required
+                className="w-full h-9 rounded-full border border-border bg-background px-4 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-xblue"
+              >
+                {CANONICAL_TOPICS.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-1.5">
@@ -309,8 +319,8 @@ export function DoubtSection() {
                       variant="outline"
                       className={`text-[10px] font-bold rounded-full ${
                         doubt.type === "leetcode"
-                          ? "border-xblue/40 text-xblue bg-xblue/10"
-                          : "border-purple-500/40 text-purple-500 bg-purple-500/10"
+                          ? "border-xblue/40 text-xblue dark:text-sky-400 bg-xblue/10 dark:bg-xblue/20"
+                          : "border-purple-500/40 text-purple-600 dark:text-purple-300 bg-purple-500/10 dark:bg-purple-500/20"
                       }`}
                     >
                       {doubt.type === "leetcode" ? (
@@ -324,7 +334,7 @@ export function DoubtSection() {
                       )}
                     </Badge>
 
-                    <Badge variant="outline" className="border-border text-foreground bg-background text-[10px] font-bold rounded-full">
+                    <Badge variant="outline" className="border-border text-foreground bg-background dark:bg-zinc-900/60 text-[10px] font-bold rounded-full">
                       {doubt.topic}
                     </Badge>
 
@@ -332,10 +342,10 @@ export function DoubtSection() {
                       variant="outline"
                       className={`text-[10px] font-bold rounded-full ${
                         doubt.priority === "high"
-                          ? "border-rose-500/40 text-rose-500 bg-rose-500/10"
+                          ? "border-rose-500/40 text-rose-600 dark:text-rose-400 bg-rose-500/10 dark:bg-rose-500/20"
                           : doubt.priority === "medium"
-                          ? "border-amber-500/40 text-amber-500 bg-amber-500/10"
-                          : "border-border text-muted-foreground bg-background"
+                          ? "border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-500/20"
+                          : "border-border text-muted-foreground bg-background dark:bg-zinc-900/60"
                       }`}
                     >
                       {doubt.priority === "high"
@@ -356,11 +366,7 @@ export function DoubtSection() {
                   </button>
                 </div>
 
-                <h3
-                  className={`text-base font-black ${
-                    doubt.resolved ? "text-muted-foreground line-through" : "text-foreground"
-                  }`}
-                >
+                <h3 className="text-base font-black text-foreground">
                   {doubt.title}
                 </h3>
 

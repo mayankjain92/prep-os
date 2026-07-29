@@ -4,6 +4,7 @@ export interface IProject extends Document {
   userId: string;
   name: string;
   techStack: string[];
+  customTags: string[];
   status: "planning" | "in-progress" | "completed" | "archived";
   repoUrl: string;
   notes: string;
@@ -24,6 +25,10 @@ const projectSchema = new Schema<IProject>(
       trim: true,
     },
     techStack: {
+      type: [String],
+      default: [],
+    },
+    customTags: {
       type: [String],
       default: [],
     },

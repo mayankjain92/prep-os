@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, Circle, Clock, Sparkles, Info } from "lucide-react";
+import { CheckCircle2, Circle, CircleDashed, Sparkles, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -171,6 +171,7 @@ export function RoadmapFlowChart({
   const renderNodeTree = (
     node: RoadmapNodeItem,
     isSubNode = false,
+    branch?: "left" | "right"
   ): React.ReactNode => {
     const st = nodeStatus[node.id] || "pending";
     const shouldShowNode =
@@ -186,11 +187,23 @@ export function RoadmapFlowChart({
     return (
       <div
         key={node.id}
-        className={`flex flex-col ${isSubNode ? "mt-3 relative before:absolute before:-left-4 before:top-6 before:h-px before:w-4 before:bg-border" : "space-y-3"}`}
+        className={`flex flex-col relative ${
+          !isSubNode && branch === "left"
+            ? "md:after:absolute md:after:h-[3px] md:after:w-8 md:after:bg-border md:after:top-7 md:after:-right-8"
+            : ""
+        } ${
+          !isSubNode && branch === "right"
+            ? "md:before:absolute md:before:h-[3px] md:before:w-8 md:before:bg-border md:before:top-7 md:before:-left-8"
+            : ""
+        } ${
+          isSubNode
+            ? "mt-2 relative before:absolute before:-left-[18px] before:top-6 before:h-[2px] before:w-4 before:bg-border"
+            : ""
+        }`}
       >
         <div
           onClick={() => setSelectedNode(node)}
-          className={`group relative flex items-center justify-between rounded-2xl border ${isSubNode ? "p-3 ml-4" : "p-4"} cursor-pointer transition shadow-sm ${
+          className={`group relative z-10 flex items-center justify-between rounded-2xl border ${isSubNode ? "p-3 ml-4" : "p-4"} cursor-pointer transition shadow-sm ${
             isDone
               ? "border-emerald-500/40 bg-emerald-500/10 hover:border-emerald-500/60"
               : isInProg
@@ -200,8 +213,9 @@ export function RoadmapFlowChart({
         >
           <div className="space-y-1 pr-3">
             <span
-              className={`${isSubNode ? "text-xs" : "text-sm"} font-black block ${isDone ? "text-muted-foreground line-through" : "text-foreground"}`}
+              className={`${isSubNode ? "text-xs" : "text-sm"} font-black flex items-center gap-1.5 text-foreground`}
             >
+              {isDone && <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />}
               {node.title}
             </span>
             {node.description && (
@@ -229,7 +243,7 @@ export function RoadmapFlowChart({
                 variant="outline"
                 className="border-xblue/40 text-xblue bg-xblue/10 font-bold gap-1 text-[10px] rounded-full px-2 py-1"
               >
-                <Clock className="h-3.5 w-3.5" /> Learning
+                <CircleDashed className="h-3.5 w-3.5" /> Learning
               </Badge>
             ) : (
               <Badge
@@ -243,8 +257,8 @@ export function RoadmapFlowChart({
         </div>
 
         {node.subNodes && node.subNodes.length > 0 && (
-          <div className="relative border-l-2 border-border ml-8">
-            {node.subNodes.map((sn) => renderNodeTree(sn, true))}
+          <div className="relative border-l-2 border-border ml-8 -mt-2 pt-2">
+            {node.subNodes.map((sn) => renderNodeTree(sn, true, branch))}
           </div>
         )}
       </div>
@@ -285,7 +299,7 @@ export function RoadmapFlowChart({
             <div className="h-2 w-48 overflow-hidden rounded-full bg-background border border-border">
               <div
                 className="h-full bg-xblue transition-all duration-500"
-                style={{ width: `${progressPercentage}%` }}
+                style={{ width: `${progressPercentage > 0 ? Math.max(progressPercentage, 4) : 0}%` }}
               />
             </div>
             <span className="text-xs font-bold text-xblue">
@@ -326,7 +340,7 @@ export function RoadmapFlowChart({
                 : "text-xblue hover:bg-xblue/10"
             }`}
           >
-            <Clock className="h-3.5 w-3.5" /> Learning ({inProgressCount})
+            <CircleDashed className="h-3.5 w-3.5" /> Learning ({inProgressCount})
           </button>
 
           <button
@@ -365,15 +379,18 @@ export function RoadmapFlowChart({
               </div>
 
               {/* Left & Right Branch Nodes */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 items-start relative mt-8">
+                {/* Connector line from milestone box to central trunk */}
+                <div className="absolute left-1/2 -top-8 bottom-0 -translate-x-1/2 w-[3px] bg-border hidden md:block z-0" />
+                
                 {/* Left Branch */}
-                <div className="space-y-4">
-                  {sec.leftNodes?.map((node) => renderNodeTree(node))}
+                <div className="space-y-6 md:space-y-8 relative z-10">
+                  {sec.leftNodes?.map((node) => renderNodeTree(node, false, "left"))}
                 </div>
 
                 {/* Right Branch */}
-                <div className="space-y-4">
-                  {sec.rightNodes?.map((node) => renderNodeTree(node))}
+                <div className="space-y-6 md:space-y-8 relative z-10">
+                  {sec.rightNodes?.map((node) => renderNodeTree(node, false, "right"))}
                 </div>
               </div>
             </div>

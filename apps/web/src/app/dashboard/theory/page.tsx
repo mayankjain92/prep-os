@@ -84,7 +84,7 @@ export default function TheoryDashboardPage() {
                   <Badge
                     variant="outline"
                     className={`rounded-full text-[10px] font-bold px-2 shrink-0 transition-colors duration-200 ${
-                      isActive ? "border-xblue/40 text-xblue bg-xblue/10" : "border-purple-500/30 text-purple-500 bg-purple-500/10"
+                      isActive ? "border-xblue/40 text-xblue dark:text-sky-400 bg-xblue/10 dark:bg-xblue/20" : "border-purple-500/30 text-purple-600 dark:text-purple-300 bg-purple-500/10 dark:bg-purple-500/20"
                     }`}
                   >
                     <AnimatedNumber value={stat.percentage} />%

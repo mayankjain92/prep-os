@@ -26,17 +26,17 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
     return set;
   }, [loginDates, currentStreak]);
 
-  // Generate 52 weeks (364 days) leading up to today
+  // Generate 26 weeks (182 days) leading up to today (~6 months)
   const { weeks, monthLabels, totalActiveDays } = useMemo(() => {
     const today = new Date();
     const days: { dateStr: string; date: Date; isActive: boolean; formatted: string }[] = [];
 
-    // Calculate start date (52 weeks ago, aligned to previous Sunday)
+    // Calculate start date (182 days ago)
     const startDate = new Date(today);
-    startDate.setDate(today.getDate() - 364);
+    startDate.setDate(today.getDate() - 182);
 
     let activeCount = 0;
-    for (let i = 0; i <= 364; i++) {
+    for (let i = 0; i <= 182; i++) {
       const d = new Date(startDate);
       d.setDate(startDate.getDate() + i);
       const dateStr = d.toISOString().split("T")[0];
@@ -62,14 +62,18 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
     // Extract month label positions
     const months: { label: string; index: number }[] = [];
     let lastMonth = -1;
+    let lastAddedIdx = -10;
     weekCols.forEach((w, idx) => {
       const firstDayInWeek = w[0].date;
       const monthIdx = firstDayInWeek.getMonth();
       if (monthIdx !== lastMonth) {
-        months.push({
-          label: firstDayInWeek.toLocaleDateString("en-US", { month: "short" }),
-          index: idx,
-        });
+        if (idx - lastAddedIdx >= 3 || idx === 0) {
+          months.push({
+            label: firstDayInWeek.toLocaleDateString("en-US", { month: "short" }),
+            index: idx,
+          });
+          lastAddedIdx = idx;
+        }
         lastMonth = monthIdx;
       }
     });
@@ -119,7 +123,7 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 font-bold text-sm text-foreground">
             <Calendar className="h-4 w-4 text-xblue" />
-            <span>Daily Login Activity & Heatmap (Past 365 Days)</span>
+            <span>Daily Login Activity & Heatmap (Past 6 Months)</span>
           </div>
 
           {/* High Contrast Legend */}
@@ -135,9 +139,9 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
           </div>
         </div>
 
-        {/* Heatmap Grid container with horizontal scroll for responsiveness */}
-        <div className="overflow-x-auto pb-3 pt-1 custom-scrollbar">
-          <div className="min-w-[720px]">
+        {/* Heatmap Grid container */}
+        <div className="w-full pt-1">
+          <div className="w-full">
             {/* Month Labels Header */}
             <div className="flex text-[10px] text-muted-foreground font-bold mb-2 ml-7 relative h-4 select-none">
               {monthLabels.map((m, i) => (
@@ -160,9 +164,9 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
               </div>
 
               {/* Heatmap Matrix */}
-              <div className="flex gap-1 flex-1">
+              <div className="flex gap-1 sm:gap-1.5 flex-1 justify-between">
                 {weeks.map((week, wIdx) => (
-                  <div key={wIdx} className="flex flex-col gap-1">
+                  <div key={wIdx} className="flex flex-col gap-1 sm:gap-1.5 flex-1 items-center">
                     {week.map((day) => {
                       const isToday = day.dateStr === todayStr;
                       return (
@@ -170,7 +174,7 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
                           key={day.dateStr}
                           onMouseEnter={() => setHoveredDay(day)}
                           onMouseLeave={() => setHoveredDay(null)}
-                          className={`w-3 h-3 rounded-[3px] transition-all duration-150 cursor-pointer relative ${
+                          className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-[3px] transition-all duration-150 cursor-pointer relative ${
                             day.isActive
                               ? "bg-xblue border border-sky-400/60 shadow-[0_0_8px_rgba(29,155,240,0.5)] dark:shadow-[0_0_10px_rgba(29,155,240,0.7)] hover:scale-130 hover:z-20 ring-1 ring-sky-300"
                               : "bg-white dark:bg-zinc-700/60 border border-gray-300 dark:border-zinc-600/60 hover:bg-slate-100 dark:hover:bg-zinc-600 hover:scale-125 hover:z-10"

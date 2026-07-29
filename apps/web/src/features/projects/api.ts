@@ -6,6 +6,7 @@ export interface ProjectItem {
   userId: string;
   name: string;
   techStack: string[];
+  customTags?: string[];
   status: "planning" | "in-progress" | "completed" | "archived";
   repoUrl: string;
   notes: string;

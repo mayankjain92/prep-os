@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   useProjects,
   useCreateProject,
+  useUpdateProject,
   useDeleteProject,
 } from "@/features/projects/useProjects";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { PageTransition, FadeInCard } from "@/components/shared/PageTransition";
 import { GitHubSyncModal, GitHubRepo } from "@/features/projects/components/GitHubSyncModal";
-import { FolderKanban, ExternalLink, Plus, Trash2, Code, CheckCircle2 } from "lucide-react";
+import { FolderKanban, ExternalLink, Plus, Trash2, Code, CheckCircle2, Pencil } from "lucide-react";
 
 function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -25,7 +26,7 @@ function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
 export default function ProjectsDashboardPage() {
   const { data: projects = [], isPending } = useProjects();
   const createMutation = useCreateProject();
-
+  const updateMutation = useUpdateProject();
   const deleteMutation = useDeleteProject();
 
   const [name, setName] = useState("");
@@ -33,31 +34,63 @@ export default function ProjectsDashboardPage() {
   const [repoUrl, setRepoUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [githubModalOpen, setGithubModalOpen] = useState(false);
   const [importNotification, setImportNotification] = useState("");
+  const [inlineTagInput, setInlineTagInput] = useState<{ id: string; value: string } | null>(null);
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    const techStack = techStackInput
+    const customTags = techStackInput
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
 
-    createMutation.mutate({
-      name: name.trim(),
-      techStack,
-      status: "in-progress",
-      repoUrl: repoUrl.trim(),
-      notes: notes.trim(),
-    });
+    if (editingProjectId) {
+      updateMutation.mutate({
+        id: editingProjectId,
+        data: {
+          name: name.trim(),
+          customTags,
+          repoUrl: repoUrl.trim(),
+          notes: notes.trim(),
+        }
+      });
+      setEditingProjectId(null);
+    } else {
+      createMutation.mutate({
+        name: name.trim(),
+        customTags,
+        status: "in-progress",
+        repoUrl: repoUrl.trim(),
+        notes: notes.trim(),
+      });
+    }
 
     setName("");
     setTechStackInput("");
     setRepoUrl("");
     setNotes("");
     setDialogOpen(false);
+  };
+
+  const handleAddInlineTag = (e: React.FormEvent, proj: any) => {
+    e.preventDefault();
+    if (!inlineTagInput || !inlineTagInput.value.trim()) {
+      setInlineTagInput(null);
+      return;
+    }
+    const newTag = inlineTagInput.value.trim();
+    const currentTags = proj.customTags || [];
+    if (!currentTags.includes(newTag)) {
+      updateMutation.mutate({
+        id: proj._id,
+        data: { customTags: [...currentTags, newTag] }
+      });
+    }
+    setInlineTagInput(null);
   };
 
   const handleGitHubImport = (items: { repo: GitHubRepo; status: "in-progress" | "completed" }[]) => {
@@ -114,7 +147,14 @@ export default function ProjectsDashboardPage() {
               <GitHubIcon className="h-4 w-4 mr-2 text-foreground" /> Sync GitHub Repos
             </Button>
             <Button
-              onClick={() => setDialogOpen(!dialogOpen)}
+              onClick={() => {
+                setEditingProjectId(null);
+                setName("");
+                setTechStackInput("");
+                setRepoUrl("");
+                setNotes("");
+                setDialogOpen(!dialogOpen);
+              }}
               className="rounded-full bg-xblue hover:bg-xhover text-white font-bold text-xs px-5 h-9"
             >
               <Plus className="h-4 w-4 mr-2" /> Log Project
@@ -154,8 +194,8 @@ export default function ProjectsDashboardPage() {
         {/* Create Dialog Form */}
         {dialogOpen && (
           <FadeInCard className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-md">
-            <h3 className="text-lg font-black text-foreground">Add New Project</h3>
-            <form onSubmit={handleCreate} className="space-y-4">
+            <h3 className="text-lg font-black text-foreground">{editingProjectId ? "Edit Project" : "Add New Project"}</h3>
+            <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-xs text-muted-foreground font-semibold">Project Name</label>
@@ -182,7 +222,7 @@ export default function ProjectsDashboardPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-muted-foreground font-semibold">Tech Stack (comma separated)</label>
+                <label className="mb-1 block text-xs text-muted-foreground font-semibold">Custom Tech Stack Tags (comma separated)</label>
                 <Input
                   autoComplete="off"
                   placeholder="Next.js, Node.js, Express, Redis, MongoDB"
@@ -204,11 +244,11 @@ export default function ProjectsDashboardPage() {
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-full border-border text-xs">
+                <Button type="button" variant="outline" onClick={() => { setDialogOpen(false); setEditingProjectId(null); }} className="rounded-full border-border text-xs">
                   Cancel
                 </Button>
                 <Button type="submit" className="rounded-full bg-xblue hover:bg-xhover text-white font-bold text-xs px-4">
-                  Save Project
+                  {editingProjectId ? "Update Project" : "Save Project"}
                 </Button>
               </div>
             </form>
@@ -262,10 +302,10 @@ export default function ProjectsDashboardPage() {
                     variant="outline"
                     className={
                       proj.status === "completed"
-                        ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/10 rounded-full"
+                        ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full"
                         : proj.status === "in-progress"
-                        ? "border-xblue/40 text-xblue bg-xblue/10 rounded-full"
-                        : "border-border text-muted-foreground bg-background rounded-full"
+                        ? "border-xblue/40 text-xblue dark:text-sky-400 bg-xblue/10 dark:bg-xblue/20 rounded-full"
+                        : "border-border text-muted-foreground bg-background dark:bg-zinc-900/60 rounded-full"
                     }
                   >
                     {proj.status}
@@ -274,20 +314,60 @@ export default function ProjectsDashboardPage() {
 
                 {proj.notes && <p className="text-xs text-muted-foreground">{proj.notes}</p>}
 
-                {proj.techStack.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-2">
-                    {proj.techStack.map((tech) => (
-                      <span
-                        key={tech}
-                        className="rounded-md bg-background border border-border px-2 py-1 text-[11px] font-bold text-foreground"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <div className="flex flex-wrap items-center gap-1.5 pt-2">
+                  {/* Primary Auto-detected Language */}
+                  {proj.techStack && proj.techStack.length > 0 && (
+                    <span className="rounded-md bg-xblue/10 dark:bg-xblue/20 border border-xblue/20 px-2 py-1 text-[11px] font-bold text-xblue dark:text-sky-400">
+                      {proj.techStack[0]}
+                    </span>
+                  )}
+                  {/* Custom Tags */}
+                  {(proj.customTags || []).map((tech: string) => (
+                    <span
+                      key={tech}
+                      className="rounded-md bg-background dark:bg-zinc-900/60 border border-border px-2 py-1 text-[11px] font-bold text-foreground"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                  {/* Add Tag Affordance */}
+                  {inlineTagInput?.id === proj._id ? (
+                    <form onSubmit={(e) => handleAddInlineTag(e, proj)} className="inline-block">
+                      <Input
+                        autoFocus
+                        value={inlineTagInput.value}
+                        onChange={(e) => setInlineTagInput({ id: proj._id, value: e.target.value })}
+                        onBlur={() => setInlineTagInput(null)}
+                        className="h-6 w-24 text-[10px] px-2 rounded-md bg-background border-border text-foreground inline-flex ml-1 focus-visible:ring-1 focus-visible:ring-xblue"
+                        placeholder="Tag name..."
+                      />
+                    </form>
+                  ) : (
+                    <button
+                      onClick={() => setInlineTagInput({ id: proj._id, value: "" })}
+                      className="rounded-md border border-dashed border-border px-2 py-1 text-[10px] font-bold text-muted-foreground hover:text-foreground hover:border-muted-foreground transition ml-1"
+                    >
+                      + Add tag
+                    </button>
+                  )}
+                </div>
 
-                <div className="flex justify-end pt-2 border-t border-border">
+                <div className="flex justify-end pt-2 border-t border-border gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setEditingProjectId(proj._id);
+                      setName(proj.name);
+                      setRepoUrl(proj.repoUrl || "");
+                      setNotes(proj.notes || "");
+                      setTechStackInput((proj.customTags || []).join(", "));
+                      setDialogOpen(true);
+                    }}
+                    className="rounded-full text-muted-foreground hover:text-xblue hover:bg-background"
+                  >
+                    <Pencil className="h-4 w-4 mr-1" /> Edit
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"

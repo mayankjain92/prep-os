@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { toPng } from "html-to-image";
 import { User } from "@/features/auth/AuthContext";
+import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
 import { Button } from "@/components/ui/button";
 import {
   Download,
@@ -32,9 +33,20 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
   const [isExporting, setIsExporting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const { data: theoryStatus = {} } = useRoadmapProgress("prep_os_theory_roadmap");
+  const { data: dsaStatus = {} } = useRoadmapProgress("prep_os_dsa_roadmap_v2");
+
   const streak = user.currentStreak || 0;
-  const dsaSolved = user.stats?.dsaSolved || 0;
-  const theoryDone = user.stats?.theoryCompleted || 0;
+  const dsaSolved = useMemo(() => {
+    const doneCount = Object.values(dsaStatus).filter((val) => val === "done").length;
+    return doneCount || user.stats?.dsaSolved || 0;
+  }, [dsaStatus, user.stats?.dsaSolved]);
+
+  const theoryDone = useMemo(() => {
+    const doneCount = Object.values(theoryStatus).filter((val) => val === "done").length;
+    return doneCount || user.stats?.theoryCompleted || 0;
+  }, [theoryStatus, user.stats?.theoryCompleted]);
+
   const projectsBuilt = user.stats?.projectsCompleted || user.stats?.projectsTotal || 0;
 
   // LeetCode Stats
@@ -290,12 +302,12 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
               <span className="flex items-center gap-1">
                 <TrendingUp className="h-3 w-3 text-amber-500" /> Prep Consistency
               </span>
-              <span className="text-amber-700">{consistencyScore}% Target</span>
+              <span className="text-amber-700">{consistencyScore}% Consistency Score</span>
             </div>
             <div className="w-full h-2 rounded-full bg-slate-200/80 overflow-hidden p-0.5">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-500"
-                style={{ width: `${consistencyScore}%` }}
+                style={{ width: `${consistencyScore > 0 ? Math.max(consistencyScore, 4) : 0}%` }}
               />
             </div>
           </div>

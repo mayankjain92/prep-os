@@ -111,12 +111,15 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="register-username" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Unique Username
               </label>
               <div className="relative">
                 <Input
+                  id="register-username"
+                  name="username"
                   type="text"
+                  autoComplete="username"
                   placeholder="alex_dev"
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase())}
@@ -147,11 +150,14 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="register-email" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Email Address
               </label>
               <Input
+                id="register-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -161,11 +167,14 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="register-password" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Password (min 6 chars)
               </label>
               <Input
+                id="register-password"
+                name="password"
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

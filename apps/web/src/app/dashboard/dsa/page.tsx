@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProblems, useSyncLeetCode, useLeetCodeProfile } from "@/features/dsa/useProblems";
 import { RoadmapFlowChart } from "@/components/shared/RoadmapFlowChart";
 import { DSA_ROADMAP_SECTIONS } from "@/data/dsa-roadmap";
@@ -20,6 +20,12 @@ export default function DsaDashboardPage() {
   const syncMutation = useSyncLeetCode();
   const [leetcodeUsername, setLeetcodeUsername] = useState("");
   const [activeTab, setActiveTab] = useState<"flowchart" | "neetcode" | "doubts">("flowchart");
+
+  useEffect(() => {
+    if (dbLeetcodeProfile?.username && !leetcodeUsername) {
+      setLeetcodeUsername(dbLeetcodeProfile.username);
+    }
+  }, [dbLeetcodeProfile?.username, leetcodeUsername]);
 
   const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
 
@@ -68,6 +74,11 @@ export default function DsaDashboardPage() {
 
           <form onSubmit={handleSync} className="flex w-full sm:w-auto items-center gap-2">
             <Input
+              id="lc-search-handle"
+              name="lc_search_handle"
+              type="text"
+              autoComplete="off"
+              spellCheck={false}
               placeholder="Enter LeetCode username"
               value={leetcodeUsername}
               onChange={(e) => setLeetcodeUsername(e.target.value)}

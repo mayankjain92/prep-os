@@ -339,6 +339,7 @@ export function Neetcode150Section() {
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
+            autoComplete="off"
             placeholder="Search problem title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

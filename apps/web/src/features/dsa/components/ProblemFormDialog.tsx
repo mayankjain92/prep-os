@@ -84,6 +84,7 @@ export function ProblemFormDialog({
         <div>
           <label className="text-xs font-semibold text-muted-foreground">Title</label>
           <Input
+            autoComplete="off"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Two Sum"
@@ -123,6 +124,7 @@ export function ProblemFormDialog({
         <div>
           <label className="text-xs font-semibold text-muted-foreground">Topics (comma separated)</label>
           <Input
+            autoComplete="off"
             value={topicsStr}
             onChange={(e) => setTopicsStr(e.target.value)}
             placeholder="Array, Hash Table"
@@ -136,6 +138,7 @@ export function ProblemFormDialog({
           <label className="text-xs font-semibold text-muted-foreground">URL</label>
           <Input
             type="url"
+            autoComplete="off"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://leetcode.com/problems/two-sum"
@@ -145,6 +148,7 @@ export function ProblemFormDialog({
         <div>
           <label className="text-xs font-semibold text-muted-foreground">Notes</label>
           <textarea
+            autoComplete="off"
             className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}

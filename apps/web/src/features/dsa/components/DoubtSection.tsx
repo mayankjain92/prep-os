@@ -150,6 +150,7 @@ export function DoubtSection() {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground">Doubt Title / Problem Name *</label>
               <Input
+                autoComplete="off"
                 placeholder="e.g. LeetCode 215 or Segment Tree Lazy Propagation"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -173,6 +174,7 @@ export function DoubtSection() {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground">DSA Topic Tag</label>
               <Input
+                autoComplete="off"
                 placeholder="e.g. Dynamic Programming, Trees, Graphs"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
@@ -196,6 +198,7 @@ export function DoubtSection() {
             <div className="space-y-1.5 sm:col-span-2">
               <label className="text-xs font-semibold text-muted-foreground">Problem / Resource URL (Optional)</label>
               <Input
+                autoComplete="off"
                 placeholder="https://leetcode.com/problems/..."
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
@@ -206,6 +209,7 @@ export function DoubtSection() {
             <div className="space-y-1.5 sm:col-span-2">
               <label className="text-xs font-semibold text-muted-foreground">Notes / Specific Doubt Details</label>
               <textarea
+                autoComplete="off"
                 rows={3}
                 placeholder="Describe what part is tricky or what approach you want to try later..."
                 value={notes}
@@ -242,6 +246,7 @@ export function DoubtSection() {
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
+            autoComplete="off"
             placeholder="Search doubts or topics..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

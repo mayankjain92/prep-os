@@ -160,6 +160,7 @@ export default function ProjectsDashboardPage() {
                 <div>
                   <label className="mb-1 block text-xs text-muted-foreground font-semibold">Project Name</label>
                   <Input
+                    autoComplete="off"
                     placeholder="e.g. Prep OS"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -170,6 +171,8 @@ export default function ProjectsDashboardPage() {
                 <div>
                   <label className="mb-1 block text-xs text-muted-foreground font-semibold">Repo URL</label>
                   <Input
+                    type="url"
+                    autoComplete="off"
                     placeholder="https://github.com/..."
                     value={repoUrl}
                     onChange={(e) => setRepoUrl(e.target.value)}
@@ -181,6 +184,7 @@ export default function ProjectsDashboardPage() {
               <div>
                 <label className="mb-1 block text-xs text-muted-foreground font-semibold">Tech Stack (comma separated)</label>
                 <Input
+                  autoComplete="off"
                   placeholder="Next.js, Node.js, Express, Redis, MongoDB"
                   value={techStackInput}
                   onChange={(e) => setTechStackInput(e.target.value)}
@@ -191,6 +195,7 @@ export default function ProjectsDashboardPage() {
               <div>
                 <label className="mb-1 block text-xs text-muted-foreground font-semibold">Notes / Highlights</label>
                 <Input
+                  autoComplete="off"
                   placeholder="System design key points..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}

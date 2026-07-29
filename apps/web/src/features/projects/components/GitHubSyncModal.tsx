@@ -131,6 +131,11 @@ export function GitHubSyncModal({
               <div className="relative flex-1">
                 <GitHubIcon className="absolute left-3.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
+                  id="github-username-input"
+                  name="githubUsername"
+                  type="text"
+                  autoComplete="off"
+                  spellCheck={false}
                   placeholder="Enter GitHub username (e.g. octocat)"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}

@@ -12,6 +12,7 @@
     "@base-ui/react": "^1.6.0",
     "@prep-os/shared": "workspace:*",
     "@tanstack/react-query": "^5.101.4",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.42.2",

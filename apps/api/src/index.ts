@@ -9,6 +9,7 @@ import projectRoutes from "./routes/projectRoutes.js";
 import doubtRoutes from "./routes/doubtRoutes.js";
 import roadmapRoutes from "./routes/roadmapRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
+import { startKeepAlive } from "./services/keepAliveService.js";
 
 const app = express();
 app.use(cors());
@@ -17,9 +18,13 @@ app.use(express.json());
 // Auth routes (Public)
 app.use("/api/auth", authRoutes);
 
-// Health check (Public / Auth optional)
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+// Health check (Public / Auth optional) - Supports both /health and /api/health
+app.get(["/health", "/api/health"], (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Protected routes (require authMiddleware)
@@ -42,6 +47,7 @@ const PORT = process.env.PORT || 4000;
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`API running on http://localhost:${PORT}`);
+    startKeepAlive();
   });
 }).catch((err) => {
   console.error("Failed to connect to database:", err);

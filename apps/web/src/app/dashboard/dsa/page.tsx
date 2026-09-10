@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { PageTransition, FadeInCard, AnimatedProgressBar } from "@/components/shared/PageTransition";
-import { AlertCircle, UserCheck, GitBranch, HelpCircle, Code2, RefreshCw, Trophy, TrendingUp } from "lucide-react";
+import { AlertCircle, UserCheck, GitBranch, HelpCircle, RefreshCw, Trophy, TrendingUp } from "lucide-react";
 import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
 import posthog from "posthog-js";
 
@@ -33,18 +33,27 @@ export default function DsaDashboardPage() {
 
   const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
 
-  const handleSync = (e: React.FormEvent) => {
-    e.preventDefault();
+  const triggerSync = (force = false) => {
     const handle = leetcodeUsername.trim();
     if (!handle) return;
-    syncMutation.mutate(handle, {
-      onSuccess: (data) => {
-        posthog.capture("leetcode_profile_synced", {
-          total_solved: data.profile?.totalSolved,
-          synced_count: data.synced,
-        });
-      },
-    });
+    syncMutation.mutate(
+      { username: handle, force },
+      {
+        onSuccess: (data) => {
+          posthog.capture("leetcode_profile_synced", {
+            total_solved: data.profile?.totalSolved,
+            synced_count: data.synced,
+            from_cache: data.fromCache,
+            forced: force,
+          });
+        },
+      }
+    );
+  };
+
+  const handleSync = (e: React.FormEvent) => {
+    e.preventDefault();
+    triggerSync(false);
   };
 
   const solvedFromDb = problems.filter((p) => p.status === "solved");
@@ -116,8 +125,8 @@ export default function DsaDashboardPage() {
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[11px] font-extrabold text-xblue uppercase tracking-widest">Problem Solving</span>
             </div>
-            <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
-              <Code2 className="h-8 w-8 text-xblue" /> Data Structures & Algorithms
+            <h1 className="text-3xl font-black tracking-tight text-foreground">
+              Data Structures & Algorithms
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Curated topic roadmaps, NeetCode 150 progress tracking, doubts queue, and live LeetCode stats synchronization.
@@ -127,14 +136,11 @@ export default function DsaDashboardPage() {
 
         {/* LeetCode Sync Bar */}
         <FadeInCard delay={0.05} className="rounded-2xl border border-border bg-card p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-          <div className="flex items-center gap-3">
-            <img src="/logo.svg" alt="PrepOS Logo" className="h-6 w-6 object-contain flex-shrink-0" />
-            <div>
-              <h3 className="text-sm font-bold text-foreground">Live LeetCode Profile Integration</h3>
-              <p className="text-xs text-muted-foreground">
-                Sync with your real LeetCode handle to fetch exact solved counts & recent AC submissions.
-              </p>
-            </div>
+          <div>
+            <h3 className="text-sm font-bold text-foreground">LeetCode Sync</h3>
+            <p className="text-xs text-muted-foreground">
+              Sync real-time solved counts and problem status pipelines.
+            </p>
           </div>
 
           <form onSubmit={handleSync} className="flex w-full sm:w-auto items-center gap-2">
@@ -144,10 +150,10 @@ export default function DsaDashboardPage() {
               type="text"
               autoComplete="off"
               spellCheck={false}
-              placeholder="Enter LeetCode username"
+              placeholder="LeetCode username"
               value={leetcodeUsername}
               onChange={(e) => setLeetcodeUsername(e.target.value)}
-              className="bg-background border-border text-foreground text-xs sm:w-56 rounded-full px-4"
+              className="bg-background border-border text-foreground text-xs sm:w-48 rounded-full px-4"
             />
             <Button
               type="submit"
@@ -156,21 +162,36 @@ export default function DsaDashboardPage() {
               className="rounded-full bg-xblue hover:bg-xhover text-white text-xs font-bold whitespace-nowrap px-4 transition-transform active:scale-95"
             >
               <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${syncMutation.isPending ? "animate-spin" : ""}`} />
-              {syncMutation.isPending ? "Syncing..." : "Sync Profile"}
+              {syncMutation.isPending ? "Syncing..." : "Sync"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={syncMutation.isPending}
+              onClick={() => triggerSync(true)}
+              title="Bypass Redis cache and fetch fresh stats directly from LeetCode"
+              className="rounded-full text-muted-foreground hover:text-foreground text-xs font-medium px-3"
+            >
+              Force Refresh
             </Button>
           </form>
         </FadeInCard>
 
         {syncMutation.isError && (
-          <div className="flex items-center gap-2 rounded-2xl bg-destructive/10 border border-destructive/20 p-4 text-xs text-destructive">
+          <div className="flex items-center gap-2 rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-2.5 text-xs text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>Failed to sync LeetCode profile. Please check the username and try again.</span>
           </div>
         )}
         {syncMutation.isSuccess && syncMutation.data && (
-          <div className="flex items-center gap-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-xs text-emerald-500 font-medium">
-            <img src="/logo.svg" alt="PrepOS Logo" className="h-4 w-4 shrink-0 object-contain" />
-            <span>{syncMutation.data.message} ({syncMutation.data.synced} problem records updated)</span>
+          <div className="flex items-center justify-between gap-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-xs text-emerald-500 font-medium">
+            <div className="flex items-center gap-2">
+              <span>{syncMutation.data.message}</span>
+              <Badge variant="outline" className="text-[10px] rounded-full border-emerald-500/30 text-emerald-500 font-semibold px-2 py-0">
+                {syncMutation.data.fromCache ? "Cached" : "Live"}
+              </Badge>
+            </div>
           </div>
         )}
 

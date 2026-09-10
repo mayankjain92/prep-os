@@ -10,6 +10,7 @@ import {
   Problem,
   LeetCodeProfileStats,
   SyncLeetCodeResult,
+  SyncLeetCodeParams,
 } from "./api";
 import type { CreateProblemInput, UpdateProblemInput } from "@prep-os/shared";
 
@@ -72,7 +73,7 @@ export function useDeleteProblem() {
 export function useSyncLeetCode() {
   const queryClient = useQueryClient();
 
-  return useMutation<SyncLeetCodeResult, Error, string | undefined>({
+  return useMutation<SyncLeetCodeResult, Error, SyncLeetCodeParams | string | undefined>({
     mutationFn: syncLeetCode,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["problems"] });

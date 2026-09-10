@@ -28,6 +28,7 @@ export interface LeetCodeProfileStats {
 export interface SyncLeetCodeResult {
   message: string;
   synced: number;
+  fromCache?: boolean;
   profile?: LeetCodeProfileStats;
 }
 
@@ -62,10 +63,16 @@ export async function deleteProblem(id: string): Promise<void> {
   });
 }
 
-export async function syncLeetCode(username?: string): Promise<SyncLeetCodeResult> {
+export interface SyncLeetCodeParams {
+  username?: string;
+  force?: boolean;
+}
+
+export async function syncLeetCode(params?: SyncLeetCodeParams | string): Promise<SyncLeetCodeResult> {
+  const body = typeof params === "string" ? { username: params } : params;
   return apiFetch<SyncLeetCodeResult>("/api/problems/sync", {
     method: "POST",
-    body: JSON.stringify({ username }),
+    body: JSON.stringify(body || {}),
   });
 }
 

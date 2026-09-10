@@ -114,12 +114,15 @@ export async function deleteProblem(req: Request, res: Response) {
 export async function syncLeetCodeProblems(req: Request, res: Response) {
   const userId = req.userId;
   const username = req.body.username as string;
+  const force = Boolean(req.body.force);
 
   if (!username) {
     return res.status(400).json({ error: "LeetCode username is required" });
   }
 
-  await invalidateLeetCodeCache(userId, username);
+  if (force) {
+    await invalidateLeetCodeCache(userId, username);
+  }
   const dataResult = await getLeetCodeUserData(userId, username);
 
   let updatedCount = 0;
@@ -161,8 +164,11 @@ export async function syncLeetCodeProblems(req: Request, res: Response) {
   });
 
   res.json({
-    message: `Successfully synced LeetCode profile for @${username}`,
+    message: dataResult.fromCache
+      ? `LeetCode profile loaded from Redis cache for @${username}`
+      : `Successfully synced LeetCode profile for @${username}`,
     synced: updatedCount,
+    fromCache: Boolean(dataResult.fromCache),
     profile: dataResult.profile,
   });
 }

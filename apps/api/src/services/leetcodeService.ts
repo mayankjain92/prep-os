@@ -23,6 +23,7 @@ export interface LeetCodeProfileStats {
 export interface LeetCodeUserDataResult {
   profile: LeetCodeProfileStats;
   solvedProblems: LeetCodeSolvedProblem[];
+  fromCache?: boolean;
 }
 
 async function fetchFromExternalLeetCode(username: string): Promise<LeetCodeUserDataResult> {
@@ -153,7 +154,8 @@ export async function getLeetCodeUserData(userId: string, username: string = "de
     const cached = await redis.get(cacheKey);
     if (cached) {
       console.log(`[cache hit] ${cacheKey}`);
-      return JSON.parse(cached);
+      const parsed = JSON.parse(cached);
+      return { ...parsed, fromCache: true };
     }
   } catch (err: any) {
     console.warn(`[cache warn] Redis read failed for ${cacheKey}:`, err.message);
@@ -168,7 +170,7 @@ export async function getLeetCodeUserData(userId: string, username: string = "de
     console.warn(`[cache warn] Redis write failed for ${cacheKey}:`, err.message);
   }
 
-  return freshData;
+  return { ...freshData, fromCache: false };
 }
 
 export async function invalidateLeetCodeCache(userId: string, username: string = "demo"): Promise<void> {

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useProblems, useSyncLeetCode, useLeetCodeProfile } from "@/features/dsa/useProblems";
+import { useSyncLeetCode, useLeetCodeProfile } from "@/features/dsa/useProblems";
 import { RoadmapFlowChart, type RoadmapNodeItem } from "@/components/shared/RoadmapFlowChart";
 import { DSA_ROADMAP_SECTIONS } from "@/data/dsa-roadmap";
 import { DoubtSection } from "@/features/dsa/components/DoubtSection";
@@ -17,7 +17,6 @@ import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
 import posthog from "posthog-js";
 
 export default function DsaDashboardPage() {
-  const { data: problems = [] } = useProblems();
   const { data: dbLeetcodeProfile } = useLeetCodeProfile();
   const { data: dsaFlowchartStatus = {} } = useRoadmapProgress("prep_os_dsa_roadmap_v2");
   const syncMutation = useSyncLeetCode();
@@ -56,11 +55,10 @@ export default function DsaDashboardPage() {
     triggerSync(false);
   };
 
-  const solvedFromDb = problems.filter((p) => p.status === "solved");
-  const totalSolved = activeProfile?.totalSolved ?? solvedFromDb.length;
-  const easySolved = activeProfile?.easySolved ?? solvedFromDb.filter((p) => p.difficulty === "Easy").length;
-  const mediumSolved = activeProfile?.mediumSolved ?? solvedFromDb.filter((p) => p.difficulty === "Medium").length;
-  const hardSolved = activeProfile?.hardSolved ?? solvedFromDb.filter((p) => p.difficulty === "Hard").length;
+  const totalSolved = activeProfile?.totalSolved ?? 0;
+  const easySolved = activeProfile?.easySolved ?? 0;
+  const mediumSolved = activeProfile?.mediumSolved ?? 0;
+  const hardSolved = activeProfile?.hardSolved ?? 0;
 
   const { categoryProgress, overallStats } = useMemo(() => {
     let totalAll = 0;

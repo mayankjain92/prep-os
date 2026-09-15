@@ -158,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const saveNeetcodeProgress = async (solved: string[], starred: string[]) => {
     try {
       const data = await apiFetch<{ message: string; neetcodeProgress: { solved: string[]; starred: string[] } }>(
-        "/api/auth/neetcode-progress",
+        "/api/problems/neetcode-progress",
         {
           method: "PUT",
           body: JSON.stringify({ solved, starred }),

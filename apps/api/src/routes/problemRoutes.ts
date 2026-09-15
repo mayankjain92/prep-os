@@ -1,22 +1,14 @@
 import { Router } from "express";
 import {
-  createProblem,
-  listProblems,
-  updateProblem,
-  deleteProblem,
   syncLeetCodeProblems,
   getLeetCodeProfile,
+  updateNeetcodeProgress,
 } from "../controllers/problemController.js";
 
 const router = Router();
 
 router.get("/leetcode-profile", getLeetCodeProfile);
 router.post("/sync", syncLeetCodeProblems);
-
-router.get("/", listProblems);
-router.post("/", createProblem);
-
-router.patch("/:id", updateProblem);
-router.delete("/:id", deleteProblem);
+router.put("/neetcode-progress", updateNeetcodeProgress);
 
 export default router;

@@ -62,7 +62,7 @@ Instead of splitting streaks and user settings into 3 different tables with expe
 
 ### Feature 2: NeetCode 150 Checklist (`User.neetcodeProgress`)
 * **Storage Location:** Embedded inside `User` document: `neetcodeProgress.solved` & `neetcodeProgress.starred`.
-* **API Route:** `PUT /api/auth/neetcode-progress`
+* **API Route:** `PUT /api/problems/neetcode-progress`
 * **Payload:** `{ solved: ["two-sum", "3sum"], starred: ["trapping-rain-water"] }`
 
 #### Storage Rationale:

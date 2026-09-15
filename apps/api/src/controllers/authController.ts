@@ -474,33 +474,3 @@ export async function getProfile(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to fetch user profile" });
   }
 }
-
-export async function updateNeetcodeProgress(req: Request, res: Response) {
-  try {
-    const userId = req.userId;
-    const { solved, starred } = req.body;
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      {
-        $set: {
-          "neetcodeProgress.solved": Array.isArray(solved) ? solved : [],
-          "neetcodeProgress.starred": Array.isArray(starred) ? starred : [],
-        },
-      },
-      { new: true },
-    );
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    return res.json({
-      message: "NeetCode progress saved",
-      neetcodeProgress: user.neetcodeProgress,
-    });
-  } catch (error: any) {
-    console.error("updateNeetcodeProgress error:", error);
-    res.status(500).json({ error: "Failed to update NeetCode progress" });
-  }
-}

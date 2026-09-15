@@ -76,15 +76,15 @@
 - **Context:** `getProblem` and `getProject` (`GET /:id`) were never called by frontend clients (all collections are loaded into React Query cache). In addition, legacy problem CRUD components and the obsolete `features/theory` directory (superseded by `RoadmapFlowChart` + `RoadmapProgress`) were lingering as dead bundle clutter.
 - **Resolution:** Removed unused `getProblem` and `getProject` routes/handlers, deleted obsolete client components, and cleaned unused mutation hooks while preserving active LeetCode sync, doubts, and roadmap functionality.
 
-### [ ] BE-10: End-to-End Request Validation Middleware
+### [x] BE-10: End-to-End Request Validation Middleware
 - **Files:** `apps/api/src/routes/*.ts`, `apps/api/src/controllers/*.ts`
-- **Context:** Shared schemas (`createProblemSchema`, `createProjectSchema`, `createDoubtSchema`) exist in `@prep-os/shared`, but routes do not use `validate.ts`. Controllers either use ad-hoc `safeParse` or insert raw `req.body` directly into MongoDB.
-- **Fix:** Attach `validate(schema)` middleware to route definitions; remove boilerplate parsing inside controllers.
+- **Context:** Shared schemas (`createProjectSchema`, `updateProjectSchema`, `createDoubtSchema`, `updateDoubtSchema`, `updateRoadmapProgressSchema`, `registerSchema`, `loginSchema`) exist in `@prep-os/shared`, but routes previously did not use `validate.ts`.
+- **Resolution:** Attached `validate(schema)` middleware directly to `authRoutes.ts`, `doubtRoutes.ts`, `projectRoutes.ts`, and `roadmapRoutes.ts`; removed manual parsing boilerplate from controllers.
 
-### [ ] BE-11: Decouple Auto-Seeding from `GET` Request Handlers
-- **Files:** `apps/api/src/controllers/theoryController.ts`, `apps/api/src/controllers/problemController.ts`
-- **Context:** `listTheoryTopics` and `listProblems` execute database insert loops on `GET` requests if empty. In REST, `GET` must be strictly read-only and idempotent.
-- **Fix:** Move roadmap seeding strictly to `POST /api/theory/seed` and explicit onboarding initialization.
+### [x] BE-11: Decouple Auto-Seeding / Prune Problem Collection & Endpoint
+- **Files:** `apps/api/src/controllers/problemController.ts`, `apps/api/src/models/Problem.ts`, `apps/api/src/routes/problemRoutes.ts`
+- **Context:** `listProblems` and manual problem CRUD were legacy write-only artifacts from an old spreadsheet-style problem table. `syncLeetCodeProblems` was running an unnecessary 100-iteration MongoDB write loop into this unused `Problem` collection.
+- **Resolution:** Pruned `listProblems` and manual problem CRUD. Deleted the `Problem.ts` model. Streamlined `syncLeetCodeProblems` to directly update `User.leetcodeProfile` with Redis cache-aside, preserving 100% of real-time user stats and NeetCode 150 checklist functionality without database bloat.
 
 ---
 

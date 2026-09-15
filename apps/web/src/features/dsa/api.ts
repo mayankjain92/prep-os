@@ -1,19 +1,5 @@
 import { apiFetch } from "@/lib/api-client";
 
-export interface Problem {
-  _id: string;
-  userId: string;
-  title: string;
-  difficulty: "Easy" | "Medium" | "Hard";
-  topics: string[];
-  status: "todo" | "attempted" | "solved" | "revisit";
-  url: string;
-  notes: string;
-  solvedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface LeetCodeProfileStats {
   username: string;
   totalSolved: number;
@@ -29,10 +15,6 @@ export interface SyncLeetCodeResult {
   synced: number;
   fromCache?: boolean;
   profile?: LeetCodeProfileStats;
-}
-
-export async function fetchProblems(): Promise<Problem[]> {
-  return apiFetch<Problem[]>("/api/problems");
 }
 
 export interface SyncLeetCodeParams {

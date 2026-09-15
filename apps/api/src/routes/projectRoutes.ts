@@ -5,15 +5,15 @@ import {
   updateProject,
   deleteProject,
 } from "../controllers/projectController.js";
+import { validate } from "../middleware/validate.js";
+import { createProjectSchema, updateProjectSchema } from "@prep-os/shared";
 
 const router = Router();
 
-router.route("/")
-  .get(listProjects)
-  .post(createProject);
+router.get("/", listProjects);
+router.post("/", validate(createProjectSchema), createProject);
 
-router.route("/:id")
-  .patch(updateProject)
-  .delete(deleteProject);
+router.patch("/:id", validate(updateProjectSchema), updateProject);
+router.delete("/:id", deleteProject);
 
 export default router;

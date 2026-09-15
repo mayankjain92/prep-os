@@ -33,14 +33,9 @@ Central contract repository. Eliminates API contract drift between frontend and 
 
 * **Validation Schemas (`src/schemas/`)**:
   * `auth.schema.ts`: `registerSchema`, `loginSchema`
-  * `problem.schema.ts`: `createProblemSchema`, `updateProblemSchema`
-  * `theory.schema.ts`: `createTheoryTopicSchema`, `updateTheoryTopicSchema`
   * `project.schema.ts`: `createProjectSchema`, `updateProjectSchema`
   * `doubt.schema.ts`: `createDoubtSchema`, `updateDoubtSchema`
   * `roadmap.schema.ts`: `updateRoadmapProgressSchema`
-* **Static Roadmap Constants (`src/constants/topics.ts`)**:
-  * `STANDARD_DSA_ROADMAP`: Curated DSA problems (NeetCode 150 / Blind 75 style).
-  * `STANDARD_THEORY_ROADMAPS`: Core topics for OS, DBMS, CN, Aptitude.
 
 ---
 
@@ -63,7 +58,6 @@ Request ──► Middleware (Auth, Validation) ──► Controller ──► S
 | Model | Key Fields | Purpose |
 |---|---|---|
 | `User` | `email`, `username`, `passwordHash`, `leetcodeProfile`, `googleId`, `githubId` | User account & auth credentials |
-| `Problem` | `userId`, `title`, `difficulty`, `status`, `topics`, `url`, `notes`, `solvedAt` | DSA problem tracking |
 | `TheoryTopic`| `userId`, `subject` (OS/DBMS/CN/Aptitude), `topicName`, `status`, `notes` | Computer science core topics |
 | `Project` | `userId`, `title`, `description`, `techStack`, `githubUrl`, `liveUrl`, `status` | Portfolio project planner |
 | `Doubt` | `userId`, `title`, `type`, `topic`, `priority`, `resolved` | Doubt & blocker tracking |
@@ -76,13 +70,13 @@ Request ──► Middleware (Auth, Validation) ──► Controller ──► S
 | `/api/auth/login` | POST | ❌ | `login` | User login |
 | `/api/auth/oauth` | POST | ❌ | `oauthLogin` | Google / GitHub OAuth |
 | `/api/auth/profile` | GET |  | `getProfile` | Current user profile |
-| `/api/problems` | GET/POST |  | `listProblems`, `createProblem` | DSA problem CRUD |
-| `/api/problems/:id` | GET/PATCH/DELETE |  | `getProblem`, `updateProblem`, `deleteProblem` | Single problem CRUD |
-| `/api/problems/sync` | POST |  | `syncLeetCodeProblems` | Sync LeetCode user data |
-| `/api/theory` | GET/POST |  | `listTheoryTopics`, `createTheoryTopic` | Core CS topics |
-| `/api/theory/stats` | GET |  | `getTheoryStats` | Mongo aggregation stats |
+| `/api/problems/leetcode-profile` | GET |  | `getLeetCodeProfile` | Cached LeetCode profile stats |
+| `/api/problems/sync` | POST |  | `syncLeetCodeProblems` | Sync LeetCode user profile data |
+| `/api/problems/neetcode-progress` | PUT |  | `updateNeetcodeProgress` | NeetCode 150 checklist state |
 | `/api/projects` | GET/POST |  | `listProjects`, `createProject` | Project idea tracking |
+| `/api/projects/:id` | PATCH/DELETE |  | `updateProject`, `deleteProject` | Single project mutation |
 | `/api/doubts` | GET/POST |  | `getDoubts`, `createDoubt` | Doubt tracking |
+| `/api/doubts/:id` | PATCH/DELETE |  | `updateDoubt`, `deleteDoubt` | Single doubt mutation |
 | `/api/roadmaps/:key` | GET/PUT |  | `getRoadmapProgress`, `updateRoadmapProgress` | Flowchart roadmap progress |
 
 ---

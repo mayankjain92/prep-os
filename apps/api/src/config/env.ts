@@ -10,7 +10,10 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().default("http://localhost:3000"),
 });
 
-const parsed = envSchema.safeParse(process.env);
+const parsed = envSchema.safeParse({
+  ...process.env,
+  JWT_SECRET: process.env.JWT_SECRET ?? (process.env.VITEST ? "prep-os-super-secret-key-12345" : undefined),
+});
 
 if (!parsed.success) {
   console.error("Environment config error:", parsed.error.format());

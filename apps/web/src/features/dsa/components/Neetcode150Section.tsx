@@ -1,7 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import {
   ExternalLink,
   Search,
@@ -311,7 +311,7 @@ export function Neetcode150Section() {
         <div className="space-y-1.5 bg-background p-3 rounded-xl border border-border">
           <div className="flex items-center justify-between text-[11px] font-bold">
             <span className="text-foreground flex items-center gap-1.5">
-              <img src="/logo.svg" alt="PrepOS Logo" className="h-3.5 w-3.5 object-contain" /> Overall Completion Progress
+              <Image src="/logo.svg" alt="PrepOS Logo" width={14} height={14} className="h-3.5 w-3.5 object-contain" /> Overall Completion Progress
             </span>
             <span className="text-xblue">{stats.solvedCount} of 150 Solved ({stats.percent}%)</span>
           </div>

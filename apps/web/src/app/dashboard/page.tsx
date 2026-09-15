@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useProblems, useLeetCodeProfile } from "@/features/dsa/useProblems";
+import { useLeetCodeProfile } from "@/features/dsa/useProblems";
 import { useProjects } from "@/features/projects/useProjects";
 import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
 import { useDoubts } from "@/features/doubts/useDoubts";
@@ -134,7 +134,6 @@ function EmptyState({ message, hint, icon, action }: { message: string; hint: st
 // ─── page ──────────────────────────────────────────────────────────────────
 
 export default function UnifiedDashboardPage() {
-  const { data: problems = [] } = useProblems();
   const { data: projects = [] } = useProjects();
   const { data: dsaFlowchartStatus = {} } = useRoadmapProgress("prep_os_dsa_roadmap_v2");
   const { data: theoryFlowchartStatus = {} } = useRoadmapProgress("prep_os_theory_roadmap");
@@ -248,11 +247,10 @@ export default function UnifiedDashboardPage() {
   const { data: dbLeetcodeProfile } = useLeetCodeProfile();
 
   // ── LeetCode ───────────────────────────────────────────────────────────
-  const solvedProblems = problems.filter((p) => p.status === "solved");
-  const totalSolved = dbLeetcodeProfile?.totalSolved ?? solvedProblems.length;
-  const easy = dbLeetcodeProfile?.easySolved ?? solvedProblems.filter((p) => p.difficulty === "Easy").length;
-  const medium = dbLeetcodeProfile?.mediumSolved ?? solvedProblems.filter((p) => p.difficulty === "Medium").length;
-  const hard = dbLeetcodeProfile?.hardSolved ?? solvedProblems.filter((p) => p.difficulty === "Hard").length;
+  const totalSolved = dbLeetcodeProfile?.totalSolved ?? 0;
+  const easy = dbLeetcodeProfile?.easySolved ?? 0;
+  const medium = dbLeetcodeProfile?.mediumSolved ?? 0;
+  const hard = dbLeetcodeProfile?.hardSolved ?? 0;
 
   // ── Doubts ─────────────────────────────────────────────────────────────
   const unresolvedDoubts = doubts.filter((d) => !d.resolved);

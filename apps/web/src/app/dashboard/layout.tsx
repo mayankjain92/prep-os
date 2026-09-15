@@ -1,14 +1,14 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
-import { ProfileModal } from "@/components/profile/ProfileModal";
+import { SetUsernameModal } from "@/components/profile/SetUsernameModal";
 import { Logo } from "@/components/shared/Logo";
 import { LayoutDashboard, Code2, BookOpen, FolderKanban } from "lucide-react";
 
@@ -16,7 +16,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const { user, isLoading } = useAuth();
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -30,7 +29,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="relative flex items-center justify-center">
           <div className="h-16 w-16 rounded-full border-2 border-transparent border-t-xblue border-r-cyan-400 animate-spin" />
           <div className="absolute flex items-center justify-center">
-            <img src="/logo.svg" alt="Loading" className="h-7 w-7 object-contain animate-pulse drop-shadow-[0_0_10px_rgba(0,212,255,0.7)]" />
+            <Image
+              src="/logo.svg"
+              alt="Loading"
+              width={28}
+              height={28}
+              priority
+              className="h-7 w-7 object-contain animate-pulse drop-shadow-[0_0_10px_rgba(0,212,255,0.7)]"
+            />
           </div>
         </div>
       </div>
@@ -80,7 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <div className="flex items-center gap-3">
             {user ? (
-              <ProfileDropdown onOpenModal={() => setIsProfileModalOpen(true)} />
+              <ProfileDropdown />
             ) : (
               <div className="flex items-center gap-2">
                 <Link href="/login">
@@ -103,11 +109,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <main className="flex-1 bg-background text-foreground">{children}</main>
       <ScrollToTop />
 
-      {/* Profile Modal */}
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-      />
+      {/* Choose Username Onboarding Modal */}
+      <SetUsernameModal />
     </div>
   );
 }

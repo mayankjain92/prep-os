@@ -1,8 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useProblems, useSyncLeetCode, useLeetCodeProfile } from "@/features/dsa/useProblems";
+import { useState, useMemo } from "react";
+import Image from "next/image";
+import { useSyncLeetCode, useLeetCodeProfile } from "@/features/dsa/useProblems";
 import { RoadmapFlowChart, type RoadmapNodeItem } from "@/components/shared/RoadmapFlowChart";
 import { DSA_ROADMAP_SECTIONS } from "@/data/dsa-roadmap";
 import { DoubtSection } from "@/features/dsa/components/DoubtSection";
@@ -17,19 +17,13 @@ import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
 import posthog from "posthog-js";
 
 export default function DsaDashboardPage() {
-  const { data: problems = [] } = useProblems();
   const { data: dbLeetcodeProfile } = useLeetCodeProfile();
   const { data: dsaFlowchartStatus = {} } = useRoadmapProgress("prep_os_dsa_roadmap_v2");
   const syncMutation = useSyncLeetCode();
-  const [leetcodeUsername, setLeetcodeUsername] = useState("");
+  const [customUsername, setCustomUsername] = useState<string | null>(null);
+  const leetcodeUsername = customUsername ?? dbLeetcodeProfile?.username ?? "";
   const [activeTab, setActiveTab] = useState<"flowchart" | "neetcode" | "doubts">("flowchart");
   const [activeSectionId, setActiveSectionId] = useState<string>(DSA_ROADMAP_SECTIONS[0].mainId);
-
-  useEffect(() => {
-    if (dbLeetcodeProfile?.username && !leetcodeUsername) {
-      setLeetcodeUsername(dbLeetcodeProfile.username);
-    }
-  }, [dbLeetcodeProfile?.username, leetcodeUsername]);
 
   const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
 
@@ -56,17 +50,12 @@ export default function DsaDashboardPage() {
     triggerSync(false);
   };
 
-  const solvedFromDb = problems.filter((p) => p.status === "solved");
-  const totalSolved = activeProfile?.totalSolved ?? solvedFromDb.length;
-  const easySolved = activeProfile?.easySolved ?? solvedFromDb.filter((p) => p.difficulty === "Easy").length;
-  const mediumSolved = activeProfile?.mediumSolved ?? solvedFromDb.filter((p) => p.difficulty === "Medium").length;
-  const hardSolved = activeProfile?.hardSolved ?? solvedFromDb.filter((p) => p.difficulty === "Hard").length;
+  const totalSolved = activeProfile?.totalSolved ?? 0;
+  const easySolved = activeProfile?.easySolved ?? 0;
+  const mediumSolved = activeProfile?.mediumSolved ?? 0;
+  const hardSolved = activeProfile?.hardSolved ?? 0;
 
   const { categoryProgress, overallStats } = useMemo(() => {
-    let totalAll = 0;
-    let doneAll = 0;
-    let learningAll = 0;
-
     const gatherNodeStats = (nodes?: RoadmapNodeItem[]) => {
       if (!nodes) return { total: 0, completed: 0, learning: 0 };
       let t = 0, c = 0, l = 0;
@@ -91,19 +80,19 @@ export default function DsaDashboardPage() {
       const com = left.completed + right.completed;
       const lrn = left.learning + right.learning;
 
-      totalAll += tot;
-      doneAll += com;
-      learningAll += lrn;
-
       return {
         mainId: sec.mainId,
         title: name,
         total: tot,
         completed: com,
+        learning: lrn,
         pct: tot > 0 ? Math.round((com / tot) * 100) : 0,
       };
     });
 
+    const totalAll = categories.reduce((acc, c) => acc + c.total, 0);
+    const doneAll = categories.reduce((acc, c) => acc + c.completed, 0);
+    const learningAll = categories.reduce((acc, c) => acc + c.learning, 0);
     const pendingAll = totalAll - doneAll - learningAll;
     const overallPct = totalAll > 0 ? Math.round((doneAll / totalAll) * 100) : 0;
 
@@ -152,7 +141,7 @@ export default function DsaDashboardPage() {
               spellCheck={false}
               placeholder="LeetCode username"
               value={leetcodeUsername}
-              onChange={(e) => setLeetcodeUsername(e.target.value)}
+              onChange={(e) => setCustomUsername(e.target.value)}
               className="bg-background border-border text-foreground text-xs sm:w-48 rounded-full px-4"
             />
             <Button
@@ -200,7 +189,13 @@ export default function DsaDashboardPage() {
           <div className="flex items-center gap-4">
             <div className="h-14 w-14 rounded-full bg-xblue/20 border border-xblue/40 flex items-center justify-center text-xblue">
               {activeProfile?.userAvatar ? (
-                <img src={activeProfile.userAvatar} alt="avatar" className="h-full w-full rounded-full object-cover" />
+                <Image
+                  src={activeProfile.userAvatar}
+                  alt="avatar"
+                  width={56}
+                  height={56}
+                  className="h-full w-full rounded-full object-cover"
+                />
               ) : (
                 <UserCheck className="h-7 w-7" />
               )}

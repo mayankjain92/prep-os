@@ -1,17 +1,13 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useTheme } from "@/components/ThemeProvider";
-import { User as UserIcon, Flame, Sun, Moon, LogOut, ChevronDown, Trophy, ExternalLink } from "lucide-react";
+import { User as UserIcon, Flame, Sun, Moon, LogOut, ChevronDown, ExternalLink } from "lucide-react";
 
-interface ProfileDropdownProps {
-  onOpenModal: () => void;
-}
-
-export function ProfileDropdown({ onOpenModal }: ProfileDropdownProps) {
+export function ProfileDropdown() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
@@ -43,7 +39,13 @@ export function ProfileDropdown({ onOpenModal }: ProfileDropdownProps) {
         {/* User Avatar Circle */}
         <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-xblue to-cyan-500 flex items-center justify-center font-bold text-white text-xs shadow-xs">
           {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt="Avatar" className="h-8 w-8 rounded-full object-cover" />
+            <Image
+              src={user.avatarUrl}
+              alt="Avatar"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-full object-cover"
+            />
           ) : (
             initial
           )}
@@ -69,7 +71,13 @@ export function ProfileDropdown({ onOpenModal }: ProfileDropdownProps) {
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-xblue to-cyan-500 flex items-center justify-center font-extrabold text-white text-sm">
                 {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="Avatar" className="h-10 w-10 rounded-full object-cover" />
+                  <Image
+                    src={user.avatarUrl}
+                    alt="Avatar"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
                 ) : (
                   initial
                 )}
@@ -118,24 +126,13 @@ export function ProfileDropdown({ onOpenModal }: ProfileDropdownProps) {
 
           {/* Profile Actions */}
           <div className="space-y-1">
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                onOpenModal();
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl text-foreground hover:bg-accent transition-colors text-left cursor-pointer"
-            >
-              <UserIcon className="h-4 w-4 text-xblue" />
-              <span>View Stats & Activity (Modal)</span>
-            </button>
-
             <Link
               href="/dashboard/profile"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl text-foreground hover:bg-accent transition-colors text-left"
             >
-              <Trophy className="h-4 w-4 text-amber-500" />
-              <span>Open Dedicated Profile Page</span>
+              <UserIcon className="h-4 w-4 text-xblue" />
+              <span>Profile & Activity</span>
               <ExternalLink className="h-3 w-3 text-muted-foreground ml-auto" />
             </Link>
 

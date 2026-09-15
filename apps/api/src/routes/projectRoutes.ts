@@ -2,20 +2,18 @@ import { Router } from "express";
 import {
   listProjects,
   createProject,
-  getProject,
   updateProject,
   deleteProject,
-} from "../controllers/projectControllers.js";
+} from "../controllers/projectController.js";
+import { validate } from "../middleware/validate.js";
+import { createProjectSchema, updateProjectSchema } from "@prep-os/shared";
 
 const router = Router();
 
-router.route("/")
-  .get(listProjects)
-  .post(createProject);
+router.get("/", listProjects);
+router.post("/", validate(createProjectSchema), createProject);
 
-router.route("/:id")
-  .get(getProject)
-  .patch(updateProject)
-  .delete(deleteProject);
+router.patch("/:id", validate(updateProjectSchema), updateProject);
+router.delete("/:id", deleteProject);
 
 export default router;

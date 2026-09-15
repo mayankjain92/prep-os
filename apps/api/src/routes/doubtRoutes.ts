@@ -5,12 +5,14 @@ import {
   updateDoubt,
   deleteDoubt,
 } from "../controllers/doubtController.js";
+import { validate } from "../middleware/validate.js";
+import { createDoubtSchema, updateDoubtSchema } from "@prep-os/shared";
 
 const router = Router();
 
 router.get("/", getDoubts);
-router.post("/", createDoubt);
-router.patch("/:id", updateDoubt);
+router.post("/", validate(createDoubtSchema), createDoubt);
+router.patch("/:id", validate(updateDoubtSchema), updateDoubt);
 router.delete("/:id", deleteDoubt);
 
 export default router;

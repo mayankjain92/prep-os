@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { Doubt } from "../models/Doubt.js";
-import { createDoubtSchema, updateDoubtSchema } from "@prep-os/shared";
 
 export async function getDoubts(req: Request, res: Response) {
   try {
@@ -25,13 +24,8 @@ export async function getDoubts(req: Request, res: Response) {
 
 export async function createDoubt(req: Request, res: Response) {
   try {
-    const parsed = createDoubtSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid input" });
-    }
-    
     const doubt = await Doubt.create({
-      ...parsed.data,
+      ...req.body,
       userId: req.userId,
     });
     
@@ -54,14 +48,10 @@ export async function createDoubt(req: Request, res: Response) {
 export async function updateDoubt(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const parsed = updateDoubtSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid input" });
-    }
 
     const doubt = await Doubt.findOneAndUpdate(
       { _id: id, userId: req.userId },
-      { $set: parsed.data },
+      { $set: req.body },
       { new: true }
     );
 

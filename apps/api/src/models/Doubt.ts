@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IDoubt extends Document {
-  userId: Types.ObjectId;
+  userId: Types.ObjectId | string;
   title: string;
   type: "leetcode" | "topic";
   topic: string;

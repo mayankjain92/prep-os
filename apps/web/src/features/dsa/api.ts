@@ -1,5 +1,4 @@
 import { apiFetch } from "@/lib/api-client";
-import type { CreateProblemInput, UpdateProblemInput } from "@prep-os/shared";
 
 export interface Problem {
   _id: string;
@@ -34,33 +33,6 @@ export interface SyncLeetCodeResult {
 
 export async function fetchProblems(): Promise<Problem[]> {
   return apiFetch<Problem[]>("/api/problems");
-}
-
-export async function fetchProblem(id: string): Promise<Problem> {
-  return apiFetch<Problem>(`/api/problems/${id}`);
-}
-
-export async function createProblem(data: CreateProblemInput): Promise<Problem> {
-  return apiFetch<Problem>("/api/problems", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-export async function updateProblem(
-  id: string,
-  data: UpdateProblemInput
-): Promise<Problem> {
-  return apiFetch<Problem>(`/api/problems/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(data),
-  });
-}
-
-export async function deleteProblem(id: string): Promise<void> {
-  return apiFetch<void>(`/api/problems/${id}`, {
-    method: "DELETE",
-  });
 }
 
 export interface SyncLeetCodeParams {

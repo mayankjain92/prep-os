@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { Types } from "mongoose";
 import { Problem } from "../models/Problem.js";
 import { User } from "../models/User.js";
-import { getLeetCodeUserData, invalidateLeetCodeCache } from "../services/leetcodeService.js";
+import {
+  getLeetCodeUserData,
+  invalidateLeetCodeCache,
+} from "../services/leetcodeService.js";
 import { STANDARD_DSA_ROADMAP } from "@prep-os/shared";
 
 function getParamId(req: Request): string {
@@ -29,7 +32,7 @@ export async function listProblems(req: Request, res: Response) {
   const userId = req.userId;
 
   // Auto-seed standard DSA roadmap if user has no problems recorded yet
-  const count = await Problem.countDocuments({ userId: userId as any });
+  const count = await Problem.countDocuments({ userId: userId });
   if (count === 0) {
     const roadmapItems = STANDARD_DSA_ROADMAP.map((item) => ({
       userId,
@@ -43,23 +46,10 @@ export async function listProblems(req: Request, res: Response) {
     await Problem.insertMany(roadmapItems);
   }
 
-  const problems = await Problem.find({ userId: userId as any }).sort({ createdAt: 1 });
+  const problems = await Problem.find({ userId: userId }).sort({
+     createdAt: 1,
+  });
   res.json(problems);
-}
-
-export async function getProblem(req: Request, res: Response) {
-  const userId = req.userId;
-  const id = getParamId(req);
-
-  if (!id || !Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "Problem not found" });
-  }
-
-  const problem = await Problem.findOne({ _id: id, userId });
-  if (!problem) {
-    return res.status(404).json({ error: "Problem not found" });
-  }
-  res.json(problem);
 }
 
 export async function updateProblem(req: Request, res: Response) {
@@ -87,7 +77,7 @@ export async function updateProblem(req: Request, res: Response) {
   const problem = await Problem.findOneAndUpdate(
     { _id: id, userId },
     updateData,
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
 
   if (!problem) {
@@ -128,9 +118,14 @@ export async function syncLeetCodeProblems(req: Request, res: Response) {
   let updatedCount = 0;
   for (const item of dataResult.solvedProblems) {
     const existing = await Problem.findOne({
-      userId: userId as any,
+      userId: userId,
       $or: [
-        { title: new RegExp(`^${item.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") },
+        {
+          title: new RegExp(
+            `^${item.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+            "i",
+          ),
+        },
         { url: new RegExp(item.titleSlug, "i") },
       ],
     });

@@ -2,26 +2,21 @@ import { Router } from "express";
 import {
   createProblem,
   listProblems,
-  getProblem,
   updateProblem,
   deleteProblem,
   syncLeetCodeProblems,
   getLeetCodeProfile,
-} from "../controllers/problemControllers.js";
+} from "../controllers/problemController.js";
 
 const router = Router();
 
 router.get("/leetcode-profile", getLeetCodeProfile);
-
-router.route("/")
-  .get(listProblems)
-  .post(createProblem);
-
 router.post("/sync", syncLeetCodeProblems);
 
-router.route("/:id")
-  .get(getProblem)
-  .patch(updateProblem)
-  .delete(deleteProblem);
+router.get("/", listProblems);
+router.post("/", createProblem);
+
+router.patch("/:id", updateProblem);
+router.delete("/:id", deleteProblem);
 
 export default router;

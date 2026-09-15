@@ -4,30 +4,41 @@ import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import { User, IUser } from "../models/User.js";
 import { RoadmapProgress } from "../models/RoadmapProgress.js";
-import { TopicStatus } from "../models/TopicStatus.js";
 import { Project } from "../models/Project.js";
 import { registerSchema, loginSchema } from "@prep-os/shared";
+import { env } from "../config/env.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || "prep-os-super-secret-key-12345";
+const JWT_SECRET = env.JWT_SECRET;
 const JWT_EXPIRES_IN = "7d";
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
-const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || "";
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || "";
+const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID;
+const GITHUB_CLIENT_ID = env.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = env.GITHUB_CLIENT_SECRET;
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 export async function checkUsername(req: Request, res: Response) {
   try {
-    const rawUsername = ((req.query.username as string) || "").trim().toLowerCase();
+    const rawUsername = ((req.query.username as string) || "")
+      .trim()
+      .toLowerCase();
     if (!rawUsername || rawUsername.length < 3 || rawUsername.length > 20) {
-      return res.json({ available: false, message: "Username must be 3-20 characters" });
+      return res.json({
+        available: false,
+        message: "Username must be 3-20 characters",
+      });
     }
     if (!/^[a-zA-Z0-9_]+$/.test(rawUsername)) {
-      return res.json({ available: false, message: "Only letters, numbers, and underscores allowed" });
+      return res.json({
+        available: false,
+        message: "Only letters, numbers, and underscores allowed",
+      });
     }
     const existing = await User.findOne({ username: rawUsername });
     if (existing) {
-      return res.json({ available: false, message: "Username is already taken" });
+      return res.json({
+        available: false,
+        message: "Username is already taken",
+      });
     }
     return res.json({ available: true, message: "Username is available!" });
   } catch (error) {
@@ -50,7 +61,10 @@ export async function register(req: Request, res: Response) {
 
   const existingEmail = await User.findOne({ email: cleanEmail });
   if (existingEmail) {
-    if (existingUsername && existingUsername._id.toString() !== existingEmail._id.toString()) {
+    if (
+      existingUsername &&
+      existingUsername._id.toString() !== existingEmail._id.toString()
+    ) {
       return res.status(400).json({ error: "Username is already taken" });
     }
 
@@ -63,9 +77,12 @@ export async function register(req: Request, res: Response) {
 
       const updatedUser = await recordDailyLogin(existingEmail);
       const token = jwt.sign(
-        { userId: (updatedUser._id as any).toString(), email: updatedUser.email },
+        {
+          userId: (updatedUser._id as any).toString(),
+          email: updatedUser.email,
+        },
         JWT_SECRET,
-        { expiresIn: JWT_EXPIRES_IN }
+        { expiresIn: JWT_EXPIRES_IN },
       );
 
       return res.status(200).json({
@@ -84,7 +101,9 @@ export async function register(req: Request, res: Response) {
       });
     }
 
-    return res.status(400).json({ error: "Email is already registered. Please sign in." });
+    return res
+      .status(400)
+      .json({ error: "Email is already registered. Please sign in." });
   }
 
   if (existingUsername) {
@@ -106,7 +125,7 @@ export async function register(req: Request, res: Response) {
   const token = jwt.sign(
     { userId: (updatedUser._id as any).toString(), email: updatedUser.email },
     JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
+    { expiresIn: JWT_EXPIRES_IN },
   );
 
   res.status(201).json({
@@ -140,7 +159,9 @@ export async function login(req: Request, res: Response) {
   });
 
   if (!existingUser) {
-    return res.status(401).json({ error: "Invalid username/email or password" });
+    return res
+      .status(401)
+      .json({ error: "Invalid username/email or password" });
   }
 
   if (!existingUser.passwordHash) {
@@ -151,7 +172,9 @@ export async function login(req: Request, res: Response) {
 
   const isMatch = await bcrypt.compare(password, existingUser.passwordHash);
   if (!isMatch) {
-    return res.status(401).json({ error: "Invalid username/email or password" });
+    return res
+      .status(401)
+      .json({ error: "Invalid username/email or password" });
   }
 
   const updatedUser = await recordDailyLogin(existingUser);
@@ -159,7 +182,7 @@ export async function login(req: Request, res: Response) {
   const token = jwt.sign(
     { userId: (updatedUser._id as any).toString(), email: updatedUser.email },
     JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
+    { expiresIn: JWT_EXPIRES_IN },
   );
 
   res.json({
@@ -218,18 +241,21 @@ export async function oauthLogin(req: Request, res: Response) {
     if (req.body.code && GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET) {
       provider = "github";
       try {
-        const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
+        const tokenRes = await fetch(
+          "https://github.com/login/oauth/access_token",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              client_id: GITHUB_CLIENT_ID,
+              client_secret: GITHUB_CLIENT_SECRET,
+              code: req.body.code,
+            }),
           },
-          body: JSON.stringify({
-            client_id: GITHUB_CLIENT_ID,
-            client_secret: GITHUB_CLIENT_SECRET,
-            code: req.body.code,
-          }),
-        });
+        );
         const tokenData = await tokenRes.json();
         if (tokenData.access_token) {
           const userRes = await fetch("https://api.github.com/user", {
@@ -240,9 +266,12 @@ export async function oauthLogin(req: Request, res: Response) {
           // Fetch primary email if private
           let userEmail = githubUser.email;
           if (!userEmail) {
-            const emailsRes = await fetch("https://api.github.com/user/emails", {
-              headers: { Authorization: `token ${tokenData.access_token}` },
-            });
+            const emailsRes = await fetch(
+              "https://api.github.com/user/emails",
+              {
+                headers: { Authorization: `token ${tokenData.access_token}` },
+              },
+            );
             const emails = await emailsRes.json();
             if (Array.isArray(emails)) {
               const primary = emails.find((e: any) => e.primary) || emails[0];
@@ -260,13 +289,18 @@ export async function oauthLogin(req: Request, res: Response) {
     }
 
     if (!email) {
-      return res.status(400).json({ error: "Could not retrieve user email from OAuth provider." });
+      return res
+        .status(400)
+        .json({ error: "Could not retrieve user email from OAuth provider." });
     }
 
     let existingUser = await User.findOne({ email });
 
     const generateUniqueUsername = async (userEmail: string) => {
-      let base = userEmail.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
+      let base = userEmail
+        .split("@")[0]
+        .replace(/[^a-zA-Z0-9_]/g, "_")
+        .toLowerCase();
       if (base.length < 3) base = `user_${base}`;
       if (base.length > 15) base = base.slice(0, 15);
 
@@ -293,7 +327,8 @@ export async function oauthLogin(req: Request, res: Response) {
         existingUser.username = await generateUniqueUsername(email);
       }
       if (providerId) existingUser.providerId = providerId;
-      if (avatarUrl && !existingUser.avatarUrl) existingUser.avatarUrl = avatarUrl;
+      if (avatarUrl && !existingUser.avatarUrl)
+        existingUser.avatarUrl = avatarUrl;
       await existingUser.save();
     }
 
@@ -302,7 +337,7 @@ export async function oauthLogin(req: Request, res: Response) {
     const token = jwt.sign(
       { userId: (updatedUser._id as any).toString(), email: updatedUser.email },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
+      { expiresIn: JWT_EXPIRES_IN },
     );
 
     res.json({
@@ -321,7 +356,9 @@ export async function oauthLogin(req: Request, res: Response) {
     });
   } catch (error: any) {
     console.error("OAuth error:", error);
-    res.status(500).json({ error: error.message || "OAuth authentication failed." });
+    res
+      .status(500)
+      .json({ error: error.message || "OAuth authentication failed." });
   }
 }
 
@@ -383,17 +420,20 @@ export async function getProfile(req: Request, res: Response) {
 
     const roadmapProgress = await RoadmapProgress.find({ userId });
     let totalDoneNodes = 0;
+    let theoryCompletedCount = 0;
+
     roadmapProgress.forEach((rp) => {
       if (rp.nodeStatuses) {
         for (const [, status] of rp.nodeStatuses) {
-          if (status === "done") totalDoneNodes++;
+          if (status === "done") {
+            if (rp.roadmapKey === "prep_os_theory_roadmap") {
+              theoryCompletedCount++;
+            } else {
+              totalDoneNodes++;
+            }
+          }
         }
       }
-    });
-
-    const theoryCompletedCount = await TopicStatus.countDocuments({
-      userId,
-      status: "done",
     });
 
     const projectsCount = await Project.countDocuments({
@@ -412,7 +452,10 @@ export async function getProfile(req: Request, res: Response) {
         authProvider: updatedUser.authProvider,
         avatarUrl: updatedUser.avatarUrl,
         leetcodeProfile: updatedUser.leetcodeProfile,
-        neetcodeProgress: updatedUser.neetcodeProgress || { solved: [], starred: [] },
+        neetcodeProgress: updatedUser.neetcodeProgress || {
+          solved: [],
+          starred: [],
+        },
         loginDates: updatedUser.loginDates || [],
         currentStreak: updatedUser.currentStreak || 0,
         longestStreak: updatedUser.longestStreak || 0,
@@ -445,7 +488,7 @@ export async function updateNeetcodeProgress(req: Request, res: Response) {
           "neetcodeProgress.starred": Array.isArray(starred) ? starred : [],
         },
       },
-      { new: true }
+      { new: true },
     );
 
     if (!user) {
@@ -461,4 +504,3 @@ export async function updateNeetcodeProgress(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to update NeetCode progress" });
   }
 }
-

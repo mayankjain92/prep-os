@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import request from "supertest";
 import express from "express";
-import problemRoutes from "../routes/ProblemRoutes.js";
+import problemRoutes from "../routes/problemRoutes.js";
 import authRoutes from "../routes/authRoutes.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { Problem } from "../models/Problem.js";

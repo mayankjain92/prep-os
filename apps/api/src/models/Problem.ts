@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IProblem extends Document {
-  userId: Types.ObjectId;
+  userId: Types.ObjectId | string;
   title: string;
   difficulty: "Easy" | "Medium" | "Hard";
   topics: string[];

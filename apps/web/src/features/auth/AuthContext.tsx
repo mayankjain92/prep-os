@@ -58,6 +58,7 @@ interface AuthContextType {
   oauthLogin: (providerData: OAuthInput) => Promise<void>;
   refreshProfile: () => Promise<void>;
   saveNeetcodeProgress: (solved: string[], starred: string[]) => Promise<void>;
+  setUsername: (username: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -175,6 +176,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const setUsername = async (newUsername: string) => {
+    const data = await apiFetch<{ message: string; user: User }>("/api/auth/set-username", {
+      method: "POST",
+      body: JSON.stringify({ username: newUsername }),
+    });
+
+    if (data?.user) {
+      setUser(data.user);
+      localStorage.setItem("user", JSON.stringify(data.user));
+    }
+  };
+
   const logout = () => {
     posthog.capture("user_logged_out");
     posthog.reset();
@@ -187,7 +200,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, login, register, oauthLogin, refreshProfile, saveNeetcodeProgress, logout }}
+      value={{
+        user,
+        token,
+        isLoading,
+        login,
+        register,
+        oauthLogin,
+        refreshProfile,
+        saveNeetcodeProgress,
+        setUsername,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

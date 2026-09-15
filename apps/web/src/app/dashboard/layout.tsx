@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 import { ProfileModal } from "@/components/profile/ProfileModal";
+import { SetUsernameModal } from "@/components/profile/SetUsernameModal";
 import { Logo } from "@/components/shared/Logo";
 import { LayoutDashboard, Code2, BookOpen, FolderKanban } from "lucide-react";
 
@@ -108,6 +109,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
+
+      {/* Choose Username Onboarding Modal */}
+      <SetUsernameModal />
     </div>
   );
 }

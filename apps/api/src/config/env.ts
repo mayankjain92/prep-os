@@ -1,9 +1,19 @@
-export const env = {
-  PORT: process.env.PORT || 4000,
-  MONGO_URI: process.env.MONGO_URI || "mongodb://localhost:27017/prep-os",
-  REDIS_URL: process.env.REDIS_URL || "redis://localhost:6379",
-  JWT_SECRET: process.env.JWT_SECRET || "prep-os-super-secret-key-12345",
-  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
-  GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID || "",
-  GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET || "",
-};
+import "dotenv/config";
+import { z } from "zod";
+
+const envSchema = z.object({
+  PORT: z.coerce.number().default(4000),
+  MONGO_URI: z.string().default("mongodb://localhost:27017/prep-os"),
+  REDIS_URL: z.string().default("redis://localhost:6379"),
+  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+  GOOGLE_CLIENT_ID: z.string().default(""),
+});
+
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error("Environment config error:", parsed.error.format());
+  process.exit(1);
+}
+
+export const env = parsed.data;

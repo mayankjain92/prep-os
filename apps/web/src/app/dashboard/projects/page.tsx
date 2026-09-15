@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { PageTransition, FadeInCard } from "@/components/shared/PageTransition";
 import { GitHubSyncModal, GitHubRepo } from "@/features/projects/components/GitHubSyncModal";
+import type { ProjectItem } from "@/features/projects/api";
 import { FolderKanban, ExternalLink, Plus, Trash2, Code, CheckCircle2, Pencil } from "lucide-react";
 import posthog from "posthog-js";
 
@@ -81,7 +82,7 @@ export default function ProjectsDashboardPage() {
     setDialogOpen(false);
   };
 
-  const handleAddInlineTag = (e: React.FormEvent, proj: any) => {
+  const handleAddInlineTag = (e: React.FormEvent, proj: ProjectItem) => {
     e.preventDefault();
     if (!inlineTagInput || !inlineTagInput.value.trim()) {
       setInlineTagInput(null);

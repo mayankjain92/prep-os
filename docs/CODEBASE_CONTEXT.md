@@ -57,27 +57,28 @@ Request ──► Middleware (Auth, Validation) ──► Controller ──► S
 ### Models (`src/models/`)
 | Model | Key Fields | Purpose |
 |---|---|---|
-| `User` | `email`, `username`, `passwordHash`, `leetcodeProfile`, `googleId`, `githubId` | User account & auth credentials |
-| `TheoryTopic`| `userId`, `subject` (OS/DBMS/CN/Aptitude), `topicName`, `status`, `notes` | Computer science core topics |
-| `Project` | `userId`, `title`, `description`, `techStack`, `githubUrl`, `liveUrl`, `status` | Portfolio project planner |
-| `Doubt` | `userId`, `title`, `type`, `topic`, `priority`, `resolved` | Doubt & blocker tracking |
+| `User` | `email`, `username`, `passwordHash`, `authProvider`, `providerId`, `leetcodeProfile`, `neetcodeProgress`, `loginDates`, `currentStreak` | User account, streaks, credentials |
+| `Project` | `userId`, `name`, `techStack`, `customTags`, `status`, `repoUrl`, `notes` | Portfolio project planner |
+| `Doubt` | `userId`, `title`, `type`, `topic`, `url`, `priority`, `notes`, `resolved` | Doubt & blocker tracking |
 | `RoadmapProgress`| `userId`, `roadmapKey`, `nodeStatuses` (Map<nodeId, status>) | Visual roadmap node completion |
 
 ### Route & Controller Registry
 | Endpoint | Method | Auth? | Controller | Description |
 |---|---|:---:|---|---|
-| `/api/auth/register` | POST | ❌ | `register` | User signup |
-| `/api/auth/login` | POST | ❌ | `login` | User login |
-| `/api/auth/oauth` | POST | ❌ | `oauthLogin` | Google / GitHub OAuth |
-| `/api/auth/profile` | GET |  | `getProfile` | Current user profile |
-| `/api/problems/leetcode-profile` | GET |  | `getLeetCodeProfile` | Cached LeetCode profile stats |
-| `/api/problems/sync` | POST |  | `syncLeetCodeProblems` | Sync LeetCode user profile data |
-| `/api/problems/neetcode-progress` | PUT |  | `updateNeetcodeProgress` | NeetCode 150 checklist state |
-| `/api/projects` | GET/POST |  | `listProjects`, `createProject` | Project idea tracking |
-| `/api/projects/:id` | PATCH/DELETE |  | `updateProject`, `deleteProject` | Single project mutation |
-| `/api/doubts` | GET/POST |  | `getDoubts`, `createDoubt` | Doubt tracking |
-| `/api/doubts/:id` | PATCH/DELETE |  | `updateDoubt`, `deleteDoubt` | Single doubt mutation |
-| `/api/roadmaps/:key` | GET/PUT |  | `getRoadmapProgress`, `updateRoadmapProgress` | Flowchart roadmap progress |
+| `/api/auth/register` | POST | ❌ | `register` | User signup with Zod validation |
+| `/api/auth/login` | POST | ❌ | `login` | User login (email or username) |
+| `/api/auth/oauth` | POST | ❌ | `oauthLogin` | Verified Google OAuth login |
+| `/api/auth/check-username` | GET | ❌ | `checkUsername` | Real-time handle availability check |
+| `/api/auth/set-username` | POST | 🔒 | `setUsername` | Set handle for OAuth users |
+| `/api/auth/profile` | GET | 🔒 | `getProfile` | User profile, streaks & overview stats |
+| `/api/problems/leetcode-profile` | GET | 🔒 | `getLeetCodeProfile` | Cached LeetCode profile stats |
+| `/api/problems/sync` | POST | 🔒 | `syncLeetCodeProblems` | Sync LeetCode user profile data |
+| `/api/problems/neetcode-progress` | PUT | 🔒 | `updateNeetcodeProgress` | NeetCode 150 checklist state |
+| `/api/projects` | GET/POST | 🔒 | `listProjects`, `createProject` | Project tracking |
+| `/api/projects/:id` | PATCH/DELETE | 🔒 | `updateProject`, `deleteProject` | Single project mutation |
+| `/api/doubts` | GET/POST | 🔒 | `getDoubts`, `createDoubt` | Doubt tracking |
+| `/api/doubts/:id` | PATCH/DELETE | 🔒 | `updateDoubt`, `deleteDoubt` | Single doubt mutation |
+| `/api/roadmaps/:key` | GET/PUT | 🔒 | `getRoadmapProgress`, `updateRoadmapProgress` | Flowchart roadmap progress |
 
 ---
 

@@ -1,7 +1,7 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Types} from "mongoose";
 
 export interface IProject extends Document {
-  userId: string;
+  userId: Types.ObjectId | string;
   name: string;
   techStack: string[];
   customTags: string[];
@@ -15,7 +15,7 @@ export interface IProject extends Document {
 const projectSchema = new Schema<IProject>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
       index: true,
     },

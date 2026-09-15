@@ -1,5 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
+
+import Image from "next/image";
 
 export default function Loading() {
   return (
@@ -18,9 +19,12 @@ export default function Loading() {
 
           {/* Centered PrepOS Emblem Cutout */}
           <div className="absolute flex items-center justify-center p-2">
-            <img
+            <Image
               src="/logo.svg"
               alt="Loading PrepOS"
+              width={36}
+              height={36}
+              priority
               className="h-9 w-9 object-contain animate-pulse drop-shadow-[0_0_12px_rgba(0,212,255,0.8)]"
             />
           </div>

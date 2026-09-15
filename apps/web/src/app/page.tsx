@@ -403,7 +403,7 @@ export default function Home() {
             <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
               <Shield className="h-6 w-6 text-amber-400 mx-auto" />
               <div className="font-extrabold text-sm">OAuth 2.0 & JWT</div>
-              <div className="text-[11px] text-muted-foreground">Google & GitHub Login</div>
+              <div className="text-[11px] text-muted-foreground">Google & Email Login</div>
             </div>
           </div>
         </section>

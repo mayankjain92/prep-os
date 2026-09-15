@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { RoadmapProgress } from "../models/RoadmapProgress.js";
-import { updateRoadmapProgressSchema } from "@prep-os/shared";
 
 export async function getRoadmapProgress(req: Request, res: Response) {
   try {
@@ -26,10 +25,10 @@ export async function getRoadmapProgress(req: Request, res: Response) {
 export async function updateRoadmapProgress(req: Request, res: Response) {
   try {
     const { key } = req.params;
-    const parsed = updateRoadmapProgressSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid input" });
-    }
+    const incomingStatuses = req.body.nodeStatuses as Record<
+      string,
+      "pending" | "in-progress" | "done"
+    >;
 
     let progress = await RoadmapProgress.findOne({ userId: req.userId, roadmapKey: key });
     
@@ -37,23 +36,23 @@ export async function updateRoadmapProgress(req: Request, res: Response) {
       progress = new RoadmapProgress({
         userId: req.userId,
         roadmapKey: key,
-        nodeStatuses: parsed.data.nodeStatuses,
+        nodeStatuses: incomingStatuses,
       });
       await progress.save();
     } else {
-      for (const [nodeId, status] of Object.entries(parsed.data.nodeStatuses)) {
+      for (const [nodeId, status] of Object.entries(incomingStatuses)) {
         progress.nodeStatuses.set(nodeId, status);
       }
       progress.markModified("nodeStatuses");
       await progress.save();
     }
 
-    const nodeStatuses: Record<string, string> = {};
+    const formattedStatuses: Record<string, string> = {};
     progress.nodeStatuses.forEach((value, k) => {
-      nodeStatuses[k] = value;
+      formattedStatuses[k] = value;
     });
 
-    res.json(nodeStatuses);
+    res.json(formattedStatuses);
   } catch (error) {
     res.status(500).json({ error: "Failed to update roadmap progress" });
   }

@@ -54,11 +54,10 @@ export function SocialAuthButtons({ onError }: { onError?: (err: string) => void
           if (response.credential) {
             setLoading(true);
             try {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              await oauthLogin({ credential: response.credential, provider: "google" } as any);
+              await oauthLogin({ credential: response.credential, provider: "google" });
             } catch (err: unknown) {
-              const error = err as Error;
-              if (onError) onError(error.message || "Google Sign In failed");
+              const error = err instanceof Error ? err.message : "Google Sign In failed";
+              if (onError) onError(error);
             } finally {
               setLoading(false);
             }
@@ -101,11 +100,10 @@ export function SocialAuthButtons({ onError }: { onError?: (err: string) => void
         callback: async (response: { credential?: string }) => {
           if (response.credential) {
             try {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              await oauthLogin({ credential: response.credential, provider: "google" } as any);
+              await oauthLogin({ credential: response.credential, provider: "google" });
             } catch (err: unknown) {
-              const error = err as Error;
-              if (onError) onError(error.message || "Google Sign In failed");
+              const error = err instanceof Error ? err.message : "Google Sign In failed";
+              if (onError) onError(error);
             } finally {
               setLoading(false);
             }

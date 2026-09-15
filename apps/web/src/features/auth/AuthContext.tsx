@@ -42,11 +42,9 @@ export interface User {
   stats?: UserStats;
 }
 
-interface OAuthInput {
-  email: string;
-  provider: "google" | "github";
-  providerId?: string;
-  avatarUrl?: string;
+export interface OAuthInput {
+  credential: string;
+  provider?: "google";
 }
 
 interface AuthContextType {
@@ -65,9 +63,31 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("token");
+    }
+    return null;
+  });
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== "undefined") {
+      const savedUser = localStorage.getItem("user");
+      if (savedUser) {
+        try {
+          return JSON.parse(savedUser) as User;
+        } catch {
+          localStorage.removeItem("user");
+        }
+      }
+    }
+    return null;
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return Boolean(localStorage.getItem("token"));
+    }
+    return true;
+  });
   const router = useRouter();
 
   const fetchProfile = async () => {
@@ -83,25 +103,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+    if (!token) return;
 
-    if (savedToken) {
-      // eslint-disable-next-line
-      setToken(savedToken);
-      if (savedUser) {
-        try {
-          const parsed: User = JSON.parse(savedUser);
-          setUser(parsed);
-          posthog.identify(parsed.id, { username: parsed.username });
-        } catch {
-          localStorage.removeItem("user");
-        }
-      }
-      fetchProfile().finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
+    if (user?.id) {
+      posthog.identify(user.id, { username: user.username });
     }
+
+    let isMounted = true;
+    apiFetch<{ user: User }>("/api/auth/profile")
+      .then((data) => {
+        if (isMounted && data?.user) {
+          setUser(data.user);
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user profile:", err);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (credentials: LoginInput) => {

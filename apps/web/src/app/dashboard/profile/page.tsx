@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useAuth } from "@/features/auth/AuthContext";
@@ -7,6 +6,7 @@ import { LoginHeatmap } from "@/components/profile/LoginHeatmap";
 import { ShareableProgressCard } from "@/components/profile/ShareableProgressCard";
 import { User as UserIcon, Sun, Moon, Flame, Shield, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -63,12 +63,18 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* User Header Profile Card */}
-      <div className="p-7 rounded-3xl bg-gradient-to-r from-xblue/10 via-card to-amber-500/10 border border-border flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+      {/* User Banner Header */}
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-xblue/10 via-card to-amber-500/10 border border-border flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
         <div className="flex items-center gap-5 text-center sm:text-left">
           <div className="h-20 w-20 rounded-3xl bg-gradient-to-tr from-xblue to-cyan-500 flex items-center justify-center font-black text-white text-3xl shadow-lg ring-4 ring-background">
             {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt="Avatar" className="h-20 w-20 rounded-3xl object-cover" />
+              <Image
+                src={user.avatarUrl}
+                alt="Avatar"
+                width={80}
+                height={80}
+                className="h-20 w-20 rounded-3xl object-cover"
+              />
             ) : (
               initial
             )}
@@ -78,7 +84,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-2 justify-center sm:justify-start">
               <h2 className="text-xl font-black text-foreground">@{user.username || user.email.split("@")[0]}</h2>
               <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-extrabold bg-xblue/20 text-xblue border border-xblue/30 shadow-xs">
-                <img src="/logo.svg" alt="PrepOS Cutout Logo" className="h-3.5 w-3.5 object-contain" />
+                <Image src="/logo.svg" alt="PrepOS Cutout Logo" width={14} height={14} className="h-3.5 w-3.5 object-contain" />
                 PrepOS Scholar
               </span>
             </div>
@@ -114,7 +120,7 @@ export default function ProfilePage() {
       {/* Section 2: Shareable Progress Card */}
       <div className="space-y-4">
         <h2 className="text-base font-black text-foreground uppercase tracking-wider flex items-center gap-2">
-          <img src="/logo.svg" alt="PrepOS Logo" className="h-5 w-5 object-contain" />
+          <Image src="/logo.svg" alt="PrepOS Logo" width={20} height={20} className="h-5 w-5 object-contain" />
           <span>Shareable Progress Card</span>
         </h2>
 

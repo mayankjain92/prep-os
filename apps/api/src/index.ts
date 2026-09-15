@@ -10,9 +10,10 @@ import roadmapRoutes from "./routes/roadmapRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { startKeepAlive } from "./services/keepAliveService.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+import { env } from "./config/env.js";
 
 const app = express();
-app.use(cors());
+app.use(cors({origin: env.FRONTEND_URL, credentials: true}));
 app.use(express.json());
 
 // Auth routes (Public)

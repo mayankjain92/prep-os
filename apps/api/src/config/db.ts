@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
+import { env } from "./env.js";
 
 export async function connectDB(): Promise<void> {
   if (mongoose.connection.readyState === 1) {
     console.log("Already connected to the DB");
     return;
   }
-  const uri = process.env.MONGO_URI;
+  const uri = env.MONGO_URI;
   if (!uri) {
     throw new Error("MongoDb URL not found");
   }

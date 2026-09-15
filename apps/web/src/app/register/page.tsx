@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useAuth } from "@/features/auth/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -19,53 +18,48 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Debounced username check state
-  const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
-  const [usernameMsg, setUsernameMsg] = useState("");
+  // Debounced username check state & derived validation
+  const cleanUsername = username.trim().toLowerCase();
+  const clientValidation = useMemo(() => {
+    if (!cleanUsername) return { status: "idle" as const, msg: "" };
+    if (cleanUsername.length < 3 || cleanUsername.length > 20) {
+      return { status: "invalid" as const, msg: "Must be 3-20 characters" };
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
+      return { status: "invalid" as const, msg: "Only letters, numbers, and underscores allowed" };
+    }
+    return null;
+  }, [cleanUsername]);
+
+  const [asyncStatus, setAsyncStatus] = useState<{
+    status: "checking" | "available" | "taken" | "idle";
+    msg: string;
+  }>({ status: "idle", msg: "" });
+
+  const usernameStatus = clientValidation ? clientValidation.status : asyncStatus.status;
+  const usernameMsg = clientValidation ? clientValidation.msg : asyncStatus.msg;
 
   useEffect(() => {
-    const cleanUsername = username.trim().toLowerCase();
-    if (!cleanUsername) {
-      setUsernameStatus("idle");
-      setUsernameMsg("");
-      return;
-    }
-
-    if (cleanUsername.length < 3 || cleanUsername.length > 20) {
-      setUsernameStatus("invalid");
-      setUsernameMsg("Must be 3-20 characters");
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
-      setUsernameStatus("invalid");
-      setUsernameMsg("Only letters, numbers, and underscores allowed");
-      return;
-    }
-
-    setUsernameStatus("checking");
-    setUsernameMsg("Checking availability...");
+    if (clientValidation !== null) return;
 
     const timer = setTimeout(async () => {
+      setAsyncStatus({ status: "checking", msg: "Checking availability..." });
       try {
         const res = await apiFetch<{ available: boolean; message: string }>(
           `/api/auth/check-username?username=${encodeURIComponent(cleanUsername)}`
         );
         if (res.available) {
-          setUsernameStatus("available");
-          setUsernameMsg(`@${cleanUsername} is available!`);
+          setAsyncStatus({ status: "available", msg: `@${cleanUsername} is available!` });
         } else {
-          setUsernameStatus("taken");
-          setUsernameMsg(res.message || "Username already taken");
+          setAsyncStatus({ status: "taken", msg: res.message || "Username already taken" });
         }
       } catch {
-        setUsernameStatus("idle");
-        setUsernameMsg("");
+        setAsyncStatus({ status: "idle", msg: "" });
       }
     }, 450);
 
     return () => clearTimeout(timer);
-  }, [username]);
+  }, [cleanUsername, clientValidation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

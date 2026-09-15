@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import { User } from "../models/User.js";
 import { RoadmapProgress } from "../models/RoadmapProgress.js";
 import { Project } from "../models/Project.js";
-import { registerSchema, loginSchema } from "@prep-os/shared";
 import { verifyGoogleToken } from "../services/oauthService.js";
 import { recordDailyLogin } from "../services/streakService.js";
 import { generateToken, formatAuthUser } from "../services/authService.js";
@@ -39,13 +38,7 @@ export async function checkUsername(req: Request, res: Response) {
 }
 
 export async function register(req: Request, res: Response) {
-  const parseResult = registerSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    const errorMsg = parseResult.error.issues?.[0]?.message || "Invalid input";
-    return res.status(400).json({ error: errorMsg });
-  }
-
-  const { username, email, password } = parseResult.data;
+  const { username, email, password } = req.body;
   const cleanUsername = username.trim().toLowerCase();
   const cleanEmail = email.trim().toLowerCase();
 
@@ -107,13 +100,7 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function login(req: Request, res: Response) {
-  const parseResult = loginSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    const errorMsg = parseResult.error.issues?.[0]?.message || "Invalid input";
-    return res.status(400).json({ error: errorMsg });
-  }
-
-  const { email, password } = parseResult.data;
+  const { email, password } = req.body;
   const identifier = email.trim().toLowerCase();
 
   // Find user by either email OR username

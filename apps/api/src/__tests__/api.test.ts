@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import request from "supertest";
 import express from "express";
+import cookieParser from "cookie-parser";
 import problemRoutes from "../routes/problemRoutes.js";
 import authRoutes from "../routes/authRoutes.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
@@ -8,6 +9,7 @@ import { User } from "../models/User.js";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 app.use("/api/auth", authRoutes);
@@ -48,5 +50,33 @@ describe("API Health & Auth Middleware Integration Tests", () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ profile: { username: "testuser", totalSolved: 42 } });
+  });
+
+  it("GET /api/problems/leetcode-profile with valid HttpOnly cookie should be accepted", async () => {
+    vi.spyOn(User, "findById").mockResolvedValue({
+      leetcodeProfile: { username: "testuser", totalSolved: 42 },
+    } as any);
+
+    const jwt = (await import("jsonwebtoken")).default;
+    const token = jwt.sign(
+      { userId: "000000000000000000000001", email: "test@example.com" },
+      process.env.JWT_SECRET || "prep-os-super-secret-key-12345"
+    );
+
+    const res = await request(app)
+      .get("/api/problems/leetcode-profile")
+      .set("Cookie", [`token=${token}`]);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ profile: { username: "testuser", totalSolved: 42 } });
+  });
+
+  it("POST /api/auth/logout should clear cookie and return 200", async () => {
+    const res = await request(app).post("/api/auth/logout");
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ message: "Logged out successfully" });
+    const cookies = res.headers["set-cookie"];
+    expect(cookies).toBeDefined();
+    expect(cookies[0]).toContain("token=");
   });
 });

@@ -7,6 +7,33 @@ import { verifyGoogleToken } from "../services/oauthService.js";
 import { recordDailyLogin } from "../services/streakService.js";
 import { generateToken, formatAuthUser } from "../services/authService.js";
 
+const sendTokenResponse = (
+  user: any,
+  statusCode: number,
+  res: Response,
+  message: string,
+) => {
+  const token = generateToken(user);
+  const isProduction = process.env.NODE_ENV === "production";
+
+  const cookieOptions = {
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: (isProduction ? "none" : "lax") as "none" | "lax",
+    path: "/",
+  };
+
+  return res
+    .status(statusCode)
+    .cookie("token", token, cookieOptions)
+    .json({
+      message,
+      token, // Temporary fallback for backward compatibility
+      user: formatAuthUser(user),
+    });
+};
+
 export async function checkUsername(req: Request, res: Response) {
   try {
     const rawUsername = ((req.query.username as string) || "")
@@ -90,13 +117,7 @@ export async function register(req: Request, res: Response) {
   });
 
   const updatedUser = await recordDailyLogin(createdUser);
-  const token = generateToken(updatedUser);
-
-  res.status(201).json({
-    message: "Registration successful",
-    token,
-    user: formatAuthUser(updatedUser),
-  });
+  return sendTokenResponse(updatedUser, 201, res, "Registration successful");
 }
 
 export async function login(req: Request, res: Response) {
@@ -128,13 +149,7 @@ export async function login(req: Request, res: Response) {
   }
 
   const updatedUser = await recordDailyLogin(existingUser);
-  const token = generateToken(updatedUser);
-
-  res.json({
-    message: "Login successful",
-    token,
-    user: formatAuthUser(updatedUser),
-  });
+  return sendTokenResponse(updatedUser, 200, res, "Login successful");
 }
 
 export async function oauthLogin(req: Request, res: Response) {
@@ -179,13 +194,7 @@ export async function oauthLogin(req: Request, res: Response) {
     }
 
     const updatedUser = await recordDailyLogin(existingUser);
-    const token = generateToken(updatedUser);
-
-    res.json({
-      message: "Google login successful",
-      token,
-      user: formatAuthUser(updatedUser),
-    });
+    return sendTokenResponse(updatedUser, 200, res, "Google login successful");
   } catch (error: any) {
     console.error("OAuth error:", error);
     res
@@ -296,4 +305,20 @@ export async function getProfile(req: Request, res: Response) {
     console.error("getProfile error:", error);
     res.status(500).json({ error: "Failed to fetch user profile" });
   }
+}
+
+export async function logout(req: Request, res: Response) {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.cookie("token", "", {
+    expires: new Date(0),
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: (isProduction ? "none" : "lax") as "none" | "lax",
+    path: "/",
+  });
+
+  return res.status(200).json({
+    message: "Logged out successfully",
+  });
 }

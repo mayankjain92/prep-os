@@ -47,11 +47,16 @@ Central contract repository. Eliminates API contract drift between frontend and 
 * **Language**: TypeScript 5
 * **Database**: MongoDB via Mongoose 9
 * **Caching**: Redis (via `ioredis`) for LeetCode profile caching
-* **Auth**: JWT (7-day expiry), bcryptjs, Google OAuth (`google-auth-library`)
+* **Auth**: HttpOnly cookie-based session with JWT (7-day expiry), bcryptjs, Google OAuth (`google-auth-library`), lightweight CSRF defense
+
+### Configuration & Infrastructure (`src/config/`)
+* `env.ts`: Central Zod-validated environment schema (`MONGO_URI`, `REDIS_URL`, `JWT_SECRET`, `FRONTEND_URL`, etc.).
+* `db.ts`: Mongoose database connection manager with idempotent state handling.
+* `redisClient.ts`: `ioredis` client singleton with retry backoff and error listeners.
 
 ### Layered Structure
 ```text
-Request ──► Middleware (Auth, Validation) ──► Controller ──► Service / Model ──► MongoDB / Redis
+Request ──► Middleware (CORS, CookieParser, CSRF, Auth, Validation) ──► Controller ──► Service / Model ──► MongoDB / Redis
 ```
 
 ### Models (`src/models/`)
@@ -65,9 +70,10 @@ Request ──► Middleware (Auth, Validation) ──► Controller ──► S
 ### Route & Controller Registry
 | Endpoint | Method | Auth? | Controller | Description |
 |---|---|:---:|---|---|
-| `/api/auth/register` | POST | ❌ | `register` | User signup with Zod validation |
-| `/api/auth/login` | POST | ❌ | `login` | User login (email or username) |
-| `/api/auth/oauth` | POST | ❌ | `oauthLogin` | Verified Google OAuth login |
+| `/api/auth/register` | POST | ❌ | `register` | User signup, sets HttpOnly cookie |
+| `/api/auth/login` | POST | ❌ | `login` | User login (email or username), sets HttpOnly cookie |
+| `/api/auth/oauth` | POST | ❌ | `oauthLogin` | Verified Google OAuth login, sets HttpOnly cookie |
+| `/api/auth/logout` | POST | ❌ | `logout` | Clears HttpOnly cookie |
 | `/api/auth/check-username` | GET | ❌ | `checkUsername` | Real-time handle availability check |
 | `/api/auth/set-username` | POST | 🔒 | `setUsername` | Set handle for OAuth users |
 | `/api/auth/profile` | GET | 🔒 | `getProfile` | User profile, streaks & overview stats |

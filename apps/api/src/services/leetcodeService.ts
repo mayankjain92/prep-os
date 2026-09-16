@@ -1,4 +1,4 @@
-import { redis } from "../lib/redisClient.js";
+import { redis } from "../config/redisClient.js";
 
 const CACHE_TTL_SECONDS = 3600; // 1 hour
 

@@ -1,5 +1,5 @@
 import { Redis } from "ioredis";
-import { env } from "../config/env.js";
+import { env } from "./env.js";
 
 const REDIS_URL = env.REDIS_URL;
 

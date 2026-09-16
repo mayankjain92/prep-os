@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import problemRoutes from "./routes/problemRoutes.js";
@@ -13,8 +14,21 @@ import { errorHandler } from "./middleware/error.middleware.js";
 import { env } from "./config/env.js";
 
 const app = express();
-app.use(cors({origin: env.FRONTEND_URL, credentials: true}));
+app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
+
+// Lightweight CSRF defense for state-mutating requests
+app.use((req, res, next) => {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+    return next();
+  }
+  const origin = req.headers.origin;
+  if (req.headers["x-requested-with"] || !origin || origin === env.FRONTEND_URL) {
+    return next();
+  }
+  return res.status(403).json({ error: "Cross-site request blocked" });
+});
 
 // Auth routes (Public)
 app.use("/api/auth", authRoutes);

@@ -67,11 +67,8 @@ export async function syncLeetCodeProblems(req: Request, res: Response) {
   });
 
   res.json({
-    message: dataResult.fromCache
-      ? `LeetCode profile loaded from Redis cache for @${username}`
-      : `Successfully synced LeetCode profile for @${username}`,
+    message: `Successfully synced LeetCode profile for @${username}`,
     synced: dataResult.profile.totalSolved,
-    fromCache: Boolean(dataResult.fromCache),
     profile: dataResult.profile,
   });
 }

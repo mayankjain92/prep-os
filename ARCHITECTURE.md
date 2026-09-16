@@ -50,8 +50,35 @@ Rather than storing thousands of individual topic documents in MongoDB for stati
 
 ---
 
-## 4. Multi-Tenant Data Isolation & Security
-Every user-specific data model (`Project`, `Doubt`, `RoadmapProgress`, and embedded `User` profiles) enforces strict multi-tenant scoping:
-- **Ownership Verification:** All controller operations restrict data scoping to `req.userId` extracted from cryptographically verified JWT headers.
+## 4. HttpOnly Cookie Authentication & Multi-Tenant Security
+Every user-specific data model (`Project`, `Doubt`, `RoadmapProgress`, and embedded `User` profiles) enforces strict multi-tenant scoping and session protection:
+- **HttpOnly Cookie Architecture:** JWTs are stored exclusively in `httpOnly` cookies (`token`) with `secure: true` (in production) and `sameSite` protection. This guarantees that client-side JavaScript has zero access to the credential, completely neutralizing Cross-Site Scripting (XSS) token exfiltration attacks.
+- **Migration & Testing Fallback:** The backend's `authMiddleware` reads `req.cookies.token` as primary, while maintaining an explicit fallback to `Authorization: Bearer <token>` for automated Vitest suites and CLI tooling.
+- **Lightweight CSRF Defense:** For all state-mutating requests (`POST`, `PUT`, `PATCH`, `DELETE`), the backend verifies that the request origin matches `env.FRONTEND_URL` or includes a custom header (`x-requested-with: XMLHttpRequest`). Standard cross-site HTML forms cannot forge custom headers, rendering CSRF attacks ineffective without requiring stateful database tokens.
+- **Ownership Verification:** All controller operations restrict data scoping to `req.userId` extracted from verified JWTs.
 - **Indexed Access:** Collections use compound indexes (e.g., `{ userId: 1, resolved: 1 }` on `doubts`) ensuring queries remain fast and isolated.
 - **No IDOR Vulnerabilities:** Even if an attacker knows an existing resource ID, cross-tenant reads and mutations are rejected at the database query level.
+
+---
+
+## 5. Infrastructure & Configuration Structure
+All external datastore clients and configurations are centralized in `apps/api/src/config/`:
+- `env.ts`: Validates environment variables at boot time via Zod (`PORT`, `MONGO_URI`, `REDIS_URL`, `JWT_SECRET`, etc.).
+- `db.ts`: Manages the primary MongoDB connection lifecycle via Mongoose with idempotent connection checks.
+- `redisClient.ts`: Configures the high-performance `ioredis` client with backoff retry strategies, error listeners, and lazy connection.
+
+---
+
+## 6. Containerization & Multi-Stage Docker Builds
+Prep OS provides reproducible, production-ready containerization across environments using Docker and Docker Compose:
+- **`mongo` & `redis`**: Pre-built official database images (`mongo:7.0`, `redis:7-alpine`) running in an isolated, internal Docker network.
+- **`api` & `web`**: Multi-stage Dockerfiles (`base` → `deps` → `builder` → `runner`) that strip TypeScript compiler and dev dependencies from final images, producing ultra-lean production containers (~150MB).
+- **Persistent Storage**: MongoDB uses a named volume (`mongo-data`) to persist state across container lifecycles.
+- **Service Discovery**: Internal Docker networking allows the API to resolve MongoDB and Redis via internal hostnames (`mongo:27017` and `redis:6379`) without exposing them to the public internet.
+
+---
+
+## 7. CI/CD & Automated Heartbeats
+Automation workflows located in `.github/workflows/`:
+- **`ci.yml`**: Triggers on `push` and `pull_request` to `main`/`master`. Installs pnpm with frozen lockfiles (`--frozen-lockfile`), runs Vitest suites on `@prep-os/api`, and compiles the full workspace (`pnpm build`).
+- **`keepalive.yml`**: Scheduled cron workflow running every 10 minutes to ping the backend `/health` endpoint, preventing free-tier instances (e.g. Render) from entering cold sleep.

@@ -37,7 +37,6 @@ export default function DsaDashboardPage() {
           posthog.capture("leetcode_profile_synced", {
             total_solved: data.profile?.totalSolved,
             synced_count: data.synced,
-            from_cache: data.fromCache,
             forced: force,
           });
         },
@@ -177,9 +176,6 @@ export default function DsaDashboardPage() {
           <div className="flex items-center justify-between gap-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-xs text-emerald-500 font-medium">
             <div className="flex items-center gap-2">
               <span>{syncMutation.data.message}</span>
-              <Badge variant="outline" className="text-[10px] rounded-full border-emerald-500/30 text-emerald-500 font-semibold px-2 py-0">
-                {syncMutation.data.fromCache ? "Cached" : "Live"}
-              </Badge>
             </div>
           </div>
         )}

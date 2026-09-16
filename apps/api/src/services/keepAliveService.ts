@@ -18,9 +18,7 @@ export function startKeepAlive() {
   setInterval(() => {
     const protocol = healthUrl.startsWith("https") ? https : http;
 
-    protocol.get(healthUrl, (res) => {
-      console.log(`[Keep-Alive] Pinged ${healthUrl} - Status: ${res.statusCode}`);
-    }).on("error", (err) => {
+    protocol.get(healthUrl, () => {}).on("error", (err) => {
       console.error(`[Keep-Alive] Ping error: ${err.message}`);
     });
   }, INTERVAL_MS);

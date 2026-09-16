@@ -20,7 +20,7 @@
 - ⚡ **High-Performance Architecture:** Implements a Redis Cache-Aside pattern for LeetCode synchronization with automatic fallbacks and write-through invalidation.
 - 📊 **Theory Aggregation Engine:** Leverages MongoDB aggregation pipelines to dynamically compute progress percentages across core CS subjects (OS, DBMS, CN, OOP, Aptitude).
 - 🎨 **Accessibility & Design System:** WCAG AA contrast compliant dark/light themes, card layering hierarchy, project tag management, and 6-month activity heatmaps.
-- 🔒 **Secure Authentication:** JWT-based secure user authentication with bcrypt password hashing and strict user-tenant data isolation.
+- 🔒 **Secure Authentication:** HttpOnly cookie-based session management with JWT, bcrypt password hashing, CSRF defense, and strict user-tenant data isolation.
 - 📈 **Unified Analytics Dashboard:** Modern responsive dashboard powered by Next.js App Router, Recharts, Framer Motion, and Lucide React.
 
 ---
@@ -97,14 +97,16 @@ Ensure you have the following installed on your local machine:
 
 ```text
 prep-os/
+├── .github/
+│   └── workflows/      # CI/CD (ci.yml) & keepalive cron (keepalive.yml)
 ├── apps/
-│   ├── api/            # Express backend service
-│   └── web/            # Next.js frontend application
+│   ├── api/            # Express ESM backend service (TypeScript + Node.js)
+│   └── web/            # Next.js 16 frontend application (React 19 + Tailwind v4)
 ├── packages/
-│   └── shared/         # Zod schemas & TS types shared across apps
-├── docs/               # Additional documentation
-├── ARCHITECTURE.md     # In-depth technical rationale
-├── docker-compose.yml  # Local infrastructure definition
+│   └── shared/         # Shared Zod validation schemas & TypeScript types
+├── docs/               # Architecture audits, system design reports & checklists
+├── ARCHITECTURE.md     # In-depth technical rationale & storage design
+├── docker-compose.yml  # Multi-container orchestration (API, Web, Mongo, Redis)
 └── pnpm-workspace.yaml # Monorepo workspace configuration
 ```
 

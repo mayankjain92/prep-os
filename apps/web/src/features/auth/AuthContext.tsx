@@ -49,7 +49,7 @@ export interface OAuthInput {
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
+  token?: string | null;
   isLoading: boolean;
   login: (credentials: LoginInput) => Promise<void>;
   register: (credentials: RegisterInput) => Promise<void>;
@@ -57,37 +57,14 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
   saveNeetcodeProgress: (solved: string[], starred: string[]) => Promise<void>;
   setUsername: (username: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("token");
-    }
-    return null;
-  });
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window !== "undefined") {
-      const savedUser = localStorage.getItem("user");
-      if (savedUser) {
-        try {
-          return JSON.parse(savedUser) as User;
-        } catch {
-          localStorage.removeItem("user");
-        }
-      }
-    }
-    return null;
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return Boolean(localStorage.getItem("token"));
-    }
-    return true;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
   const fetchProfile = async () => {
@@ -95,7 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await apiFetch<{ user: User }>("/api/auth/profile");
       if (data?.user) {
         setUser(data.user);
-        localStorage.setItem("user", JSON.stringify(data.user));
       }
     } catch (err) {
       console.error("Failed to fetch user profile:", err);
@@ -103,78 +79,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    if (!token) return;
-
-    if (user?.id) {
-      posthog.identify(user.id, { username: user.username });
-    }
-
     let isMounted = true;
-    apiFetch<{ user: User }>("/api/auth/profile")
-      .then((data) => {
+
+    const checkAuth = async () => {
+      try {
+        const data = await apiFetch<{ user: User }>("/api/auth/profile");
         if (isMounted && data?.user) {
           setUser(data.user);
-          localStorage.setItem("user", JSON.stringify(data.user));
+          if (data.user.id) {
+            posthog.identify(data.user.id, { username: data.user.username });
+          }
         }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch user profile:", err);
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
+      } catch {
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    checkAuth();
 
     return () => {
       isMounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (credentials: LoginInput) => {
-    const data = await apiFetch<{ token: string; user: User }>("/api/auth/login", {
+    const data = await apiFetch<{ user: User }>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
 
-    setToken(data.token);
     setUser(data.user);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    posthog.identify(data.user.id, { username: data.user.username });
+    if (data.user.id) {
+      posthog.identify(data.user.id, { username: data.user.username });
+    }
     posthog.capture("user_logged_in", { login_method: "email" });
-    fetchProfile();
     router.push("/dashboard");
   };
 
   const register = async (credentials: RegisterInput) => {
-    const data = await apiFetch<{ token: string; user: User }>("/api/auth/register", {
+    const data = await apiFetch<{ user: User }>("/api/auth/register", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
 
-    setToken(data.token);
     setUser(data.user);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    posthog.identify(data.user.id, { username: data.user.username });
+    if (data.user.id) {
+      posthog.identify(data.user.id, { username: data.user.username });
+    }
     posthog.capture("user_registered");
-    fetchProfile();
     router.push("/dashboard");
   };
 
   const oauthLogin = async (providerData: OAuthInput) => {
-    const data = await apiFetch<{ token: string; user: User }>("/api/auth/oauth", {
+    const data = await apiFetch<{ user: User }>("/api/auth/oauth", {
       method: "POST",
       body: JSON.stringify(providerData),
     });
 
-    setToken(data.token);
     setUser(data.user);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    posthog.identify(data.user.id, { username: data.user.username });
+    if (data.user.id) {
+      posthog.identify(data.user.id, { username: data.user.username });
+    }
     posthog.capture("user_oauth_logged_in", { provider: providerData.provider });
-    fetchProfile();
     router.push("/dashboard");
   };
 
@@ -193,9 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
 
       if (data?.neetcodeProgress && user) {
-        const updatedUser = { ...user, neetcodeProgress: data.neetcodeProgress };
-        setUser(updatedUser);
-        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser({ ...user, neetcodeProgress: data.neetcodeProgress });
       }
     } catch (err) {
       console.error("Failed to save NeetCode progress to server:", err);
@@ -210,17 +180,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (data?.user) {
       setUser(data.user);
-      localStorage.setItem("user", JSON.stringify(data.user));
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     posthog.capture("user_logged_out");
     posthog.reset();
-    setToken(null);
+    try {
+      await apiFetch("/api/auth/logout", { method: "POST" });
+    } catch (err) {
+      console.error("Failed to call logout endpoint:", err);
+    }
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
     router.push("/login");
   };
 
@@ -228,7 +199,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        token,
+        token: null,
         isLoading,
         login,
         register,

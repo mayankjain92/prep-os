@@ -13,7 +13,6 @@ export interface LeetCodeProfileStats {
 export interface SyncLeetCodeResult {
   message: string;
   synced: number;
-  fromCache?: boolean;
   profile?: LeetCodeProfileStats;
 }
 

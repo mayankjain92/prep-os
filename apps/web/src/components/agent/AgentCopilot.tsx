@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sendAgentMessage, ChatMessage } from "@/features/agent/api";
 import ReactMarkdown from "react-markdown";
+import { AnimatedEmblem } from "@/components/shared/AnimatedEmblem";
 
 export function AgentCopilot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,30 +61,20 @@ export function AgentCopilot() {
 
   return (
     <>
-      {/* 1. Animated Logo Floating Trigger (No text, native app style) */}
+      {/* 1. Animated Logo Floating Trigger with Stitch Orbital Diamond Emblem */}
       <div className="fixed bottom-6 right-6 z-50">
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.94 }}
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open Prep Copilot"
-          className="relative w-13 h-13 rounded-full bg-card hover:bg-secondary border border-border shadow-xl flex items-center justify-center text-foreground cursor-pointer transition-colors group"
+          className="relative w-14 h-14 rounded-full bg-slate-950 dark:bg-[#121212] hover:bg-slate-900 dark:hover:bg-[#1a1a1a] border border-slate-700/60 dark:border-white/15 shadow-2xl flex items-center justify-center text-foreground cursor-pointer transition-colors group p-1"
         >
-          {/* Subtle spinning orbital dashed ring */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-1 rounded-full border border-dashed border-xblue/30 group-hover:border-xblue/70 transition-colors"
-          />
-
-          {/* Center brand icon */}
-          <div className="relative w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-xblue group-hover:bg-xblue/10 transition-colors">
-            {isOpen ? (
-              <X className="w-4 h-4 text-xblue transition-transform" />
-            ) : (
-              <Sparkles className="w-4 h-4 text-xblue transition-transform group-hover:rotate-12" />
-            )}
-          </div>
+          {isOpen ? (
+            <X className="w-5 h-5 text-sky-400 transition-transform" />
+          ) : (
+            <AnimatedEmblem className="w-11 h-11" />
+          )}
         </motion.button>
       </div>
 
@@ -123,8 +114,8 @@ export function AgentCopilot() {
             {/* Header: Clean dark style matching Prep OS */}
             <div className="px-4 py-3.5 border-b border-border bg-card flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-secondary border border-border flex items-center justify-center text-xblue">
-                  <Bot className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-white/[0.06] border border-slate-200 dark:border-white/10 flex items-center justify-center shrink-0 p-0.5">
+                  <AnimatedEmblem className="w-7 h-7" />
                 </div>
                 <div>
                   <h3 className="text-xs font-bold text-foreground">

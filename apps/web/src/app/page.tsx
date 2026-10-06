@@ -1,134 +1,153 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/shared/Logo";
+import { AnimatedEmblem } from "@/components/shared/AnimatedEmblem";
+import { RoadmapTreePreview } from "@/components/shared/RoadmapTreePreview";
 import {
   Code2,
   Zap,
-  Database,
   ArrowRight,
   BookOpen,
   FolderKanban,
   Flame,
-  Star,
   CheckCircle2,
   Compass,
-  Shield,
-  Cpu,
-  Globe,
   Sparkles,
-  Bot
+  Bot,
+  ChevronRight,
+  GitBranch,
+  Share2,
+  GraduationCap,
+  Target,
+  Trophy,
 } from "lucide-react";
 
 export default function Home() {
-  const features = [
+  const studentMetrics = [
     {
-      icon: Sparkles,
-      badge: "Autonomous ReAct Agent",
-      title: "AI Placement Copilot",
-      description:
-        "Audits live telemetry across your streaks, NeetCode solves, and CS roadmap nodes. Automatically syncs fresh LeetCode stats, conducts gap analysis, and logs blockers into your doubt queue.",
-      gradient: "from-blue-600/10 via-xblue/10 to-indigo-500/10",
-      accent: "text-xblue",
-      highlights: ["ReAct Tool Calling Loop", "Live DB Telemetry Audit", "Auto LeetCode Sync", "Doubt Queue Mutations"],
+      value: "150",
+      label: "DSA Interview Problems",
+      detail: "Curated NeetCode master pathway",
+      color: "text-sky-500 dark:text-sky-400",
     },
     {
-      icon: Compass,
-      badge: "Placement Pathways",
-      title: "Interactive Prep Roadmaps",
-      description:
-        "Structured step-by-step career and interview pathways for DSA Masterclass, SDE Placement Track, CS Theory Core, and System Design Architecture with milestone tracking.",
-      gradient: "from-blue-500/10 via-xblue/10 to-cyan-500/10",
-      accent: "text-xblue",
-      highlights: ["DSA 150 Master Path", "SDE Placement Roadmap", "System Design Track", "Milestone Tracking"],
+      value: "4",
+      label: "Core CS Subjects",
+      detail: "OS, DBMS, Networks & System Design",
+      color: "text-indigo-500 dark:text-indigo-400",
     },
+    {
+      value: "1-Click",
+      label: "Automated LeetCode Sync",
+      detail: "Direct live profile tracking",
+      color: "text-amber-500 dark:text-amber-400",
+    },
+    {
+      value: "24/7",
+      label: "AI Placement Mentor",
+      detail: "Instant prep diagnostics & guidance",
+      color: "text-emerald-500 dark:text-emerald-400",
+    },
+  ];
+
+  const minimalFeatures = [
     {
       icon: Code2,
-      badge: "NeetCode 150 Engine",
-      title: "Persistent NeetCode 150 Tracker",
+      title: "Targeted DSA Roadmap",
       description:
-        "Master the top 150 interview problems grouped topic-wise with live progress bars, compact 2-column problem layouts, star revision bookmarks, and direct MongoDB profile persistence.",
-      gradient: "from-cyan-500/10 via-xblue/10 to-blue-600/10",
-      accent: "text-cyan-400",
-      highlights: ["Topic Progress Bars", "Star Revision Marks", "Cloud MongoDB Persistence", "Compact Layout"],
-    },
-    {
-      icon: Zap,
-      badge: "Performance Sync",
-      title: "Cached LeetCode Analytics",
-      description:
-        "Sync external LeetCode statistics and track your problem-solving status pipelines (Solved, Revision Needed, Wishlist) powered by a high-speed Redis cache-aside architecture.",
-      gradient: "from-amber-500/10 via-orange-500/10 to-amber-600/10",
-      accent: "text-amber-400",
-      highlights: ["Redis Cache-Aside Speed", "Difficulty Breakdown", "Status Pipelines", "Submission Sync"],
+        "Master the 150 most frequently asked interview problems grouped by pattern, from Arrays and Two Pointers to Dynamic Programming.",
+      tag: "DSA 150",
     },
     {
       icon: BookOpen,
-      badge: "CS Core Subjects",
-      title: "CS Theory Checklists",
+      title: "Core CS Fundamentals",
       description:
-        "Comprehensive interactive revision checklists for Operating Systems, DBMS, Computer Networks, and System Design powered by MongoDB aggregation pipelines.",
-      gradient: "from-emerald-500/10 via-teal-500/10 to-emerald-600/10",
-      accent: "text-emerald-400",
-      highlights: ["Operating Systems", "DBMS & SQL", "Computer Networks", "System Design Basics"],
+        "Ace technical interview rounds with structured checklists covering Operating Systems, DBMS, Computer Networks, and System Design.",
+      tag: "CS Theory",
     },
     {
       icon: FolderKanban,
-      badge: "Engineering Portfolio",
-      title: "Software Project Portfolio",
+      title: "Project Portfolio Hub",
       description:
-        "Log full-stack software development projects, technical stack tags (Next.js, Node.js, Express, Redis, MongoDB), live demo links, repository URLs, and architecture decisions.",
-      gradient: "from-purple-500/10 via-indigo-500/10 to-purple-600/10",
-      accent: "text-purple-400",
-      highlights: ["Tech Stack Tags", "Architecture Logs", "GitHub Repo Links", "Live Demo Tracking"],
+        "Showcase your full-stack projects, architecture decisions, live demos, and GitHub repositories in an interview-ready format.",
+      tag: "Portfolio",
     },
     {
-      icon: Flame,
-      badge: "Consistency Engine",
-      title: "Activity Heatmap & Streaks",
+      icon: Share2,
+      title: "Shareable Proof of Work",
       description:
-        "Build interview preparation discipline with GitHub-style daily activity heatmap calendars, active login streak counters, and preparation milestone tracking.",
-      gradient: "from-rose-500/10 via-red-500/10 to-orange-500/10",
-      accent: "text-rose-400",
-      highlights: ["GitHub-Style Heatmap", "Login Streak Counter", "Longest Streak Records", "Daily Milestones"],
+        "Export high-resolution placement milestone cards to celebrate your preparation consistency and solved count on LinkedIn and X.",
+      tag: "Milestone Cards",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between transition-colors duration-300 overflow-x-hidden selection:bg-xblue selection:text-white">
-      {/* Top Glassmorphism Navigation */}
-      <header className="sticky top-0 z-50 border-b border-border/80 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
-          <Logo href="/" size="md" />
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 flex flex-col justify-between selection:bg-sky-500/20 selection:text-sky-300 transition-colors duration-200 relative overflow-x-hidden font-sans">
+      {/* Background Grid Pattern & Ambient Glows */}
+      <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.04)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px]" />
+        <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)] bg-radial from-transparent to-slate-50 dark:to-[#0A0A0A]" />
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[680px] h-[340px] bg-gradient-to-tr from-sky-500/15 via-indigo-500/10 to-cyan-400/15 blur-[140px] rounded-full" />
+        <div className="absolute top-[900px] left-1/3 -translate-x-1/2 w-[500px] h-[300px] bg-indigo-500/10 blur-[150px] rounded-full" />
+      </div>
 
-          {/* Center Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-muted-foreground">
-            <a href="#copilot" className="hover:text-xblue transition-colors flex items-center gap-1.5 text-foreground">
-              <Sparkles className="w-3.5 h-3.5 text-xblue" /> AI Copilot
+      {/* Stitch Navbar with Original PrepOS Logo */}
+      <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#0A0A0A]/85 backdrop-blur-md transition-colors duration-200">
+        <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
+          <div className="flex items-center shrink-0">
+            <Logo href="/" size="md" />
+          </div>
+
+          <nav
+            aria-label="Global Navigation"
+            className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-neutral-400"
+          >
+            <a
+              href="#overview"
+              className="px-3 py-1.5 rounded-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-all"
+            >
+              Overview
             </a>
-            <a href="#roadmaps" className="hover:text-foreground transition-colors">
+            <a
+              href="#roadmaps"
+              className="px-3 py-1.5 rounded-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-all"
+            >
               Roadmaps
             </a>
-            <a href="#features" className="hover:text-foreground transition-colors">
+            <a
+              href="#features"
+              className="px-3 py-1.5 rounded-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-all"
+            >
               Features
             </a>
-            <a href="#neetcode" className="hover:text-foreground transition-colors">
-              NeetCode 150
-            </a>
-            <a href="#architecture" className="hover:text-foreground transition-colors">
-              Architecture
+            <a
+              href="#mentor"
+              className="px-3 py-1.5 rounded-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-all flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-sky-500" />
+              <span>AI Mentor</span>
             </a>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <ThemeToggle />
             <Link href="/login">
-              <Button variant="outline" size="sm" className="rounded-full border-border text-xs font-bold px-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-lg border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-all"
+              >
                 Sign In
               </Button>
             </Link>
             <Link href="/register">
-              <Button size="sm" className="rounded-full bg-xblue hover:bg-xhover text-white font-extrabold text-xs px-5 shadow-sm">
+              <Button
+                size="sm"
+                className="rounded-lg bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs px-4 shadow-sm shadow-sky-500/20 transition-all"
+              >
                 Get Started
               </Button>
             </Link>
@@ -138,417 +157,625 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="flex-1 space-y-24 py-12 sm:py-20">
-        {/* Hero Section */}
-        <section className="mx-auto max-w-5xl px-6 text-center space-y-8 relative">
-          {/* Background Ambient Glow Orbs */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-xblue/20 via-cyan-400/10 to-blue-600/20 blur-[120px] rounded-full pointer-events-none -z-10" />
-
-          {/* Hero Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-[1.1] animate-in fade-in slide-in-from-bottom-4 duration-700">
-            The High-Performance Placement Prep{" "}
-            <span className="bg-gradient-to-r from-xblue via-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Operating System.
+        {/* HERO SECTION */}
+        <section className="mx-auto max-w-5xl px-4 sm:px-6 text-center space-y-8 relative">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-[#EDEDED] leading-[1.08]">
+            Crack Your Tech Placements{" "}
+            <span className="bg-gradient-to-r from-sky-500 via-indigo-500 to-cyan-400 bg-clip-text text-transparent">
+              Without the Chaos.
             </span>
           </h1>
 
-          {/* Hero Subtitle */}
-          <p className="max-w-3xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed font-medium">
-            PrepOS streamlines your software engineering interview preparation with structured career roadmaps, an autonomous AI ReAct Copilot, NeetCode 150 persistence, live LeetCode telemetry, and CS Theory checklists.
+          <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-600 dark:text-[#A1A1AA] leading-relaxed font-normal">
+            Stop juggling scattered spreadsheets, Notion templates, and lost
+            bookmarks. PrepOS brings your DSA roadmap, core CS theory revision,
+            engineering projects, and daily study consistency into a single
+            focused dashboard.
           </p>
 
-          {/* Action CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-            <Link href="/dashboard">
-              <Button size="lg" className="rounded-full bg-xblue hover:bg-xhover text-white font-extrabold px-8 h-12 gap-2 text-sm shadow-md transition-all hover:scale-105">
-                Launch Dashboard <ArrowRight className="h-4 w-4" />
+          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+            <Link href="/register">
+              <Button
+                size="lg"
+                className="rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold px-7 h-11 gap-2 text-sm shadow-md shadow-sky-500/25 transition-all hover:scale-[1.02]"
+              >
+                Start Your Prep Free <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/register">
-              <Button size="lg" variant="outline" className="rounded-full border-border text-foreground hover:bg-card px-8 h-12 text-sm font-bold transition-all">
-                Create Free Account
+            <Link href="/dashboard">
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-xl border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] text-slate-700 dark:text-[#EDEDED] hover:bg-slate-100 dark:hover:bg-white/[0.04] px-7 h-11 text-sm font-semibold transition-all"
+              >
+                Launch Dashboard
+              </Button>
+            </Link>
+            <Link href="/dashboard/dsa">
+              <Button
+                size="lg"
+                variant="ghost"
+                className="rounded-xl text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] px-5 h-11 text-sm font-medium transition-all"
+              >
+                Explore 150 Roadmaps <ChevronRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
 
-          {/* Metric Stats Banner */}
-          <div className="pt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
-            <div className="p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md">
-              <div className="text-2xl font-black text-xblue">AI Copilot</div>
-              <div className="text-xs font-semibold text-muted-foreground mt-0.5">ReAct Loop & Live Grounding</div>
+          {/* Student Metric Strip */}
+          <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-3.5 max-w-4xl mx-auto text-left">
+            {studentMetrics.map((stat, i) => (
+              <div
+                key={i}
+                className="p-4 rounded-xl bg-white/70 dark:bg-[#121212]/80 border border-slate-200/80 dark:border-white/[0.08] backdrop-blur-md shadow-xs hover:border-slate-300 dark:hover:border-white/[0.16] transition-all"
+              >
+                <div
+                  className={`text-2xl font-black ${stat.color} tracking-tight`}
+                >
+                  {stat.value}
+                </div>
+                <div className="text-xs font-semibold text-slate-900 dark:text-[#EDEDED] mt-1">
+                  {stat.label}
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-[#A1A1AA] mt-0.5 leading-snug">
+                  {stat.detail}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* SECTION: UNIFIED DASHBOARD PREVIEW */}
+        <section
+          id="overview"
+          className="mx-auto max-w-7xl px-4 sm:px-6 space-y-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                <Target className="w-3.5 h-3.5" /> Unified Student Platform
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-[#EDEDED] mt-1">
+                Everything You Need to Track in One Place
+              </h2>
             </div>
-            <div className="p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md">
-              <div className="text-2xl font-black text-cyan-400">150</div>
-              <div className="text-xs font-semibold text-muted-foreground mt-0.5">NeetCode DSA Track</div>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-[#A1A1AA] max-w-md">
+              Designed around how software engineering students actually study
+              for on-campus placements and off-campus tech drives.
+            </p>
+          </div>
+
+          {/* Feature Showcase Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* CARD 1: DSA Dependency Roadmap (Span 2) */}
+            <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-6 sm:p-7 space-y-5 shadow-xs relative overflow-hidden group hover:border-sky-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-sky-500/10 text-sky-500 dark:text-sky-400 border border-sky-500/20">
+                    <Code2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-[#EDEDED]">
+                      Interactive DSA Roadmap Engine
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-[#A1A1AA]">
+                      Structured step-by-step topic milestones with revision
+                      bookmarks
+                    </p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  150 Problems
+                </span>
+              </div>
+
+              {/* Roadmap Mini Progress Visual */}
+              <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-[#0A0A0A]/60 border border-slate-200/60 dark:border-white/[0.04] space-y-3 font-sans">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-700 dark:text-neutral-300 flex items-center gap-1.5">
+                    <GitBranch className="w-3.5 h-3.5 text-sky-500" /> Topic
+                    Progression
+                  </span>
+                  <span className="text-sky-600 dark:text-sky-400 font-bold">
+                    42 Solved • In Progress
+                  </span>
+                </div>
+                <div className="w-full bg-slate-200 dark:bg-white/[0.08] h-2 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-sky-500 via-indigo-500 to-cyan-400 rounded-full w-[35%]" />
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200/80 dark:border-white/[0.08] text-xs space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      <span>Arrays & Hashing</span>
+                      <span>✓ Mastered</span>
+                    </div>
+                    <div className="h-1 bg-emerald-500/20 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 w-full" />
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200/80 dark:border-white/[0.08] text-xs space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      <span>Two Pointers</span>
+                      <span>✓ Mastered</span>
+                    </div>
+                    <div className="h-1 bg-emerald-500/20 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 w-full" />
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-[#121212] border border-sky-500/30 text-xs space-y-1 shadow-xs">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-sky-600 dark:text-sky-400">
+                      <span>Sliding Window</span>
+                      <span>Current Focus</span>
+                    </div>
+                    <div className="h-1 bg-sky-500/20 rounded-full overflow-hidden">
+                      <div className="h-full bg-sky-500 w-2/3" />
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200/80 dark:border-white/[0.08] text-xs space-y-1 opacity-70">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-neutral-400">
+                      <span>Binary Trees</span>
+                      <span>Up Next</span>
+                    </div>
+                    <div className="h-1 bg-slate-200 dark:bg-white/[0.06] rounded-full overflow-hidden">
+                      <div className="h-full bg-indigo-500 w-0" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600 dark:text-neutral-400 pt-1">
+                <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]">
+                  • Grouped by Interview Topics
+                </span>
+                <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]">
+                  • Star Markings for Revision
+                </span>
+                <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]">
+                  • Solution Notes & Video Guides
+                </span>
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md">
-              <div className="text-2xl font-black text-amber-400">Auto-Sync</div>
-              <div className="text-xs font-semibold text-muted-foreground mt-0.5">Live LeetCode Telemetry</div>
+
+            {/* CARD 2: Live LeetCode Sync (Span 1) */}
+            <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-6 sm:p-7 space-y-5 shadow-xs relative overflow-hidden group hover:border-amber-500/30 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-900 dark:text-[#EDEDED]">
+                        Live LeetCode Sync
+                      </h3>
+                      <p className="text-[11px] text-slate-500 dark:text-[#A1A1AA]">
+                        Zero manual spreadsheet data entry
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                    Auto Pull
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-[#0A0A0A]/60 border border-slate-200/60 dark:border-white/[0.04] flex items-center justify-between">
+                    <div>
+                      <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                        Easy Problems
+                      </div>
+                      <div className="text-lg font-black text-slate-900 dark:text-[#EDEDED]">
+                        68{" "}
+                        <span className="text-xs font-normal text-slate-500 dark:text-neutral-400">
+                          Solved
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-xs font-bold text-emerald-500">
+                      Foundation
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-[#0A0A0A]/60 border border-slate-200/60 dark:border-white/[0.04] flex items-center justify-between">
+                    <div>
+                      <div className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                        Medium Problems
+                      </div>
+                      <div className="text-lg font-black text-slate-900 dark:text-[#EDEDED]">
+                        94{" "}
+                        <span className="text-xs font-normal text-slate-500 dark:text-neutral-400">
+                          Solved
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-xs font-bold text-amber-500">
+                      Core Focus
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-[#0A0A0A]/60 border border-slate-200/60 dark:border-white/[0.04] flex items-center justify-between">
+                    <div>
+                      <div className="text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+                        Hard Problems
+                      </div>
+                      <div className="text-lg font-black text-slate-900 dark:text-[#EDEDED]">
+                        18{" "}
+                        <span className="text-xs font-normal text-slate-500 dark:text-neutral-400">
+                          Solved
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-xs font-bold text-rose-500">
+                      Advanced
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between text-xs text-slate-500 dark:text-neutral-400 font-medium">
+                <span>Total: 180 Solved</span>
+                <span className="text-sky-500 dark:text-sky-400 font-semibold">
+                  Synced in Seconds
+                </span>
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md">
-              <div className="text-2xl font-black text-emerald-400">100%</div>
-              <div className="text-xs font-semibold text-muted-foreground mt-0.5">MongoDB Cloud Sync</div>
+
+            {/* CARD 3: Daily Consistency & Heatmap (Span 1) */}
+            <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-6 sm:p-7 space-y-5 shadow-xs relative overflow-hidden group hover:border-rose-500/30 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20">
+                      <Flame className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-900 dark:text-[#EDEDED]">
+                        Consistency Tracker
+                      </h3>
+                      <p className="text-[11px] text-slate-500 dark:text-[#A1A1AA]">
+                        Build placement preparation discipline
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center gap-1">
+                    <Flame className="w-3 h-3 fill-rose-500" /> 14-Day Streak
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-[#0A0A0A]/60 border border-slate-200/60 dark:border-white/[0.04] space-y-2">
+                  <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700 dark:text-neutral-300">
+                    <span>Study Activity</span>
+                    <span className="text-rose-500 font-bold">
+                      Peak Streak: 38 Days
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-1.5 pt-1">
+                    {Array.from({ length: 48 }).map((_, idx) => {
+                      const active = idx % 4 === 0 || idx % 6 === 0 || idx > 34;
+                      const highlyActive = idx % 8 === 0 || idx > 40;
+                      return (
+                        <div
+                          key={idx}
+                          className={`aspect-square rounded-xs transition-colors ${
+                            highlyActive
+                              ? "bg-rose-500 dark:bg-rose-400 shadow-xs shadow-rose-500/40"
+                              : active
+                                ? "bg-rose-400/60 dark:bg-rose-500/50"
+                                : "bg-slate-200 dark:bg-white/[0.06]"
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]">
+                    <div className="text-[10px] text-slate-500 dark:text-[#A1A1AA]">
+                      Active Study Days
+                    </div>
+                    <div className="text-sm font-extrabold text-slate-900 dark:text-[#EDEDED]">
+                      84 Days
+                    </div>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]">
+                    <div className="text-[10px] text-slate-500 dark:text-[#A1A1AA]">
+                      Momentum
+                    </div>
+                    <div className="text-sm font-extrabold text-emerald-500">
+                      Consistent 🔥
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] text-[11px] text-slate-500 dark:text-neutral-400">
+                Daily problem solves keep your placement flame burning.
+              </div>
+            </div>
+
+            {/* CARD 4: AI Placement Mentor (Span 2) */}
+            <div
+              id="mentor"
+              className="lg:col-span-2 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-6 sm:p-7 space-y-5 shadow-xs relative overflow-hidden group hover:border-indigo-500/30 transition-all duration-300"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20">
+                    <Bot className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-[#EDEDED]">
+                      24/7 AI Placement Mentor
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-[#A1A1AA]">
+                      Analyzes your actual progress to find blind spots and
+                      suggest what to study next
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AnimatedEmblem size={20} />
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                    Context-Aware
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-[#0A0A0A]/60 border border-slate-200/60 dark:border-white/[0.04] space-y-3 font-sans text-xs">
+                <div className="flex justify-end">
+                  <div className="max-w-[85%] px-3.5 py-2 rounded-xl bg-sky-500 text-white font-medium shadow-xs">
+                    What should I focus on before my upcoming technical
+                    interview round?
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-neutral-400 bg-white dark:bg-[#121212] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] w-fit shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500 animate-spin" />
+                  <span>
+                    Auditing your solved topics & doubts across PrepOS...
+                  </span>
+                </div>
+
+                <div className="flex justify-start">
+                  <div className="max-w-[92%] px-3.5 py-3 rounded-xl bg-white dark:bg-[#121212] border border-slate-200/80 dark:border-white/[0.08] text-slate-800 dark:text-neutral-200 space-y-2 shadow-xs">
+                    <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />{" "}
+                      Your Placement Diagnostic:
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-neutral-400">
+                      <div>
+                        ✅ <strong>Strengths:</strong> Arrays & Two Pointers
+                        solved
+                      </div>
+                      <div>
+                        ⚠️ <strong>Blind Spot:</strong> Sliding Window (needs
+                        practice)
+                      </div>
+                      <div>
+                        📚 <strong>CS Theory:</strong> DBMS ACID & Indexing
+                        untouched
+                      </div>
+                      <div>
+                        🔥 <strong>Streak:</strong> 14 Days Active (Good
+                        discipline)
+                      </div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-700 dark:text-indigo-300 font-medium">
+                      💡 <em>Action Plan:</em> Focus on{" "}
+                      <strong>
+                        Longest Substring Without Repeating Characters
+                      </strong>{" "}
+                      and review <strong>B+ Trees vs Hash Indexing</strong>.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div className="text-xs text-slate-500 dark:text-neutral-400">
+                  Grounded in your real roadmap progress, not generic ChatGPT
+                  responses.
+                </div>
+                <Link href="/dashboard">
+                  <Button
+                    size="sm"
+                    className="rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4"
+                  >
+                    Open Mentor in Dashboard{" "}
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Dedicated Section: Curated Preparation Roadmaps */}
-        <section id="roadmaps" className="mx-auto max-w-7xl px-6">
-          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-xblue/10 via-card to-cyan-500/10 border border-xblue/30 space-y-8 relative overflow-hidden">
+        {/* SECTION: PLACEMENT ROADMAP PATHWAYS */}
+        <section id="roadmaps" className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-sky-500/5 via-white dark:via-[#121212] to-indigo-500/5 border border-slate-200/80 dark:border-white/[0.08] space-y-8 relative overflow-hidden shadow-xs">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="space-y-3 max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-xblue/20 text-xblue border border-xblue/40">
-                  <Compass className="h-3.5 w-3.5" /> Structured Learning Pathways
+              <div className="space-y-2 max-w-2xl">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+                  <Compass className="h-3.5 w-3.5" /> Structured Learning
+                  Pathways
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-                  Guided Interview Roadmaps & Milestones
+                <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-[#EDEDED]">
+                  Clear, Structured Pathways for Top Companies
                 </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  Never wonder what to study next. PrepOS provides clear, structured roadmaps designed for top tech placement tracks.
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-[#A1A1AA] leading-relaxed">
+                  Eliminate decision fatigue. Know exactly what problem to solve
+                  or topic to revise each day until placement day.
                 </p>
               </div>
 
               <Link href="/dashboard">
-                <Button className="rounded-full bg-xblue hover:bg-xhover text-white font-extrabold text-xs px-6 h-10 gap-2 shrink-0">
+                <Button className="rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs px-6 h-10 gap-2 shrink-0 shadow-sm shadow-sky-500/20">
                   Explore All Roadmaps <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </Link>
             </div>
 
-            {/* Roadmaps Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-              <div className="p-6 rounded-2xl bg-background/80 border border-border space-y-4 shadow-sm hover:border-xblue/40 transition-all">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
+              <div className="p-6 rounded-2xl bg-white dark:bg-[#0A0A0A]/90 border border-slate-200/80 dark:border-white/[0.08] space-y-4 shadow-xs hover:border-sky-500/40 transition-all">
                 <div className="flex items-center justify-between">
-                  <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-xs font-black">
+                  <span className="p-2 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 text-xs font-black">
                     DSA Track
                   </span>
-                  <span className="text-[10px] font-bold text-muted-foreground">150 Milestones</span>
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-neutral-400">
+                    150 Milestones
+                  </span>
                 </div>
                 <div className="space-y-1.5">
-                  <h3 className="text-lg font-black text-foreground">NeetCode 150 Path</h3>
-                  <p className="text-xs text-muted-foreground">Arrays, Pointers, Trees, Graphs, DP, and Advanced Data Structures.</p>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-[#EDEDED]">
+                    DSA Masterclass
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-[#A1A1AA]">
+                    Arrays, Two Pointers, Sliding Window, Trees, Graphs, and
+                    Dynamic Programming.
+                  </p>
                 </div>
-                <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                  <div className="h-full w-2/3 bg-cyan-400 rounded-full" />
+                <div className="w-full bg-slate-100 dark:bg-white/[0.08] h-1.5 rounded-full overflow-hidden">
+                  <div className="h-full w-2/3 bg-sky-500 rounded-full" />
                 </div>
               </div>
 
-              <div className="p-6 rounded-2xl bg-background/80 border border-border space-y-4 shadow-sm hover:border-emerald-400/40 transition-all">
+              <div className="p-6 rounded-2xl bg-white dark:bg-[#0A0A0A]/90 border border-slate-200/80 dark:border-white/[0.08] space-y-4 shadow-xs hover:border-emerald-500/40 transition-all">
                 <div className="flex items-center justify-between">
-                  <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-black">
+                  <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-black">
                     Theory Track
                   </span>
-                  <span className="text-[10px] font-bold text-muted-foreground">4 Core Subjects</span>
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-neutral-400">
+                    4 Core Subjects
+                  </span>
                 </div>
                 <div className="space-y-1.5">
-                  <h3 className="text-lg font-black text-foreground">CS Fundamentals Roadmap</h3>
-                  <p className="text-xs text-muted-foreground">OS, Database Management, Computer Networks, and System Architecture.</p>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-[#EDEDED]">
+                    CS Theory Revision
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-[#A1A1AA]">
+                    Operating Systems, DBMS & SQL, Computer Networks, and System
+                    Architecture.
+                  </p>
                 </div>
-                <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                  <div className="h-full w-4/5 bg-emerald-400 rounded-full" />
+                <div className="w-full bg-slate-100 dark:bg-white/[0.08] h-1.5 rounded-full overflow-hidden">
+                  <div className="h-full w-4/5 bg-emerald-500 rounded-full" />
                 </div>
               </div>
 
-              <div className="p-6 rounded-2xl bg-background/80 border border-border space-y-4 shadow-sm hover:border-purple-400/40 transition-all">
+              <div className="p-6 rounded-2xl bg-white dark:bg-[#0A0A0A]/90 border border-slate-200/80 dark:border-white/[0.08] space-y-4 shadow-xs hover:border-indigo-500/40 transition-all">
                 <div className="flex items-center justify-between">
-                  <span className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-black">
-                    Projects Track
+                  <span className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-xs font-black">
+                    Portfolio Track
                   </span>
-                  <span className="text-[10px] font-bold text-muted-foreground">Portfolio Driven</span>
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-neutral-400">
+                    Resume Ready
+                  </span>
                 </div>
                 <div className="space-y-1.5">
-                  <h3 className="text-lg font-black text-foreground">Full-Stack SDE Portfolio</h3>
-                  <p className="text-xs text-muted-foreground">Build production apps with Next.js, Express, MongoDB, and Redis.</p>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-[#EDEDED]">
+                    Engineering Projects
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-[#A1A1AA]">
+                    Highlight full-stack projects, architecture decisions, and
+                    live GitHub repositories.
+                  </p>
                 </div>
-                <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                  <div className="h-full w-1/2 bg-purple-400 rounded-full" />
+                <div className="w-full bg-slate-100 dark:bg-white/[0.08] h-1.5 rounded-full overflow-hidden">
+                  <div className="h-full w-1/2 bg-indigo-500 rounded-full" />
                 </div>
               </div>
+            </div>
+
+            {/* Interactive Visual Roadmap Tree Graph */}
+            <div className="pt-6">
+              <RoadmapTreePreview />
             </div>
           </div>
         </section>
 
-        {/* Feature Grid Section */}
-        <section id="features" className="mx-auto max-w-7xl px-6 space-y-12">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-              Everything You Need to Crack Tech Interviews
+        {/* SECTION: MINIMAL FEATURE PILLARS */}
+        <section
+          id="features"
+          className="mx-auto max-w-7xl px-4 sm:px-6 space-y-8"
+        >
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-[#EDEDED]">
+              Built Exclusively for Campus & Off-Campus Prep
             </h2>
-            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-              Engineered with modern full-stack architecture to ensure zero data loss, instant updates, and intuitive preparation workflows.
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-[#A1A1AA]">
+              Four focused pillars designed to keep your preparation simple,
+              structured, and consistent.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((item, idx) => {
-              const IconComponent = item.icon;
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {minimalFeatures.map((item, idx) => {
+              const Icon = item.icon;
               return (
                 <div
                   key={idx}
-                  className={`group rounded-3xl border border-border bg-card p-7 space-y-5 transition-all duration-300 hover:border-xblue/50 hover:shadow-lg relative overflow-hidden bg-gradient-to-b ${item.gradient}`}
+                  className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-5 space-y-3.5 shadow-xs hover:border-sky-500/40 transition-all duration-300"
                 >
                   <div className="flex items-center justify-between">
-                    <div className={`p-3 rounded-2xl bg-background/80 border border-border ${item.accent} shadow-xs group-hover:scale-110 transition-transform duration-300`}>
-                      <IconComponent className="h-6 w-6" />
+                    <div className="p-2 rounded-xl bg-sky-500/10 text-sky-500 dark:text-sky-400 border border-sky-500/20">
+                      <Icon className="h-4 w-4" />
                     </div>
-                    <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-background/80 border border-border text-muted-foreground">
-                      {item.badge}
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-wider">
+                      {item.tag}
                     </span>
                   </div>
 
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-black text-foreground group-hover:text-xblue transition-colors">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
+                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-[#EDEDED]">
+                    {item.title}
+                  </h3>
 
-                  <div className="pt-2 border-t border-border/50 grid grid-cols-2 gap-2 text-[11px] font-bold text-foreground/80">
-                    {item.highlights.map((h, i) => (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-xblue shrink-0" />
-                        <span className="truncate">{h}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-xs text-slate-600 dark:text-[#A1A1AA] leading-relaxed">
+                    {item.description}
+                  </p>
                 </div>
               );
             })}
           </div>
         </section>
 
-        {/* Feature Highlight Spotlight: AI Copilot */}
-        <section id="copilot" className="mx-auto max-w-7xl px-6">
-          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-card via-secondary/20 to-card border border-xblue/30 relative overflow-hidden shadow-lg space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div className="space-y-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-xblue/20 text-xblue border border-xblue/40">
-                  <Sparkles className="h-3.5 w-3.5 text-xblue" /> Autonomous ReAct Agent
-                </div>
-
-                <h3 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-                  Meet Your Live AI Placement Copilot
-                </h3>
-
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Unlike passive chatbots or generic prompt wrappers, the Prep OS Copilot runs a multi-turn <strong>ReAct (Reason + Act) loop</strong> grounded directly in your live database telemetry. It audits your streak, auto-syncs your newest LeetCode solves, detects untouched roadmap blind spots, and logs study blockers to MongoDB autonomously.
-                </p>
-
-                <ul className="space-y-3 text-xs font-bold text-foreground">
-                  <li className="flex items-center gap-2.5">
-                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
-                    Deterministic Tool Calling — Zero hallucinated progress stats
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
-                    Pre-Fetch LeetCode Sync — Fresh solves pulled automatically before answering
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
-                    Direct State Mutation — Creates doubt records in MongoDB on your behalf
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
-                    macOS Genie Lamp Physics — Smooth unwrap/wrap animation pinned to the trigger
-                  </li>
-                </ul>
-
-                <div className="pt-2">
-                  <Link href="/dashboard">
-                    <Button className="rounded-full bg-xblue hover:bg-xhover text-white font-extrabold text-xs px-6 h-10 gap-2">
-                      Try Copilot in Dashboard <ArrowRight className="h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Mock Copilot UI Window Showcase */}
-              <div className="p-5 rounded-2xl bg-card border border-border shadow-2xl space-y-3 font-sans">
-                {/* Window Header */}
-                <div className="flex items-center justify-between border-b border-border pb-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-secondary border border-border flex items-center justify-center text-xblue">
-                      <Bot className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="font-extrabold text-xs text-foreground">Prep OS Copilot</div>
-                      <div className="text-[10px] text-muted-foreground">Connected to Roadmaps & Doubts</div>
-                    </div>
-                  </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-xblue/10 text-xblue border border-xblue/20">
-                    Live Telemetry
-                  </span>
-                </div>
-
-                {/* Chat Bubbles */}
-                <div className="space-y-3 text-xs pt-1">
-                  {/* User Bubble */}
-                  <div className="flex justify-end">
-                    <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl bg-xblue text-white rounded-tr-xs leading-relaxed">
-                      Analyze my overall prep across DSA & CS Theory
-                    </div>
-                  </div>
-
-                  {/* Agent Tool Executing indicator */}
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground bg-secondary/80 px-3 py-1.5 rounded-xl border border-border w-fit">
-                    <Sparkles className="w-3.5 h-3.5 text-xblue animate-spin" />
-                    <span>Auto-syncing LeetCode & auditing roadmap progress...</span>
-                  </div>
-
-                  {/* Agent Response */}
-                  <div className="flex justify-start">
-                    <div className="max-w-[90%] px-3.5 py-3 rounded-2xl bg-secondary/70 border border-border text-foreground rounded-tl-xs space-y-2 leading-relaxed">
-                      <p className="font-semibold text-foreground">
-                        Here is your live diagnostic across Prep OS:
-                      </p>
-                      <div className="space-y-1 text-[11px] text-muted-foreground">
-                        <div>🔥 <strong>Current Streak:</strong> 1 day (Peak: 3 days)</div>
-                        <div>💻 <strong>NeetCode Solved:</strong> 14 problems (Arrays & Two Pointers mastered)</div>
-                        <div>⚠️ <strong>Untracked Blind Spots:</strong> Sliding Window (0/6) & DBMS (ACID untouched)</div>
-                      </div>
-                      <div className="p-2 rounded-lg bg-card border border-border text-[11px] text-xblue font-medium">
-                        💡 <em>Auto-Action:</em> Prepared next study session targeting <strong>Sliding Window</strong> + <strong>OS Deadlocks</strong>.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* SECTION: FINAL CALL TO ACTION BANNER */}
+        <section className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="p-8 sm:p-12 rounded-3xl bg-white dark:bg-[#121212] border border-slate-200/80 dark:border-white/[0.08] text-center space-y-6 shadow-xs relative overflow-hidden">
+            <div className="flex justify-center">
+              <AnimatedEmblem size={56} />
             </div>
-          </div>
-        </section>
 
-        {/* Feature Highlight Spotlight: NeetCode 150 */}
-        <section id="neetcode" className="mx-auto max-w-7xl px-6">
-          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-card via-background to-card border border-border relative overflow-hidden shadow-sm space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div className="space-y-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-                  <Star className="h-3.5 w-3.5 fill-cyan-400" /> Persistent Roadmap Engine
-                </div>
-
-                <h3 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-                  NeetCode 150 Built for Cross-Device Persistence
-                </h3>
-
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  No more losing your solved progress when switching laptops or clearing browser cookies. PrepOS stores your solved states and starred revision marks directly inside your authenticated MongoDB user document.
-                </p>
-
-                <ul className="space-y-3 text-xs font-bold text-foreground">
-                  <li className="flex items-center gap-2.5">
-                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
-                    Topic-wise progression bars (Arrays, Two Pointers, Trees, Graphs, DP)
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
-                    Star button for instant revision flagging
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
-                    Optimistic UI updates with automatic background cloud sync
-                  </li>
-                </ul>
-              </div>
-
-              {/* Mock UI Showcase */}
-              <div className="p-6 rounded-2xl bg-card border border-border/80 shadow-md space-y-4 font-sans">
-                <div className="flex items-center justify-between border-b border-border pb-3">
-                  <div className="flex items-center gap-2">
-                    <Code2 className="h-5 w-5 text-xblue" />
-                    <span className="font-extrabold text-sm text-foreground">NeetCode 150 Roadmap</span>
-                  </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400">
-                    24 / 150 Solved
-                  </span>
-                </div>
-
-                {/* Sample Topic Block */}
-                <div className="p-3.5 rounded-xl bg-background border border-border space-y-2">
-                  <div className="flex items-center justify-between text-xs font-extrabold">
-                    <span>Arrays & Hashing</span>
-                    <span className="text-xblue">7 / 9 Solved</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                    <div className="h-full w-3/4 bg-gradient-to-r from-xblue to-cyan-400 rounded-full" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    <div className="p-2 rounded-lg bg-card border border-border/60 flex items-center justify-between text-[11px] font-bold">
-                      <span className="text-emerald-400">✓ Two Sum</span>
-                      <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
-                    </div>
-                    <div className="p-2 rounded-lg bg-card border border-border/60 flex items-center justify-between text-[11px] font-bold">
-                      <span className="text-emerald-400">✓ Valid Anagram</span>
-                      <Star className="h-3 w-3 text-muted-foreground/40" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="space-y-2">
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-[#EDEDED]">
+                Start Cracking Your Placement Journey Today
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-[#A1A1AA] max-w-xl mx-auto">
+                Join ambitious students building daily problem-solving
+                discipline and landing top tech offers.
+              </p>
             </div>
-          </div>
-        </section>
 
-        {/* Tech Stack & Architecture Grid */}
-        <section id="architecture" className="mx-auto max-w-7xl px-6 space-y-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black tracking-tight text-foreground">
-              Production-Grade Full-Stack Architecture
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Powered by industry-standard open source technology stack
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
-              <Globe className="h-6 w-6 text-xblue mx-auto" />
-              <div className="font-extrabold text-sm">Next.js 16 App Router</div>
-              <div className="text-[11px] text-muted-foreground">React Server Components</div>
-            </div>
-            <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
-              <Sparkles className="h-6 w-6 text-indigo-400 mx-auto" />
-              <div className="font-extrabold text-sm">Google Gemini 2.5</div>
-              <div className="text-[11px] text-muted-foreground">Autonomous ReAct Agent</div>
-            </div>
-            <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
-              <Database className="h-6 w-6 text-emerald-400 mx-auto" />
-              <div className="font-extrabold text-sm">MongoDB & Mongoose</div>
-              <div className="text-[11px] text-muted-foreground">User-Scoped State Sync</div>
-            </div>
-            <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
-              <Cpu className="h-6 w-6 text-rose-400 mx-auto" />
-              <div className="font-extrabold text-sm">Redis Caching</div>
-              <div className="text-[11px] text-muted-foreground">Fast Cache-Aside Layer</div>
-            </div>
-            <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
-              <Shield className="h-6 w-6 text-amber-400 mx-auto" />
-              <div className="font-extrabold text-sm">OAuth 2.0 & JWT</div>
-              <div className="text-[11px] text-muted-foreground">HttpOnly Cookie Sessions</div>
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA Banner */}
-        <section className="mx-auto max-w-5xl px-6">
-          <div className="p-10 rounded-3xl bg-gradient-to-r from-xblue/20 via-card to-cyan-500/20 border border-xblue/30 text-center space-y-6 shadow-md relative overflow-hidden">
-            <Logo size="lg" className="mx-auto" />
-
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-              Ready to Accelerate Your Placement Preparation?
-            </h2>
-
-            <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto">
-              Join software engineers tracking their NeetCode 150 progress, CS theory, and portfolio projects in one unified operating system.
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
               <Link href="/register">
-                <Button size="lg" className="rounded-full bg-xblue hover:bg-xhover text-white font-extrabold px-8 h-12 gap-2 text-sm shadow-md">
+                <Button
+                  size="lg"
+                  className="rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold px-8 h-11 gap-2 text-sm shadow-md shadow-sky-500/25 transition-all"
+                >
                   Get Started Free <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/login">
-                <Button size="lg" variant="outline" className="rounded-full border-border text-foreground hover:bg-card px-8 h-12 text-sm font-bold">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-xl border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] text-slate-700 dark:text-[#EDEDED] hover:bg-slate-100 dark:hover:bg-white/[0.04] px-8 h-11 text-sm font-semibold transition-all"
+                >
                   Sign In
                 </Button>
               </Link>
@@ -557,12 +784,13 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Brand Footer */}
-      <footer className="border-t border-border bg-background/90 py-8">
-        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Stitch Minimal Footer with Original Logo */}
+      <footer className="border-t border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#0A0A0A]/90 py-8 transition-colors duration-200">
+        <div className="mx-auto max-w-[1520px] px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Logo size="sm" />
-          <div className="text-xs text-muted-foreground font-semibold">
-            PrepOS — Placement Preparation Operating System © 2026
+          <div className="text-xs text-slate-500 dark:text-[#A1A1AA] font-medium text-center sm:text-right">
+            PrepOS — Placement Preparation Operating System © 2026. Empowering
+            student developers.
           </div>
         </div>
       </footer>

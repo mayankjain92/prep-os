@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
-import { RoadmapFlowChart, RoadmapNodeItem } from "@/components/shared/RoadmapFlowChart";
-import { THEORY_ROADMAP_SECTIONS } from "@/data/theory-roadmap";
-import { Badge } from "@/components/ui/badge";
-import { BookOpen } from "lucide-react";
+import { RoadmapFlowChart, type RoadmapNodeItem } from "@/components/shared/RoadmapFlowChart";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
-import { PageTransition, FadeInCard, AnimatedProgressBar } from "@/components/shared/PageTransition";
+import { AnimatedProgressBar } from "@/components/shared/PageTransition";
+import { THEORY_ROADMAP_SECTIONS } from "@/data/theory-roadmap";
+import { TrendingUp } from "lucide-react";
 
 const SUBJECTS = [
   { key: "OS", label: "Operating Systems", mainId: "theory-os" },
@@ -21,102 +20,230 @@ export default function TheoryDashboardPage() {
   const { data: roadmapStatus = {} } = useRoadmapProgress("prep_os_theory_roadmap");
   const [activeSubjectId, setActiveSubjectId] = useState<string>(SUBJECTS[0].mainId);
 
-  // Compute stats per section from THEORY_ROADMAP_SECTIONS + roadmapStatus
-  const subjectStats = SUBJECTS.map((sub) => {
-    const section = THEORY_ROADMAP_SECTIONS.find((s) => s.mainId === sub.mainId);
-    let total = 0;
-    let completed = 0;
+  // Compute stats per section & overall stats
+  const { subjectStats, overallStats } = useMemo(() => {
+    let grandTotal = 0;
+    let grandDone = 0;
+    let grandLearning = 0;
 
-    if (section) {
-      const traverse = (nodes?: RoadmapNodeItem[]) => {
-        nodes?.forEach((n) => {
-          total++;
-          if (roadmapStatus[n.id] === "done") completed++;
-          if (n.subNodes) traverse(n.subNodes);
-        });
-      };
-      traverse(section.leftNodes);
-      traverse(section.rightNodes);
-    }
+    const stats = SUBJECTS.map((sub) => {
+      const section = THEORY_ROADMAP_SECTIONS.find((s) => s.mainId === sub.mainId);
+      let total = 0;
+      let completed = 0;
+      let learning = 0;
 
-    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-    return { ...sub, total, completed, percentage };
-  });
+      if (section) {
+        const traverse = (nodes?: RoadmapNodeItem[]) => {
+          nodes?.forEach((n) => {
+            total++;
+            const st = roadmapStatus[n.id];
+            if (st === "done") completed++;
+            else if (st === "in-progress") learning++;
+            if (n.subNodes) traverse(n.subNodes);
+          });
+        };
+        traverse(section.leftNodes);
+        traverse(section.rightNodes);
+      }
 
-  const activeSection = THEORY_ROADMAP_SECTIONS.find(s => s.mainId === activeSubjectId);
-  const activeLabel = SUBJECTS.find(s => s.mainId === activeSubjectId)?.label || "Roadmap";
+      grandTotal += total;
+      grandDone += completed;
+      grandLearning += learning;
+
+      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+      return { ...sub, total, completed, learning, percentage };
+    });
+
+    const grandPending = grandTotal - grandDone - grandLearning;
+    const grandPct = grandTotal > 0 ? Math.round((grandDone / grandTotal) * 100) : 0;
+
+    return {
+      subjectStats: stats,
+      overallStats: {
+        total: grandTotal,
+        done: grandDone,
+        learning: grandLearning,
+        pending: grandPending,
+        pct: grandPct,
+      },
+    };
+  }, [roadmapStatus]);
+
+  const activeSection = THEORY_ROADMAP_SECTIONS.find((s) => s.mainId === activeSubjectId);
+  const activeLabel = SUBJECTS.find((s) => s.mainId === activeSubjectId)?.label || "Roadmap";
 
   return (
-    <PageTransition className="min-h-screen bg-background p-6 sm:p-10 text-foreground transition-colors duration-200">
-      <div className="mx-auto max-w-6xl space-y-8">
-        {/* Header */}
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-extrabold text-xblue uppercase tracking-widest">Placement Curriculum</span>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 pb-28 transition-colors duration-200">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-300">
+        {/* BEGIN: PageHeader */}
+        <section className="space-y-1" data-purpose="header-section">
+          <div className="flex items-center space-x-2">
+            <span className="text-[11px] font-semibold tracking-wider text-sky-600 dark:text-sky-400 uppercase">
+              PLACEMENT CURRICULUM
+            </span>
+            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-neutral-700" />
+            <span className="text-xs text-slate-500 dark:text-neutral-400 font-medium">
+              B.Tech & Technical Interviews
+            </span>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-xblue" /> CS Fundamentals & Aptitude
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground max-w-3xl">
-            Interactive, node-by-node learning roadmaps designed for technical placement interviews and engineering exams.
-          </p>
-        </div>
+          <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Computer Science Theory & Fundamentals
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1 max-w-2xl">
+                Interactive, node-by-node learning roadmaps designed for technical placement interviews and core engineering exams.
+              </p>
+            </div>
+          </div>
+        </section>
+        {/* END: PageHeader */}
 
-        {/* Section Stats Cards acts as Tabs */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {subjectStats.map((stat, idx) => {
-            const isActive = activeSubjectId === stat.mainId;
-            return (
-              <FadeInCard
-                key={stat.key}
-                delay={0.05 * idx}
-                onClick={() => setActiveSubjectId(stat.mainId)}
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className={`cursor-pointer rounded-2xl border p-4 transition-colors duration-200 shadow-sm flex flex-col justify-between ${
-                  isActive ? "border-xblue bg-xblue/5 ring-1 ring-xblue/20" : "border-border bg-card hover:border-xblue/40"
-                }`}
-              >
-                <div className="flex items-center justify-between gap-1 mb-2">
-                  <span className={`font-black text-sm sm:text-base truncate ${isActive ? "text-xblue" : "text-foreground"}`}>
-                    {stat.key}
-                  </span>
-                  <Badge
-                    variant="outline"
-                    className={`rounded-full text-[10px] font-bold px-2 shrink-0 transition-colors duration-200 ${
-                      isActive ? "border-xblue/40 text-xblue dark:text-sky-400 bg-xblue/10 dark:bg-xblue/20" : "border-purple-500/30 text-purple-600 dark:text-purple-300 bg-purple-500/10 dark:bg-purple-500/20"
+        {/* BEGIN: OverallProgressSummary */}
+        <section
+          className="rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] p-5 space-y-4 shadow-xs dark:shadow-none"
+          data-purpose="overall-progress"
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Core Engineering Curriculum Progress
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">
+                OS, DBMS, Computer Networks, Object-Oriented Design, and Placement Aptitude
+              </p>
+            </div>
+
+            {/* Counts Badges */}
+            <div className="flex items-center gap-2 text-xs font-medium flex-wrap">
+              <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                Done: <AnimatedNumber value={overallStats.done} />
+              </span>
+              <span className="px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+                Learning: <AnimatedNumber value={overallStats.learning} />
+              </span>
+              <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-neutral-900 text-slate-600 dark:text-neutral-400 border border-slate-200 dark:border-white/[0.06]">
+                Pending: <AnimatedNumber value={overallStats.pending} />
+              </span>
+              <div className="flex items-baseline gap-1 ml-2">
+                <span className="font-mono font-bold text-sky-600 dark:text-sky-400 text-base">
+                  <AnimatedNumber value={overallStats.pct} />%
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-neutral-500 uppercase tracking-wider font-semibold">TOTAL</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-neutral-400">
+              <div className="flex items-center space-x-1.5 text-sky-600 dark:text-sky-400">
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span className="font-medium text-xs text-slate-700 dark:text-neutral-300">CS Theory Overall Progress</span>
+              </div>
+              <span className="text-[11px] text-slate-400 dark:text-neutral-500">
+                {overallStats.total} total nodes across all theory subjects
+              </span>
+            </div>
+            <AnimatedProgressBar
+              pct={overallStats.pct}
+              color="bg-sky-500 dark:bg-sky-400"
+              className="w-full bg-slate-100 dark:bg-white/[0.06] h-1.5 rounded-full overflow-hidden"
+            />
+          </div>
+        </section>
+        {/* END: OverallProgressSummary */}
+
+        {/* BEGIN: Split View Layout - Curated Modules Sidebar (4 cols) & Interactive Roadmap Canvas (8 cols) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* LEFT COLUMN: Curated Theory Modules Sidebar (4 cols) */}
+          <aside className="lg:col-span-4 flex flex-col space-y-3 lg:sticky lg:top-20">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-semibold tracking-wider uppercase text-slate-500 dark:text-neutral-400">
+                  CURATED THEORY MODULES
+                </span>
+                <span className="text-[11px] px-2 py-0.5 rounded bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-white/[0.06] text-slate-600 dark:text-neutral-400 font-medium">
+                  {subjectStats.length} Subjects
+                </span>
+              </div>
+            </div>
+
+            {/* Vertical Module Selection List */}
+            <div className="space-y-2.5" role="tablist">
+              {subjectStats.map((stat) => {
+                const isActive = activeSubjectId === stat.mainId;
+                return (
+                  <button
+                    type="button"
+                    key={stat.key}
+                    onClick={() => setActiveSubjectId(stat.mainId)}
+                    role="tab"
+                    aria-selected={isActive}
+                    className={`w-full text-left cursor-pointer group relative rounded-xl p-3.5 transition-all select-none overflow-hidden bg-white dark:bg-[#121212] ${
+                      isActive
+                        ? "border border-sky-500/60 dark:border-sky-400/60 shadow-xs ring-1 ring-sky-500/20"
+                        : "border border-slate-200 dark:border-white/[0.08] hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50/60 dark:hover:bg-white/[0.02] shadow-xs"
                     }`}
                   >
-                    <AnimatedNumber value={stat.percentage} />%
-                  </Badge>
-                </div>
+                    {/* Active Left Indicator Bar */}
+                    {isActive && (
+                      <div className="absolute left-0 top-3 bottom-3 w-1 bg-sky-500 dark:bg-sky-400 rounded-r" />
+                    )}
 
-                <div>
-                  <div className="text-[11px] text-muted-foreground font-medium mb-1.5">
-                    <AnimatedNumber value={stat.completed} /> of {stat.total} done
-                  </div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className={isActive ? "pl-2" : "pl-0"}>
+                        <div className="flex items-center space-x-2">
+                          <span
+                            className={`text-sm font-semibold transition-colors ${
+                              isActive
+                                ? "text-slate-900 dark:text-white"
+                                : "text-slate-700 dark:text-neutral-300 group-hover:text-slate-900 dark:group-hover:text-white"
+                            }`}
+                          >
+                            {stat.label}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">
+                          <AnimatedNumber value={stat.completed} /> of <AnimatedNumber value={stat.total} /> done
+                        </p>
+                      </div>
 
-                  {/* Progress bar */}
-                  <AnimatedProgressBar 
-                    pct={stat.percentage} 
-                    color={isActive ? "bg-xblue" : "bg-purple-500"} 
-                    className="h-2 w-full overflow-hidden rounded-full bg-background border border-border" 
-                  />
-                </div>
-              </FadeInCard>
-            );
-          })}
+                      <span
+                        className={`text-xs font-semibold shrink-0 font-mono ${
+                          isActive
+                            ? "text-sky-600 dark:text-sky-400 font-bold"
+                            : "text-slate-500 dark:text-neutral-400"
+                        }`}
+                      >
+                        <AnimatedNumber value={stat.percentage} />%
+                      </span>
+                    </div>
+
+                    {/* Module Progress Bar */}
+                    <div className={`mt-3 ${isActive ? "pl-2" : "pl-0"}`}>
+                      <AnimatedProgressBar
+                        pct={stat.percentage}
+                        color={isActive ? "bg-sky-500 dark:bg-sky-400" : "bg-slate-400 dark:bg-neutral-600"}
+                        className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-white/[0.06] overflow-hidden"
+                      />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+
+          {/* RIGHT COLUMN: Interactive Roadmap Canvas (8 cols) */}
+          <section className="lg:col-span-8 w-full min-w-0" data-purpose="roadmap-canvas">
+            <RoadmapFlowChart
+              title={`${activeLabel} Roadmap`}
+              sections={activeSection ? [activeSection] : []}
+              storageKey="prep_os_theory_roadmap"
+            />
+          </section>
         </div>
-
-        {/* Selected Subject Learning Roadmap */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <RoadmapFlowChart
-            title={`${activeLabel} Learning Roadmap`}
-            sections={activeSection ? [activeSection] : []}
-            storageKey="prep_os_theory_roadmap"
-          />
-        </div>
-      </div>
-    </PageTransition>
+        {/* END: Split View Layout */}
+      </main>
+    </div>
   );
 }

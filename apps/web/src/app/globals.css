@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([class~="dark"], [class~="dark"] *));
+
 @layer base {
   :root {
-    --background: #ffffff;
-    --foreground: #0f1419;
-    --card: #f7f9f9;
-    --card-foreground: #0f1419;
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
     --popover: #ffffff;
-    --popover-foreground: #0f1419;
-    --primary: #1d9bf0;
+    --popover-foreground: #0f172a;
+    --primary: #0ea5e9;
     --primary-foreground: #ffffff;
-    --secondary: #eff3f4;
-    --secondary-foreground: #0f1419;
-    --muted: #f7f9f9;
-    --muted-foreground: #536471;
-    --accent: #eff3f4;
-    --accent-foreground: #1d9bf0;
-    --destructive: #f4212e;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #f1f5f9;
+    --accent-foreground: #0ea5e9;
+    --destructive: #ef4444;
     --destructive-foreground: #ffffff;
-    --border: #eff3f4;
-    --input: #eff3f4;
-    --ring: #1d9bf0;
+    --border: #e2e8f0;
+    --input: #f1f5f9;
+    --ring: #0ea5e9;
 
     --twitter-blue: #1d9bf0;
     --twitter-hover: #1a8cd8;
@@ -32,25 +34,25 @@
   }
 
   .dark {
-    --background: #000000;
-    --foreground: #e7e9ea;
-    --card: #16181c;
-    --card-foreground: #e7e9ea;
-    --popover: #16181c;
-    --popover-foreground: #e7e9ea;
-    --primary: #1d9bf0;
+    --background: #0A0A0A;
+    --foreground: #EDEDED;
+    --card: #121212;
+    --card-foreground: #EDEDED;
+    --popover: #121212;
+    --popover-foreground: #EDEDED;
+    --primary: #38bdf8;
     --primary-foreground: #ffffff;
-    --secondary: #202327;
-    --secondary-foreground: #e7e9ea;
+    --secondary: #16181c;
+    --secondary-foreground: #EDEDED;
     --muted: #16181c;
     --muted-foreground: #8b949e;
     --accent: #202327;
-    --accent-foreground: #1d9bf0;
+    --accent-foreground: #38bdf8;
     --destructive: #f4212e;
     --destructive-foreground: #ffffff;
-    --border: #2f3336;
-    --input: #202327;
-    --ring: #1d9bf0;
+    --border: rgba(255, 255, 255, 0.08);
+    --input: #0e0e0e;
+    --ring: #38bdf8;
   }
 }
 
@@ -116,4 +118,3 @@ select:-webkit-autofill:active {
   caret-color: var(--foreground) !important;
   transition: background-color 50000s ease-in-out 0s;
 }
-

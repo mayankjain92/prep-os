@@ -13,29 +13,36 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("prep_os_theme") as Theme | null;
-      if (saved === "light" || saved === "dark") return saved;
-    }
-    return "dark";
-  });
+  const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
-    if (theme === "dark") {
+    const saved = localStorage.getItem("prep_os_theme") as Theme | null;
+    const initialTheme = saved === "light" || saved === "dark" ? saved : "dark";
+    setThemeState(initialTheme);
+    if (initialTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [theme]);
+  }, []);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem("prep_os_theme", newTheme);
+    try {
+      localStorage.setItem("prep_os_theme", newTheme);
+    } catch {
+      // ignore in incognito or restricted mode
+    }
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
   };
 
   return (

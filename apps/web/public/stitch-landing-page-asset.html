@@ -1,0 +1,145 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width,initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_SVG_START:ANIMATION_112 class="fixed inset-0 w-full h-full" --><div class="fixed inset-0 w-full h-full" id="animated-svg-ANIMATION_112" style="display:block;"><svg height="100%" viewBox="0 0 512 512" width="100%" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="indigoGrad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#818cf8"></stop>
+<stop offset="50%" stop-color="#6366f1"></stop>
+<stop offset="100%" stop-color="#4f46e5"></stop>
+</linearGradient>
+<linearGradient id="glowGrad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#38bdf8"></stop>
+<stop offset="100%" stop-color="#6366f1"></stop>
+</linearGradient>
+<filter height="160%" id="softGlow" width="160%" x="-30%" y="-30%">
+<feGaussianBlur result="blur" stdDeviation="8"></feGaussianBlur>
+<feComposite in="SourceGraphic" in2="blur" operator="over"></feComposite>
+</filter>
+</defs>
+<style>
+    @keyframes orbitClockwise {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes orbitCounterClockwise {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(-360deg); }
+    }
+    @keyframes coreBreathe {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.4));
+      }
+      50% {
+        transform: scale(1.045);
+        filter: drop-shadow(0 0 28px rgba(56, 189, 248, 0.75));
+      }
+    }
+    @keyframes innerSparkRotate {
+      0%, 100% {
+        transform: scale(0.96) rotate(0deg);
+        opacity: 0.85;
+      }
+      50% {
+        transform: scale(1.08) rotate(45deg);
+        opacity: 1;
+      }
+    }
+    @keyframes nodePulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.4);
+        opacity: 1;
+      }
+    }
+    @keyframes centralRingPulse {
+      0%, 100% {
+        r: 28px;
+        opacity: 0.4;
+      }
+      50% {
+        r: 34px;
+        opacity: 0.8;
+      }
+    }
+    .anim-orbit-cw {
+      transform-origin: 256px 256px;
+      animation: orbitClockwise 14s linear infinite;
+    }
+    .anim-orbit-ccw {
+      transform-origin: 256px 256px;
+      animation: orbitCounterClockwise 22s linear infinite;
+    }
+    .anim-core {
+      transform-origin: 256px 256px;
+      animation: coreBreathe 3.6s ease-in-out infinite;
+    }
+    .anim-inner-spark {
+      transform-origin: 256px 256px;
+      animation: innerSparkRotate 7.2s ease-in-out infinite;
+    }
+    .anim-pulse-node {
+      transform-origin: center;
+      animation: nodePulse 2.4s ease-in-out infinite;
+    }
+    .anim-pulse-ring {
+      animation: centralRingPulse 2.8s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .anim-orbit-cw, .anim-orbit-ccw, .anim-core, .anim-inner-spark, .anim-pulse-node, .anim-pulse-ring {
+        animation: none !important;
+      }
+    }
+  </style>
+<!-- Background Base Container -->
+<rect fill="#131313" height="512" rx="128" width="512"></rect>
+<rect fill="none" height="508" rx="126" stroke="#262626" stroke-width="2" width="508" x="2" y="2"></rect>
+<!-- Orbital Track Ring 1 (Inner Track - Rotates Clockwise with Satellite Nodes) -->
+<g class="anim-orbit-cw">
+<circle cx="256" cy="256" fill="none" opacity="0.45" r="148" stroke="#6366f1" stroke-dasharray="8 8" stroke-width="2"></circle>
+<!-- Satellite Node A -->
+<circle class="anim-pulse-node" cx="360" cy="152" fill="#38bdf8" r="7" style="animation-delay: 0s;"></circle>
+<!-- Satellite Node B -->
+<circle class="anim-pulse-node" cx="152" cy="360" fill="#818cf8" r="5.5" style="animation-delay: 1.2s;"></circle>
+</g>
+<!-- Orbital Track Ring 2 (Outer Track - Rotates Counter-Clockwise) -->
+<g class="anim-orbit-ccw">
+<circle cx="256" cy="256" fill="none" opacity="0.3" r="184" stroke="#38bdf8" stroke-dasharray="16 12" stroke-width="1.5"></circle>
+<!-- Satellite Node C -->
+<circle class="anim-pulse-node" cx="390" cy="280" fill="#a5b4fc" r="5" style="animation-delay: 0.6s;"></circle>
+<!-- Satellite Node D -->
+<circle cx="122" cy="232" fill="#38bdf8" opacity="0.75" r="4"></circle>
+</g>
+<!-- Core Diamond Star Emblem with Glowing Breathing Dynamics -->
+<g class="anim-core">
+<!-- Primary 4-point Diamond Star Spark -->
+<path d="M 256 64 C 256 160 256 160 352 256 C 256 256 256 352 256 448 C 256 352 256 352 160 256 C 256 160 256 160 256 64 Z" fill="url(#indigoGrad)"></path>
+<!-- Secondary Diagonal Rotating Sparkle -->
+<g class="anim-inner-spark">
+<path d="M 256 180 C 275 220 292 237 332 256 C 292 275 275 292 256 332 C 237 292 220 275 180 256 C 220 237 237 220 256 180 Z" fill="url(#glowGrad)" opacity="0.9"></path>
+</g>
+<!-- Radiating Focal Ring -->
+<circle class="anim-pulse-ring" cx="256" cy="256" fill="none" r="28" stroke="#ffffff" stroke-width="2"></circle>
+<!-- Pure White Central Intelligence Node Core -->
+<circle cx="256" cy="256" fill="#ffffff" filter="url(#softGlow)" r="15"></circle>
+</g>
+</svg></div><!-- STITCH_SVG_END:ANIMATION_112 -->
+
+
+</body></html>

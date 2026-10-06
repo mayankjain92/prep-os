@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
+import { AnimatedProgressBar } from "@/components/shared/PageTransition";
 import { NEETCODE_150_PROBLEMS, NeetcodeProblem } from "@/data/neetcode150";
 import { useAuth } from "@/features/auth/AuthContext";
 import posthog from "posthog-js";
@@ -291,18 +293,22 @@ export function Neetcode150Section() {
             <div className="text-center">
               <div className="text-[9px] uppercase font-extrabold text-muted-foreground">Completed</div>
               <div className="text-base font-black text-xblue">
-                {stats.solvedCount} <span className="text-[10px] font-bold text-muted-foreground">/ {stats.total}</span>
+                <AnimatedNumber value={stats.solvedCount} /> <span className="text-[10px] font-bold text-muted-foreground">/ {stats.total}</span>
               </div>
             </div>
             <div className="h-6 w-px bg-border" />
             <div className="text-center">
               <div className="text-[9px] uppercase font-extrabold text-muted-foreground">For Revision</div>
-              <div className="text-base font-black text-amber-500">{stats.starredCount}</div>
+              <div className="text-base font-black text-amber-500">
+                <AnimatedNumber value={stats.starredCount} />
+              </div>
             </div>
             <div className="h-6 w-px bg-border" />
             <div className="text-center">
               <div className="text-[9px] uppercase font-extrabold text-muted-foreground">Progress</div>
-              <div className="text-base font-black text-emerald-500">{stats.percent}%</div>
+              <div className="text-base font-black text-emerald-500">
+                <AnimatedNumber value={stats.percent} />%
+              </div>
             </div>
           </div>
         </div>
@@ -313,36 +319,37 @@ export function Neetcode150Section() {
             <span className="text-foreground flex items-center gap-1.5">
               <Image src="/logo.svg" alt="PrepOS Logo" width={14} height={14} className="h-3.5 w-3.5 object-contain" /> Overall Completion Progress
             </span>
-            <span className="text-xblue">{stats.solvedCount} of 150 Solved ({stats.percent}%)</span>
+            <span className="text-xblue">
+              <AnimatedNumber value={stats.solvedCount} /> of 150 Solved (<AnimatedNumber value={stats.percent} />%)
+            </span>
           </div>
 
-          <div className="h-2.5 w-full bg-muted/60 rounded-full overflow-hidden border border-border">
-            <div
-              className="h-full bg-gradient-to-r from-xblue via-cyan-500 to-emerald-400 rounded-full transition-all duration-500"
-              style={{ width: `${stats.percent > 0 ? Math.max(stats.percent, 4) : 0}%` }}
-            />
-          </div>
+          <AnimatedProgressBar
+            pct={stats.percent}
+            className="h-2.5 w-full bg-muted/60 rounded-full border border-border"
+            color="bg-gradient-to-r from-xblue via-cyan-500 to-emerald-400"
+          />
 
           {/* Difficulty breakdown gauges */}
           <div className="grid grid-cols-3 gap-2 pt-1 text-[10px]">
             <div className="py-1 px-2 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-center flex items-center justify-between">
               <span className="text-emerald-500 font-extrabold">Easy</span>
               <span className="text-foreground font-black">
-                {stats.easySolved} / {stats.easyTotal}
+                <AnimatedNumber value={stats.easySolved} /> / {stats.easyTotal}
               </span>
             </div>
 
             <div className="py-1 px-2 rounded-md bg-amber-500/10 border border-amber-500/20 text-center flex items-center justify-between">
               <span className="text-amber-500 font-extrabold">Medium</span>
               <span className="text-foreground font-black">
-                {stats.mediumSolved} / {stats.mediumTotal}
+                <AnimatedNumber value={stats.mediumSolved} /> / {stats.mediumTotal}
               </span>
             </div>
 
             <div className="py-1 px-2 rounded-md bg-rose-500/10 border border-rose-500/20 text-center flex items-center justify-between">
               <span className="text-rose-500 font-extrabold">Hard</span>
               <span className="text-foreground font-black">
-                {stats.hardSolved} / {stats.hardTotal}
+                <AnimatedNumber value={stats.hardSolved} /> / {stats.hardTotal}
               </span>
             </div>
           </div>
@@ -448,14 +455,15 @@ export function Neetcode150Section() {
                     <div className="w-36 sm:w-44 space-y-0.5">
                       <div className="flex justify-between text-[9px] font-bold">
                         <span className="text-muted-foreground">Topic Progress</span>
-                        <span className="text-xblue">{group.solved}/{group.total} ({group.percent}%)</span>
+                        <span className="text-xblue">
+                          <AnimatedNumber value={group.solved} />/{group.total} (<AnimatedNumber value={group.percent} />%)
+                        </span>
                       </div>
-                      <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-border p-0.2">
-                        <div
-                          className="h-full bg-emerald-500 rounded-full transition-all duration-300"
-                          style={{ width: `${group.percent > 0 ? Math.max(group.percent, 4) : 0}%` }}
-                        />
-                      </div>
+                      <AnimatedProgressBar
+                        pct={group.percent}
+                        className="h-1.5 w-full bg-background rounded-full border border-border p-0.2"
+                        color="bg-emerald-500"
+                      />
                     </div>
                   </div>
                 </div>

@@ -47,7 +47,7 @@
 - **Containerization:** Docker & Docker Compose
 - **CI/CD:** GitHub Actions (ready)
 
-> 📖 **Read more about architectural decisions in [ARCHITECTURE.md](./ARCHITECTURE.md)**
+> 📖 **Read more about architectural decisions in [ARCHITECTURE.md](./ARCHITECTURE.md) and prepare for campus rounds with the [Master Interview Guide](./docs/INTERVIEW_QUESTIONS.md).**
 
 ---
 

@@ -11,8 +11,13 @@ import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 import { SetUsernameModal } from "@/components/profile/SetUsernameModal";
 import { Logo } from "@/components/shared/Logo";
 import { LayoutDashboard, Code2, BookOpen, FolderKanban } from "lucide-react";
+import { AgentCopilot } from "@/components/agent/AgentCopilot";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isLoading } = useAuth();
@@ -90,12 +95,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ) : (
               <div className="flex items-center gap-2">
                 <Link href="/login">
-                  <Button variant="outline" size="sm" className="rounded-full border-border text-xs font-semibold">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full border-border text-xs font-semibold"
+                  >
                     Sign In
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" className="rounded-full bg-xblue hover:bg-xhover text-white font-bold text-xs px-4">
+                  <Button
+                    size="sm"
+                    className="rounded-full bg-xblue hover:bg-xhover text-white font-bold text-xs px-4"
+                  >
                     Register
                   </Button>
                 </Link>
@@ -108,8 +120,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content Area */}
       <main className="flex-1 bg-background text-foreground">{children}</main>
       <ScrollToTop />
-
-      {/* Choose Username Onboarding Modal */}
+      <AgentCopilot />
       <SetUsernameModal />
     </div>
   );

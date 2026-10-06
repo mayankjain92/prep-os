@@ -17,6 +17,7 @@
 ## ✨ Key Features
 
 - 🧠 **DSA Problem Tracker & NeetCode 150:** Full lifecycle tracking with difficulty filters, topic roadmaps, NeetCode 150 interactive checklist, and LeetCode profile synchronization.
+- 🤖 **Autonomous AI Copilot (ReAct Agent):** Integrated AI mentor powered by Google Gemini 2.5 Flash Lite (`@google/genai`). Performs live database telemetry audits, cross-references CS Theory and DSA progress, auto-syncs live LeetCode stats, and mutates MongoDB state (logging doubts) with a macOS Genie Lamp animated UI drawer.
 - ⚡ **High-Performance Architecture:** Implements a Redis Cache-Aside pattern for LeetCode synchronization with automatic fallbacks and write-through invalidation.
 - 📊 **Theory Aggregation Engine:** Leverages MongoDB aggregation pipelines to dynamically compute progress percentages across core CS subjects (OS, DBMS, CN, OOP, Aptitude).
 - 🎨 **Accessibility & Design System:** WCAG AA contrast compliant dark/light themes, card layering hierarchy, project tag management, and 6-month activity heatmaps.
@@ -32,12 +33,13 @@
 - **Styling:** Tailwind CSS
 - **Data Fetching:** TanStack Query
 - **Visualization:** Recharts
-- **Icons:** Lucide React
+- **Icons & Animation:** Lucide React, Framer Motion
 
 ### Backend (`apps/api`)
 - **Framework:** Node.js, Express (ESM)
 - **Database:** MongoDB (Mongoose)
 - **Caching:** Redis (ioredis)
+- **AI / LLM:** Google Gemini 2.5 Flash Lite (`@google/genai`), Autonomous ReAct Tool Calling
 - **Validation:** Zod
 - **Auth:** bcryptjs, jsonwebtoken
 
@@ -75,7 +77,9 @@ Ensure you have the following installed on your local machine:
    ```
 
 3. **Environment Setup:**
-   Ensure you create the necessary `.env` files in `apps/api` and `apps/web`. *(See `.env.example` in respective directories if available).*
+   Ensure you create the necessary `.env` files in `apps/api` and `apps/web`.
+   * For `apps/api`: provide `PORT`, `MONGO_URI`, `REDIS_URL`, `JWT_SECRET`, and optionally `GEMINI_API_KEY` to enable the AI Copilot.
+   * For `apps/web`: provide `NEXT_PUBLIC_API_URL`.
 
 4. **Start Infrastructure Services:**
    Spin up MongoDB and Redis using Docker.

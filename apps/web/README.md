@@ -7,6 +7,7 @@ The frontend web application for **Prep OS**, built with Next.js 16 (App Router)
 - **Dashboard Overview:** Comprehensive progress tracking with LeetCode stat cards, Doubt Queue, active project portfolio cards, and 6-month activity heatmap.
 - **DSA Roadmap & NeetCode 150:** Interactive section cards, flowcharts with parent-child connector lines, status badge controls, and problem checklists.
 - **CS Fundamentals & Theory:** Visual subject roadmaps (OS, DBMS, CN, OOP, Aptitude) with dynamic progress bars.
+- **Autonomous AI Copilot:** Floating action trigger with orbital rotation, macOS Genie Lamp unwrap/wrap spring animation, live telemetry gap diagnosis, and interactive Markdown chat.
 - **Software Projects Portfolio:** Repository sync, custom technology tags, and project logging.
 - **Theme Toggle:** Global Light/Dark mode with WCAG AA contrast compliance.
 

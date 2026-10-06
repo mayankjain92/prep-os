@@ -15,11 +15,23 @@ import {
   Compass,
   Shield,
   Cpu,
-  Globe
+  Globe,
+  Sparkles,
+  Bot
 } from "lucide-react";
 
 export default function Home() {
   const features = [
+    {
+      icon: Sparkles,
+      badge: "Autonomous ReAct Agent",
+      title: "AI Placement Copilot",
+      description:
+        "Audits live telemetry across your streaks, NeetCode solves, and CS roadmap nodes. Automatically syncs fresh LeetCode stats, conducts gap analysis, and logs blockers into your doubt queue.",
+      gradient: "from-blue-600/10 via-xblue/10 to-indigo-500/10",
+      accent: "text-xblue",
+      highlights: ["ReAct Tool Calling Loop", "Live DB Telemetry Audit", "Auto LeetCode Sync", "Doubt Queue Mutations"],
+    },
     {
       icon: Compass,
       badge: "Placement Pathways",
@@ -91,6 +103,9 @@ export default function Home() {
 
           {/* Center Nav Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-muted-foreground">
+            <a href="#copilot" className="hover:text-xblue transition-colors flex items-center gap-1.5 text-foreground">
+              <Sparkles className="w-3.5 h-3.5 text-xblue" /> AI Copilot
+            </a>
             <a href="#roadmaps" className="hover:text-foreground transition-colors">
               Roadmaps
             </a>
@@ -138,7 +153,7 @@ export default function Home() {
 
           {/* Hero Subtitle */}
           <p className="max-w-3xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed font-medium">
-            PrepOS streamlines your software engineering interview preparation with structured career roadmaps, NeetCode 150 MongoDB persistence, LeetCode analytics, CS Theory checklists, and portfolio project logs.
+            PrepOS streamlines your software engineering interview preparation with structured career roadmaps, an autonomous AI ReAct Copilot, NeetCode 150 persistence, live LeetCode telemetry, and CS Theory checklists.
           </p>
 
           {/* Action CTAs */}
@@ -158,20 +173,20 @@ export default function Home() {
           {/* Metric Stats Banner */}
           <div className="pt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
             <div className="p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md">
-              <div className="text-2xl font-black text-xblue">Roadmaps</div>
-              <div className="text-xs font-semibold text-muted-foreground mt-0.5">Structured Pathways</div>
+              <div className="text-2xl font-black text-xblue">AI Copilot</div>
+              <div className="text-xs font-semibold text-muted-foreground mt-0.5">ReAct Loop & Live Grounding</div>
             </div>
             <div className="p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md">
               <div className="text-2xl font-black text-cyan-400">150</div>
               <div className="text-xs font-semibold text-muted-foreground mt-0.5">NeetCode DSA Track</div>
             </div>
             <div className="p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md">
-              <div className="text-2xl font-black text-amber-400">100%</div>
-              <div className="text-xs font-semibold text-muted-foreground mt-0.5">MongoDB Cloud Sync</div>
+              <div className="text-2xl font-black text-amber-400">Auto-Sync</div>
+              <div className="text-xs font-semibold text-muted-foreground mt-0.5">Live LeetCode Telemetry</div>
             </div>
             <div className="p-4 rounded-2xl bg-card/60 border border-border/60 backdrop-blur-md">
-              <div className="text-2xl font-black text-emerald-400">4 CS</div>
-              <div className="text-xs font-semibold text-muted-foreground mt-0.5">Core Subject Modules</div>
+              <div className="text-2xl font-black text-emerald-400">100%</div>
+              <div className="text-xs font-semibold text-muted-foreground mt-0.5">MongoDB Cloud Sync</div>
             </div>
           </div>
         </section>
@@ -303,6 +318,106 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Feature Highlight Spotlight: AI Copilot */}
+        <section id="copilot" className="mx-auto max-w-7xl px-6">
+          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-card via-secondary/20 to-card border border-xblue/30 relative overflow-hidden shadow-lg space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="space-y-5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-xblue/20 text-xblue border border-xblue/40">
+                  <Sparkles className="h-3.5 w-3.5 text-xblue" /> Autonomous ReAct Agent
+                </div>
+
+                <h3 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
+                  Meet Your Live AI Placement Copilot
+                </h3>
+
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Unlike passive chatbots or generic prompt wrappers, the Prep OS Copilot runs a multi-turn <strong>ReAct (Reason + Act) loop</strong> grounded directly in your live database telemetry. It audits your streak, auto-syncs your newest LeetCode solves, detects untouched roadmap blind spots, and logs study blockers to MongoDB autonomously.
+                </p>
+
+                <ul className="space-y-3 text-xs font-bold text-foreground">
+                  <li className="flex items-center gap-2.5">
+                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
+                    Deterministic Tool Calling — Zero hallucinated progress stats
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
+                    Pre-Fetch LeetCode Sync — Fresh solves pulled automatically before answering
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
+                    Direct State Mutation — Creates doubt records in MongoDB on your behalf
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="h-5 w-5 rounded-full bg-xblue/20 text-xblue flex items-center justify-center">✓</div>
+                    macOS Genie Lamp Physics — Smooth unwrap/wrap animation pinned to the trigger
+                  </li>
+                </ul>
+
+                <div className="pt-2">
+                  <Link href="/dashboard">
+                    <Button className="rounded-full bg-xblue hover:bg-xhover text-white font-extrabold text-xs px-6 h-10 gap-2">
+                      Try Copilot in Dashboard <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Mock Copilot UI Window Showcase */}
+              <div className="p-5 rounded-2xl bg-card border border-border shadow-2xl space-y-3 font-sans">
+                {/* Window Header */}
+                <div className="flex items-center justify-between border-b border-border pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-secondary border border-border flex items-center justify-center text-xblue">
+                      <Bot className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-extrabold text-xs text-foreground">Prep OS Copilot</div>
+                      <div className="text-[10px] text-muted-foreground">Connected to Roadmaps & Doubts</div>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-xblue/10 text-xblue border border-xblue/20">
+                    Live Telemetry
+                  </span>
+                </div>
+
+                {/* Chat Bubbles */}
+                <div className="space-y-3 text-xs pt-1">
+                  {/* User Bubble */}
+                  <div className="flex justify-end">
+                    <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl bg-xblue text-white rounded-tr-xs leading-relaxed">
+                      Analyze my overall prep across DSA & CS Theory
+                    </div>
+                  </div>
+
+                  {/* Agent Tool Executing indicator */}
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground bg-secondary/80 px-3 py-1.5 rounded-xl border border-border w-fit">
+                    <Sparkles className="w-3.5 h-3.5 text-xblue animate-spin" />
+                    <span>Auto-syncing LeetCode & auditing roadmap progress...</span>
+                  </div>
+
+                  {/* Agent Response */}
+                  <div className="flex justify-start">
+                    <div className="max-w-[90%] px-3.5 py-3 rounded-2xl bg-secondary/70 border border-border text-foreground rounded-tl-xs space-y-2 leading-relaxed">
+                      <p className="font-semibold text-foreground">
+                        Here is your live diagnostic across Prep OS:
+                      </p>
+                      <div className="space-y-1 text-[11px] text-muted-foreground">
+                        <div>🔥 <strong>Current Streak:</strong> 1 day (Peak: 3 days)</div>
+                        <div>💻 <strong>NeetCode Solved:</strong> 14 problems (Arrays & Two Pointers mastered)</div>
+                        <div>⚠️ <strong>Untracked Blind Spots:</strong> Sliding Window (0/6) & DBMS (ACID untouched)</div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-card border border-border text-[11px] text-xblue font-medium">
+                        💡 <em>Auto-Action:</em> Prepared next study session targeting <strong>Sliding Window</strong> + <strong>OS Deadlocks</strong>.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Feature Highlight Spotlight: NeetCode 150 */}
         <section id="neetcode" className="mx-auto max-w-7xl px-6">
           <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-card via-background to-card border border-border relative overflow-hidden shadow-sm space-y-8">
@@ -384,11 +499,16 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
               <Globe className="h-6 w-6 text-xblue mx-auto" />
               <div className="font-extrabold text-sm">Next.js 16 App Router</div>
               <div className="text-[11px] text-muted-foreground">React Server Components</div>
+            </div>
+            <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
+              <Sparkles className="h-6 w-6 text-indigo-400 mx-auto" />
+              <div className="font-extrabold text-sm">Google Gemini 2.5</div>
+              <div className="text-[11px] text-muted-foreground">Autonomous ReAct Agent</div>
             </div>
             <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
               <Database className="h-6 w-6 text-emerald-400 mx-auto" />
@@ -403,7 +523,7 @@ export default function Home() {
             <div className="p-5 rounded-2xl bg-card border border-border text-center space-y-2">
               <Shield className="h-6 w-6 text-amber-400 mx-auto" />
               <div className="font-extrabold text-sm">OAuth 2.0 & JWT</div>
-              <div className="text-[11px] text-muted-foreground">Google & Email Login</div>
+              <div className="text-[11px] text-muted-foreground">HttpOnly Cookie Sessions</div>
             </div>
           </div>
         </section>

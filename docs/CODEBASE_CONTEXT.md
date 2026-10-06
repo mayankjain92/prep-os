@@ -85,6 +85,15 @@ Request ──► Middleware (CORS, CookieParser, CSRF, Auth, Validation) ──
 | `/api/doubts` | GET/POST | 🔒 | `getDoubts`, `createDoubt` | Doubt tracking |
 | `/api/doubts/:id` | PATCH/DELETE | 🔒 | `updateDoubt`, `deleteDoubt` | Single doubt mutation |
 | `/api/roadmaps/:key` | GET/PUT | 🔒 | `getRoadmapProgress`, `updateRoadmapProgress` | Flowchart roadmap progress |
+| `/api/agent/chat` | POST | 🔒 | `chatWithAgent` | Multi-turn ReAct agent conversation with tool execution |
+
+### Agent Services (`src/services/agent/`)
+* `agentService.ts`: Core ReAct loop powered by `@google/genai` (Gemini 2.5 Flash Lite) with multi-turn loop (`MAX_TURNS = 5`), dynamic tool routing, and gap-analysis system prompt.
+* `tools.ts`: Grounded tool declarations and executors:
+  * `getUserProgress`: Audits streaks, live LeetCode stats, NeetCode solved IDs, completed roadmap topics, and active doubts (auto-triggers live sync).
+  * `getLeetCodeStats`: On-demand problem counts and global ranking with live sync.
+  * `syncLeetCode`: Dedicated on-demand platform sync tool.
+  * `createDoubt`: State mutation tool logging doubts directly to MongoDB.
 
 ---
 
@@ -106,6 +115,10 @@ Request ──► Middleware (CORS, CookieParser, CSRF, Auth, Validation) ──
 * `/dashboard/theory`: 4-subject CS theory progress cards & checklists
 * `/dashboard/projects`: Project ideation & portfolio tracker
 * `/dashboard/profile`: Heatmap streak calendar, shareable card generator
+
+### Global Components & Agents
+* `AgentCopilot.tsx` (`src/components/agent/`): Globally mounted in `dashboard/layout.tsx`. Features an animated continuous orbital trigger button, macOS Dock Genie Lamp unwrap/wrap animation, native dark theme, and interactive Markdown rendering.
+* `api.ts` (`src/features/agent/`): Client-side API client for streaming/exchanging messages with `/api/agent/chat`.
 
 ---
 

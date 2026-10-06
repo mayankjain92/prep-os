@@ -82,3 +82,24 @@ Prep OS provides reproducible, production-ready containerization across environm
 Automation workflows located in `.github/workflows/`:
 - **`ci.yml`**: Triggers on `push` and `pull_request` to `main`/`master`. Installs pnpm with frozen lockfiles (`--frozen-lockfile`), runs Vitest suites on `@prep-os/api`, and compiles the full workspace (`pnpm build`).
 - **`keepalive.yml`**: Scheduled cron workflow running every 10 minutes to ping the backend `/health` endpoint, preventing free-tier instances (e.g. Render) from entering cold sleep.
+
+---
+
+## 8. Autonomous AI Copilot Architecture (ReAct Pattern & Tool Grounding)
+Prep OS features an integrated, production-grade AI mentor built to analyze student preparation, diagnose knowledge gaps across DSA and CS Theory, and log study blockers autonomously.
+
+### Core Architectural Decisions:
+- **ReAct (Reason + Act) Loop:** Powered by `@google/genai` (Gemini 2.5 Flash Lite) in `apps/api/src/services/agent/agentService.ts`. The loop allows up to 5 iterative turns (`MAX_TURNS = 5`) where the LLM reasons over user intent, decides if tool execution is required, evaluates tool observations, and chains subsequent actions before formulating its final response.
+- **Deterministic Tool Calling over RAG:** 
+  - *Why not RAG?* Retrieval-Augmented Generation relies on semantic similarity over unstructured text. Student preparation telemetry (streaks, solved counts, roadmap node completions) is **deterministic, structured relational data** in MongoDB. Vector search cannot count completed documents or perform writes.
+  - *Tool Grounding:* The Copilot perceives environment state via read tools (`getUserProgress`, `getLeetCodeStats`) and mutates state via write tools (`createDoubt`, `syncLeetCode`).
+- **Auto-Sync Telemetry Pipeline:**
+  - Before returning telemetry via `getUserProgress` or `getLeetCodeStats`, the backend automatically calls `syncUserLeetCodeProfile(userId, username, force = true)`.
+  - Flushes the Redis cache, queries live LeetCode stats via GraphQL with an `AbortSignal.timeout(6000)` safeguard, updates MongoDB with `syncedAt`, and feeds fresh data directly to the LLM.
+- **Shared Service Pattern:**
+  - The synchronization logic is encapsulated in `syncUserLeetCodeProfile` in `leetcodeService.ts`. Both the REST API endpoint (`POST /api/problems/sync`) and the internal AI Agent tools share the same service function with 0 code duplication.
+- **Frontend Copilot UI & Micro-interactions:**
+  - **macOS Dock "Genie Lamp" Animation:** Implemented via Framer Motion with pinned transformation anchors (`originX: 0.96`, `originY: 0.98`) and spring physics (`stiffness: 320, damping: 27`), smoothly expanding out of and wrapping back into the floating trigger.
+  - **Animated Action Logo:** Standalone circular trigger button with a continuously spinning dashed orbital ring (`border-xblue/30`) and a morphing `Sparkles` to `X` icon.
+  - **Native Dark Theme:** Clean Twitter/X palette (`bg-card`, `border-border`, `text-xblue`, `bg-secondary`), removing third-party AI provider badges.
+

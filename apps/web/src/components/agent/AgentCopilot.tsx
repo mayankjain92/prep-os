@@ -55,9 +55,9 @@ export function AgentCopilot() {
   };
 
   const quickPrompts = [
-    "Check my current study streak & solved problems",
-    "Log a high-priority doubt about OS Paging",
-    "What topic should I focus on next?",
+    "Analyze my overall prep across DSA & CS Theory",
+    "Review my active doubts & high-priority blockers",
+    "Build a 7-day revision sprint based on my weakest subjects",
   ];
 
   return (
@@ -158,8 +158,58 @@ export function AgentCopilot() {
                       {msg.role === "user" ? (
                         <div className="whitespace-pre-wrap">{msg.content}</div>
                       ) : (
-                        <div className="prose prose-invert prose-xs max-w-none space-y-1.5 [&>p]:leading-relaxed [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>strong]:text-foreground [&>strong]:font-bold [&>code]:bg-background/80 [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:font-mono [&>code]:text-[11px]">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        <div className="space-y-1.5">
+                          <ReactMarkdown
+                            components={{
+                              h1: ({ children }) => (
+                                <h1 className="font-bold text-sm text-foreground my-1.5 border-b border-border pb-1">
+                                  {children}
+                                </h1>
+                              ),
+                              h2: ({ children }) => (
+                                <h2 className="font-bold text-xs text-foreground mt-2 mb-1">
+                                  {children}
+                                </h2>
+                              ),
+                              h3: ({ children }) => (
+                                <h3 className="font-semibold text-xs text-foreground mt-1.5 mb-0.5">
+                                  {children}
+                                </h3>
+                              ),
+                              p: ({ children }) => (
+                                <p className="leading-relaxed mb-1.5 last:mb-0 text-foreground/90">
+                                  {children}
+                                </p>
+                              ),
+                              strong: ({ children }) => (
+                                <strong className="font-bold text-foreground">
+                                  {children}
+                                </strong>
+                              ),
+                              ul: ({ children }) => (
+                                <ul className="list-disc pl-4 space-y-1 my-1">
+                                  {children}
+                                </ul>
+                              ),
+                              ol: ({ children }) => (
+                                <ol className="list-decimal pl-4 space-y-1 my-1">
+                                  {children}
+                                </ol>
+                              ),
+                              li: ({ children }) => (
+                                <li className="leading-relaxed text-foreground/90">
+                                  {children}
+                                </li>
+                              ),
+                              code: ({ children }) => (
+                                <code className="bg-background/80 border border-border px-1.5 py-0.5 rounded font-mono text-[11px] text-cyan-400">
+                                  {children}
+                                </code>
+                              ),
+                            }}
+                          >
+                            {msg.content}
+                          </ReactMarkdown>
                         </div>
                       )}
                     </div>

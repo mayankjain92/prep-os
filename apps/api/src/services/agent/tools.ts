@@ -57,24 +57,52 @@ export const createDoubtTool = {
 export const getUserProgressTool = {
   name: "getUserProgress",
   description:
-    "Retrieve the student's daily streak, total NeetCode problems solved, and active unresolved doubts count.",
+    "Retrieve a deep, comprehensive breakdown of the student's preparation: streak, LeetCode stats, solved NeetCode problem IDs, completed vs pending CS roadmap topics, and active doubt titles/topics.",
   parameters: {
     type: "OBJECT",
     properties: {},
   },
   execute: async (userId: string) => {
     const user = await User.findById(userId);
-    const activeDoubts = await Doubt.countDocuments({
+    const activeDoubts = await Doubt.find({
       userId,
       resolved: false,
-    });
+    })
+      .select("title topic priority createdAt")
+      .limit(5);
+
     const roadmaps = await RoadmapProgress.find({ userId });
+    const roadmapBreakdown = roadmaps.map((r) => {
+      const completed: string[] = [];
+      const inProgress: string[] = [];
+      r.nodeStatuses?.forEach((status: string, nodeId: string) => {
+        if (status === "done") completed.push(nodeId);
+        if (status === "in-progress") inProgress.push(nodeId);
+      });
+      return {
+        roadmap: r.roadmapKey,
+        completedTopics: completed,
+        inProgressTopics: inProgress,
+      };
+    });
+
     return {
-      streak: user?.currentStreak || 0,
-      longestStreak: user?.longestStreak || 0,
-      neetcodeSolvedCount: user?.neetcodeProgress?.solved?.length || 0,
-      activeUnresolvedDoubts: activeDoubts,
-      roadmapsTracked: roadmaps.map((r) => r.roadmapKey),
+      streak: {
+        current: user?.currentStreak || 0,
+        longest: user?.longestStreak || 0,
+      },
+      leetcodeProfile: user?.leetcodeProfile || null,
+      neetcode: {
+        totalSolved: user?.neetcodeProgress?.solved?.length || 0,
+        solvedProblemsList: user?.neetcodeProgress?.solved || [],
+      },
+      roadmaps: roadmapBreakdown,
+      unresolvedDoubts: activeDoubts.map((d) => ({
+        id: d._id,
+        title: d.title,
+        topic: d.topic,
+        priority: d.priority,
+      })),
     };
   },
 };

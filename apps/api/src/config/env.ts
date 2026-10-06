@@ -8,11 +8,14 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   GOOGLE_CLIENT_ID: z.string().default(""),
   FRONTEND_URL: z.string().default("http://localhost:3000"),
+  GEMINI_API_KEY: z.string().optional().default(""),
 });
 
 const parsed = envSchema.safeParse({
   ...process.env,
-  JWT_SECRET: process.env.JWT_SECRET ?? (process.env.VITEST ? "prep-os-super-secret-key-12345" : undefined),
+  JWT_SECRET:
+    process.env.JWT_SECRET ??
+    (process.env.VITEST ? "prep-os-super-secret-key-12345" : undefined),
 });
 
 if (!parsed.success) {

@@ -12,6 +12,7 @@ import { authMiddleware } from "./middleware/authMiddleware.js";
 import { startKeepAlive } from "./services/keepAliveService.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { env } from "./config/env.js";
+import agentRoutes from "./routes/agentRoutes.js";
 
 const app = express();
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
@@ -47,6 +48,7 @@ app.use("/api/problems", authMiddleware, problemRoutes);
 app.use("/api/projects", authMiddleware, projectRoutes);
 app.use("/api/doubts", authMiddleware, doubtRoutes);
 app.use("/api/roadmaps", authMiddleware, roadmapRoutes);
+app.use("/api/agent", agentRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

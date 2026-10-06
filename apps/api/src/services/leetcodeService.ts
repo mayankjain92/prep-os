@@ -1,4 +1,5 @@
 import { redis } from "../config/redisClient.js";
+import { User } from "../models/User.js";
 
 const CACHE_TTL_SECONDS = 3600; // 1 hour
 
@@ -61,6 +62,7 @@ async function fetchFromExternalLeetCode(
         query,
         variables: { username },
       }),
+      signal: AbortSignal.timeout(6000),
     });
 
     if (res.ok) {
@@ -170,3 +172,68 @@ export async function invalidateLeetCodeCache(
     );
   }
 }
+
+export async function syncUserLeetCodeProfile(
+  userId: string,
+  username?: string,
+  force: boolean = true,
+): Promise<{ profile: LeetCodeProfileStats; synced: boolean; error?: string }> {
+  try {
+    const user = await User.findById(userId);
+    const targetUsername = username || user?.leetcodeProfile?.username;
+    if (!targetUsername) {
+      return {
+        profile: user?.leetcodeProfile || {
+          username: "",
+          totalSolved: 0,
+          easySolved: 0,
+          mediumSolved: 0,
+          hardSolved: 0,
+          ranking: 0,
+        },
+        synced: false,
+        error: "No LeetCode username provided or linked to profile.",
+      };
+    }
+
+    if (force) {
+      await invalidateLeetCodeCache(userId, targetUsername);
+    }
+
+    const dataResult = await getLeetCodeUserData(userId, targetUsername);
+
+    if (dataResult?.profile) {
+      await User.findByIdAndUpdate(userId, {
+        leetcodeProfile: {
+          ...dataResult.profile,
+          syncedAt: new Date(),
+        },
+      });
+      return {
+        profile: dataResult.profile,
+        synced: true,
+      };
+    }
+
+    return {
+      profile: user?.leetcodeProfile || dataResult.profile,
+      synced: false,
+    };
+  } catch (err: any) {
+    console.warn(`[syncUserLeetCodeProfile] Sync failed:`, err.message);
+    const user = await User.findById(userId);
+    return {
+      profile: user?.leetcodeProfile || {
+        username: "",
+        totalSolved: 0,
+        easySolved: 0,
+        mediumSolved: 0,
+        hardSolved: 0,
+        ranking: 0,
+      },
+      synced: false,
+      error: err.message,
+    };
+  }
+}
+

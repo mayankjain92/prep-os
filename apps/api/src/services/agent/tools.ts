@@ -2,7 +2,10 @@ import { z } from "zod";
 import { Doubt } from "../../models/Doubt.js";
 import { User } from "../../models/User.js";
 import { RoadmapProgress } from "../../models/RoadmapProgress.js";
-import { getLeetCodeUserData } from "../leetcodeService.js";
+import {
+  getLeetCodeUserData,
+  syncUserLeetCodeProfile,
+} from "../leetcodeService.js";
 
 export const createDoubtTool = {
   name: "createDoubt",
@@ -54,16 +57,83 @@ export const createDoubtTool = {
   },
 };
 
+export const syncLeetCodeTool = {
+  name: "syncLeetCode",
+  description:
+    "Trigger an on-demand synchronization with LeetCode to fetch the student's latest problem solve counts and global ranking, saving fresh stats to the database.",
+  parameters: {
+    type: "OBJECT",
+    properties: {
+      username: {
+        type: "STRING",
+        description:
+          "LeetCode username to sync (optional if already linked in user profile)",
+      },
+    },
+  },
+  execute: async (userId: string, args: any) => {
+    const user = await User.findById(userId);
+    const username = args?.username || user?.leetcodeProfile?.username;
+    if (!username) {
+      return {
+        success: false,
+        error:
+          "No LeetCode username provided and none linked in user profile.",
+      };
+    }
+    const syncRes = await syncUserLeetCodeProfile(userId, username, true);
+    return {
+      success: syncRes.synced,
+      message: syncRes.synced
+        ? `Successfully synced latest LeetCode stats for @${username}. Total solved: ${syncRes.profile.totalSolved} (Easy: ${syncRes.profile.easySolved}, Med: ${syncRes.profile.mediumSolved}, Hard: ${syncRes.profile.hardSolved})`
+        : `Could not reach live LeetCode API, returned current cached profile for @${username}.`,
+      profile: syncRes.profile,
+    };
+  },
+};
+
 export const getUserProgressTool = {
   name: "getUserProgress",
   description:
-    "Retrieve a deep, comprehensive breakdown of the student's preparation: streak, LeetCode stats, solved NeetCode problem IDs, completed vs pending CS roadmap topics, and active doubt titles/topics.",
+    "Retrieve a deep, comprehensive breakdown of the student's preparation: streak, freshly synced LeetCode stats, solved NeetCode problem IDs, completed vs pending CS roadmap topics, and active doubt titles/topics. Automatically triggers a real-time sync with LeetCode before returning telemetry.",
   parameters: {
     type: "OBJECT",
-    properties: {},
+    properties: {
+      sync: {
+        type: "BOOLEAN",
+        description:
+          "Whether to trigger a fresh sync with LeetCode before returning progress (defaults to true).",
+      },
+    },
   },
-  execute: async (userId: string) => {
-    const user = await User.findById(userId);
+  execute: async (userId: string, args?: any) => {
+    let user = await User.findById(userId);
+
+    // Auto-sync latest LeetCode progress before inspecting stats
+    const shouldSync = args?.sync !== false;
+    let syncInfo: any = null;
+    const leetcodeUser = user?.leetcodeProfile?.username;
+
+    if (shouldSync && leetcodeUser) {
+      try {
+        const syncRes = await syncUserLeetCodeProfile(
+          userId,
+          leetcodeUser,
+          true,
+        );
+        if (syncRes.synced) {
+          syncInfo = {
+            syncedNow: true,
+            totalSolved: syncRes.profile.totalSolved,
+            syncedAt: new Date().toISOString(),
+          };
+          user = await User.findById(userId);
+        }
+      } catch (err: any) {
+        console.warn("[getUserProgressTool] Auto-sync failed:", err.message);
+      }
+    }
+
     const activeDoubts = await Doubt.find({
       userId,
       resolved: false,
@@ -92,6 +162,11 @@ export const getUserProgressTool = {
         longest: user?.longestStreak || 0,
       },
       leetcodeProfile: user?.leetcodeProfile || null,
+      leetcodeSyncStatus:
+        syncInfo ||
+        (user?.leetcodeProfile?.syncedAt
+          ? { syncedNow: false, syncedAt: user.leetcodeProfile.syncedAt }
+          : { syncedNow: false }),
       neetcode: {
         totalSolved: user?.neetcodeProgress?.solved?.length || 0,
         solvedProblemsList: user?.neetcodeProgress?.solved || [],
@@ -110,7 +185,7 @@ export const getUserProgressTool = {
 export const getLeetCodeStatsTool = {
   name: "getLeetCodeStats",
   description:
-    "Retrieve the user's LeetCode solved count (easy, medium, hard) and global ranking.",
+    "Retrieve the user's latest LeetCode solved count (easy, medium, hard) and global ranking. Automatically triggers a sync with LeetCode to guarantee fresh live data.",
   parameters: {
     type: "OBJECT",
     properties: {
@@ -123,14 +198,17 @@ export const getLeetCodeStatsTool = {
   },
   execute: async (userId: string, args: any) => {
     const user = await User.findById(userId);
-    const username = args.username || user?.leetcodeProfile?.username;
+    const username = args?.username || user?.leetcodeProfile?.username;
     if (!username) {
       return {
         error: "No LeetCode username provided and none linked in profile.",
       };
     }
-    const data = await getLeetCodeUserData(userId, username);
-    return data.profile;
+    const syncRes = await syncUserLeetCodeProfile(userId, username, true);
+    return {
+      ...syncRes.profile,
+      syncedNow: syncRes.synced,
+    };
   },
 };
 
@@ -138,4 +216,5 @@ export const toolsRegistry = {
   createDoubt: createDoubtTool,
   getUserProgress: getUserProgressTool,
   getLeetCodeStats: getLeetCodeStatsTool,
+  syncLeetCode: syncLeetCodeTool,
 };

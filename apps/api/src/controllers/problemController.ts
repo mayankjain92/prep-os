@@ -3,6 +3,7 @@ import { User } from "../models/User.js";
 import {
   getLeetCodeUserData,
   invalidateLeetCodeCache,
+  syncUserLeetCodeProfile,
 } from "../services/leetcodeService.js";
 
 export async function getLeetCodeProfile(req: Request, res: Response) {
@@ -53,22 +54,11 @@ export async function syncLeetCodeProblems(req: Request, res: Response) {
     return res.status(400).json({ error: "LeetCode username is required" });
   }
 
-  if (force) {
-    await invalidateLeetCodeCache(userId, username);
-  }
-  const dataResult = await getLeetCodeUserData(userId, username);
-
-  // Persist synced profile into User document
-  await User.findByIdAndUpdate(userId, {
-    leetcodeProfile: {
-      ...dataResult.profile,
-      syncedAt: new Date(),
-    },
-  });
+  const result = await syncUserLeetCodeProfile(userId, username, force);
 
   res.json({
     message: `Successfully synced LeetCode profile for @${username}`,
-    synced: dataResult.profile.totalSolved,
-    profile: dataResult.profile,
+    synced: result.profile.totalSolved,
+    profile: result.profile,
   });
 }

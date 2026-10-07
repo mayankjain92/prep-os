@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/features/auth/AuthContext";
-import { useTheme } from "@/components/ThemeProvider";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import {
   User as UserIcon,
   Flame,
@@ -13,11 +13,19 @@ import {
   LogOut,
   ChevronDown,
   ExternalLink,
+  RotateCw,
+  Code2,
 } from "lucide-react";
+import { useLeetCodeProfile, useSyncLeetCode } from "@/features/dsa/useProblems";
+import posthog from "posthog-js";
 
 export function ProfileDropdown() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { data: dbLeetcodeProfile } = useLeetCodeProfile();
+  const syncMutation = useSyncLeetCode();
+  const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
+
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -113,6 +121,86 @@ export function ProfileDropdown() {
               </div>
             </div>
           </div>
+
+          {/* LeetCode Detailed Status & 1-Click Sync */}
+          {activeProfile?.username && (
+            <div className="mb-2 bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-xl p-2.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <Code2 className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                  <span className="text-xs font-semibold text-slate-800 dark:text-neutral-200 truncate">
+                    LeetCode Stats
+                  </span>
+                  {activeProfile.ranking ? (
+                    <span className="text-[10px] text-slate-400 dark:text-neutral-500 font-mono">
+                      #{activeProfile.ranking.toLocaleString()}
+                    </span>
+                  ) : null}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    syncMutation.mutate(
+                      { username: activeProfile.username, force: false },
+                      {
+                        onSuccess: (data) => {
+                          posthog.capture("leetcode_profile_synced_dropdown", {
+                            total_solved: data.profile?.totalSolved,
+                          });
+                        },
+                      },
+                    );
+                  }}
+                  disabled={syncMutation.isPending}
+                  title="Sync LeetCode profile"
+                  className="p-1 rounded-md text-slate-400 hover:text-sky-500 dark:text-neutral-500 dark:hover:text-sky-400 hover:bg-slate-200/60 dark:hover:bg-white/[0.06] transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <RotateCw
+                    className={`w-3 h-3 ${
+                      syncMutation.isPending ? "animate-spin text-sky-500" : ""
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-4 gap-1.5 text-center">
+                <div className="bg-white dark:bg-[#121212] rounded-lg py-1 px-1 border border-slate-200/60 dark:border-white/[0.04]">
+                  <div className="text-[9px] uppercase font-semibold text-slate-500 dark:text-neutral-500">
+                    Total
+                  </div>
+                  <div className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400">
+                    {activeProfile.totalSolved ?? 0}
+                  </div>
+                </div>
+                <div className="bg-white dark:bg-[#121212] rounded-lg py-1 px-1 border border-slate-200/60 dark:border-white/[0.04]">
+                  <div className="text-[9px] uppercase font-semibold text-slate-500 dark:text-neutral-500">
+                    Easy
+                  </div>
+                  <div className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                    {activeProfile.easySolved ?? 0}
+                  </div>
+                </div>
+                <div className="bg-white dark:bg-[#121212] rounded-lg py-1 px-1 border border-slate-200/60 dark:border-white/[0.04]">
+                  <div className="text-[9px] uppercase font-semibold text-slate-500 dark:text-neutral-500">
+                    Med
+                  </div>
+                  <div className="text-xs font-bold font-mono text-amber-600 dark:text-amber-400">
+                    {activeProfile.mediumSolved ?? 0}
+                  </div>
+                </div>
+                <div className="bg-white dark:bg-[#121212] rounded-lg py-1 px-1 border border-slate-200/60 dark:border-white/[0.04]">
+                  <div className="text-[9px] uppercase font-semibold text-slate-500 dark:text-neutral-500">
+                    Hard
+                  </div>
+                  <div className="text-xs font-bold font-mono text-rose-600 dark:text-rose-400">
+                    {activeProfile.hardSolved ?? 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Divider */}
           <div className="border-t border-slate-200 dark:border-white/[0.08] my-2.5 -mx-4" />

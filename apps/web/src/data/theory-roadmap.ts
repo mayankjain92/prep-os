@@ -1,4 +1,4 @@
-import { RoadmapSection } from "@/components/shared/RoadmapFlowChart";
+import type { RoadmapSection } from "@/features/roadmap/types";
 
 export const THEORY_ROADMAP_SECTIONS: RoadmapSection[] = [
   {

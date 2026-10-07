@@ -5,11 +5,8 @@ import Link from "next/link";
 import {
   CheckCircle2,
   CircleDashed,
-  Compass,
   ArrowRight,
   GitBranch,
-  Sparkles,
-  ExternalLink,
   Tag,
   Building2,
 } from "lucide-react";

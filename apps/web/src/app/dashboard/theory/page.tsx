@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
-import { RoadmapFlowChart, type RoadmapNodeItem } from "@/components/shared/RoadmapFlowChart";
+import { RoadmapFlowChart } from "@/features/roadmap/components/RoadmapFlowChart";
+import type { RoadmapNodeItem } from "@/features/roadmap/types";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { AnimatedProgressBar } from "@/components/shared/PageTransition";
 import { THEORY_ROADMAP_SECTIONS } from "@/data/theory-roadmap";
@@ -22,10 +23,6 @@ export default function TheoryDashboardPage() {
 
   // Compute stats per section & overall stats
   const { subjectStats, overallStats } = useMemo(() => {
-    let grandTotal = 0;
-    let grandDone = 0;
-    let grandLearning = 0;
-
     const stats = SUBJECTS.map((sub) => {
       const section = THEORY_ROADMAP_SECTIONS.find((s) => s.mainId === sub.mainId);
       let total = 0;
@@ -46,14 +43,13 @@ export default function TheoryDashboardPage() {
         traverse(section.rightNodes);
       }
 
-      grandTotal += total;
-      grandDone += completed;
-      grandLearning += learning;
-
       const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
       return { ...sub, total, completed, learning, percentage };
     });
 
+    const grandTotal = stats.reduce((acc, s) => acc + s.total, 0);
+    const grandDone = stats.reduce((acc, s) => acc + s.completed, 0);
+    const grandLearning = stats.reduce((acc, s) => acc + s.learning, 0);
     const grandPending = grandTotal - grandDone - grandLearning;
     const grandPct = grandTotal > 0 ? Math.round((grandDone / grandTotal) * 100) : 0;
 

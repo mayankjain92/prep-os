@@ -181,7 +181,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               disabled={loading || usernameStatus === "checking" || usernameStatus === "taken"}
-              className="w-full rounded-xl font-bold bg-xblue hover:bg-xhover text-white"
+              className="w-full rounded-xl font-bold bg-sky-500 hover:bg-sky-400 text-white cursor-pointer shadow-sm shadow-sky-500/20"
             >
               {loading ? "Creating Account..." : "Register"}
             </Button>
@@ -189,7 +189,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-xs font-semibold text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="font-bold text-xblue hover:underline">
+            <Link href="/login" className="font-bold text-sky-500 hover:underline">
               Sign in here
             </Link>
           </p>

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { Logo } from "@/components/shared/Logo";
 import { AnimatedEmblem } from "@/components/shared/AnimatedEmblem";
-import { RoadmapTreePreview } from "@/components/shared/RoadmapTreePreview";
+import { RoadmapTreePreview } from "@/features/roadmap/components/RoadmapTreePreview";
 import {
   Code2,
   Zap,
@@ -13,16 +13,13 @@ import {
   BookOpen,
   FolderKanban,
   Flame,
-  CheckCircle2,
   Compass,
   Sparkles,
   Bot,
   ChevronRight,
   GitBranch,
   Share2,
-  GraduationCap,
   Target,
-  Trophy,
 } from "lucide-react";
 
 export default function Home() {

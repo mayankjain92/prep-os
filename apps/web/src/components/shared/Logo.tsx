@@ -34,7 +34,7 @@ export function Logo({ size = "md", iconOnly = false, href, className = "" }: Lo
 
       {!iconOnly && (
         <span className={`font-black tracking-tight ${currentSize.text} text-foreground flex items-center`}>
-          Prep<span className="bg-gradient-to-r from-xblue to-cyan-400 bg-clip-text text-transparent">OS</span>
+          Prep<span className="bg-gradient-to-r from-sky-500 to-cyan-400 bg-clip-text text-transparent">OS</span>
         </span>
       )}
     </div>

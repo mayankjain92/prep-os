@@ -32,7 +32,7 @@ export default function DashboardLoading() {
               <div className="h-3.5 w-full bg-muted/40 rounded-md animate-pulse" />
             </div>
             <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
-              <div className="h-full w-1/3 bg-xblue/30 rounded-full animate-pulse" />
+              <div className="h-full w-1/3 bg-sky-500/30 rounded-full animate-pulse" />
             </div>
           </div>
         ))}

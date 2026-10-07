@@ -86,14 +86,14 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full rounded-xl font-bold bg-xblue hover:bg-xhover text-white">
+            <Button type="submit" disabled={loading} className="w-full rounded-xl font-bold bg-sky-500 hover:bg-sky-400 text-white cursor-pointer shadow-sm shadow-sky-500/20">
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
           <p className="text-center text-xs font-semibold text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-bold text-xblue hover:underline">
+            <Link href="/register" className="font-bold text-sky-500 hover:underline">
               Register here
             </Link>
           </p>

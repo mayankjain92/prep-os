@@ -9,7 +9,7 @@ import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
 import { useDoubts } from "@/features/doubts/useDoubts";
 import { DSA_ROADMAP_SECTIONS } from "@/data/dsa-roadmap";
 import { THEORY_ROADMAP_SECTIONS } from "@/data/theory-roadmap";
-import type { RoadmapNodeItem } from "@/components/shared/RoadmapFlowChart";
+import type { RoadmapNodeItem } from "@/features/roadmap/types";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { AnimatedProgressBar } from "@/components/shared/PageTransition";
 import {
@@ -162,7 +162,7 @@ export default function UnifiedDashboardPage() {
               <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
             </button>
             
-            <Link href="/dashboard/dsa">
+            <Link href="/dashboard/doubts">
               <button
                 type="button"
                 className="inline-flex items-center justify-center space-x-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-sky-500 hover:bg-sky-400 rounded-lg transition-colors shadow-sm shadow-sky-500/20 focus:outline-none focus:ring-1 focus:ring-sky-400 cursor-pointer"
@@ -375,7 +375,7 @@ export default function UnifiedDashboardPage() {
                     <AnimatedNumber value={unresolvedDoubts.length} /> {unresolvedDoubts.length === 1 ? "item" : "items"}
                   </span>
                   <Link
-                    href="/dashboard/dsa"
+                    href="/dashboard/doubts"
                     className="text-xs font-medium text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 inline-flex items-center space-x-1 transition-colors"
                   >
                     <span>Open</span>
@@ -395,7 +395,7 @@ export default function UnifiedDashboardPage() {
                   unresolvedDoubts.slice(0, 3).map((doubt) => (
                     <article key={doubt.id} className="py-3 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-white/[0.02] -mx-2 px-2 rounded-lg transition-colors">
                       <div className="min-w-0 pr-4">
-                        <Link href="/dashboard/dsa" className="text-sm font-medium text-slate-800 dark:text-neutral-200 group-hover:text-slate-900 dark:group-hover:text-white truncate block">
+                        <Link href="/dashboard/doubts" className="text-sm font-medium text-slate-800 dark:text-neutral-200 group-hover:text-slate-900 dark:group-hover:text-white truncate block">
                           {doubt.title}
                         </Link>
                         <div className="flex items-center space-x-2 mt-1">
@@ -426,7 +426,7 @@ export default function UnifiedDashboardPage() {
                         </a>
                       ) : (
                         <Link
-                          href="/dashboard/dsa"
+                          href="/dashboard/doubts"
                           className="text-xs font-medium text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 flex items-center space-x-1 p-1 transition-colors shrink-0"
                         >
                           <span>Open</span>

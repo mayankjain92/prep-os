@@ -111,14 +111,20 @@ Request ──► Middleware (CORS, CookieParser, CSRF, Auth, Validation) ──
 * `/`: Marketing / Landing page
 * `/login` & `/register`: Authentication flows
 * `/dashboard`: Overview metrics (DSA count, Theory percentage, Active doubts)
-* `/dashboard/dsa`: Interactive DSA table with difficulty filters & LeetCode sync
-* `/dashboard/theory`: 4-subject CS theory progress cards & checklists
-* `/dashboard/projects`: Project ideation & portfolio tracker
-* `/dashboard/profile`: Heatmap streak calendar, shareable card generator
+* `/dashboard/dsa`: Interactive DSA checklist, NeetCode 150 table & LeetCode sync
+* `/dashboard/doubts`: Dedicated revision target queue with blurred backdrop logging modal
+* `/dashboard/theory`: 5-subject CS theory progress cards & visual flowcharts (OS, DBMS, CN, OOP, Aptitude)
+* `/dashboard/projects`: Project ideation, portfolio tracker & GitHub sync modal
+* `/dashboard/profile`: Heatmap streak calendar, handle claiming, shareable card generator
 
-### Global Components & Agents
-* `AgentCopilot.tsx` (`src/components/agent/`): Globally mounted in `dashboard/layout.tsx`. Features an animated continuous orbital trigger button, macOS Dock Genie Lamp unwrap/wrap animation, native dark theme, and interactive Markdown rendering.
-* `api.ts` (`src/features/agent/`): Client-side API client for streaming/exchanging messages with `/api/agent/chat`.
+### Feature-Sliced Structure (`src/features/`)
+* `features/agent/`: AI Copilot API client (`api.ts`) & Expandable IDE reader drawer (`components/AgentCopilot.tsx`).
+* `features/doubts/`: Doubts data layer (`api.ts`, `useDoubts.ts`) & full revision UI (`components/DoubtSection.tsx`).
+* `features/dsa/`: Problems API (`api.ts`, `useProblems.ts`) & NeetCode 150 component (`components/Neetcode150Section.tsx`).
+* `features/profile/`: Profile UI slices (`components/ProfileDropdown.tsx`, `components/SetUsernameModal.tsx`, `components/LoginHeatmap.tsx`, `components/ShareableProgressCard.tsx`).
+* `features/projects/`: Project planner API & GitHub sync modal (`components/GitHubSyncModal.tsx`).
+* `features/roadmap/`: FlowChart & Tree components, hooks, and decoupled types (`types.ts`).
+* `features/auth/`: Global auth context & token management (`AuthContext.tsx`).
 
 ---
 

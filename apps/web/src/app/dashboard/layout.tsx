@@ -6,18 +6,19 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/AuthContext";
 import { Button } from "@/components/ui/button";
-import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
-import { SetUsernameModal } from "@/components/profile/SetUsernameModal";
+import { ProfileDropdown } from "@/features/profile/components/ProfileDropdown";
+import { SetUsernameModal } from "@/features/profile/components/SetUsernameModal";
 import { Logo } from "@/components/shared/Logo";
 import {
   LayoutGrid,
   Code2,
   BookOpen,
   FolderKanban,
+  HelpCircle,
   Menu,
   X,
 } from "lucide-react";
-import { AgentCopilot } from "@/components/agent/AgentCopilot";
+import { AgentCopilot } from "@/features/agent/components/AgentCopilot";
 
 export default function DashboardLayout({
   children,
@@ -66,9 +67,10 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: "/dashboard", label: "Overview", icon: LayoutGrid },
-    { href: "/dashboard/dsa", label: "DSA Roadmap", icon: Code2 },
+    { href: "/dashboard/dsa", label: "DSA", icon: Code2 },
     { href: "/dashboard/theory", label: "CS Theory", icon: BookOpen },
     { href: "/dashboard/projects", label: "Projects", icon: FolderKanban },
+    { href: "/dashboard/doubts", label: "Doubts", icon: HelpCircle },
   ];
 
   return (

@@ -44,7 +44,7 @@ export function SetUsernameModal() {
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
       <div className="w-full max-w-md bg-card border border-border rounded-3xl p-7 shadow-2xl space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3.5 rounded-2xl bg-xblue/10 text-xblue mb-1">
+          <div className="inline-flex p-3.5 rounded-2xl bg-sky-500/10 text-sky-500 mb-1">
             <Sparkles className="h-6 w-6" />
           </div>
           <h2 className="text-xl font-black tracking-tight text-foreground">Welcome to Prep OS!</h2>
@@ -86,7 +86,7 @@ export function SetUsernameModal() {
           <Button
             type="submit"
             disabled={loading || !handle.trim()}
-            className="w-full h-11 rounded-xl bg-xblue hover:bg-xhover text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+            className="w-full h-11 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
               <>

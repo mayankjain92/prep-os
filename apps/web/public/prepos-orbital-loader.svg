@@ -1,0 +1,90 @@
+<svg class="prepos-loader-orbital" height="300" viewBox="0 0 300 300" width="300" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient cx="50%" cy="50%" id="halo-glow" r="50%">
+<stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+<stop offset="50%" stop-color="#38bdf8" stop-opacity="0.12"/>
+<stop offset="100%" stop-color="#0a0a0c" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="primary-grad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#818cf8"/>
+<stop offset="50%" stop-color="#6366f1"/>
+<stop offset="100%" stop-color="#38bdf8"/>
+</linearGradient>
+<linearGradient id="ring-grad-1" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#6366f1" stop-opacity="0.8"/>
+<stop offset="100%" stop-color="#38bdf8" stop-opacity="0.1"/>
+</linearGradient>
+<filter height="160%" id="bloom" width="160%" x="-30%" y="-30%">
+<feGaussianBlur result="blur" stdDeviation="3.5"/>
+<feMerge>
+<feMergeNode in="blur"/>
+<feMergeNode in="SourceGraphic"/>
+</feMerge>
+</filter>
+<style>
+    @keyframes pulse-core {
+      0%, 100% { transform: scale(0.92); opacity: 0.85; filter: drop-shadow(0 0 8px rgba(99,102,241,0.5)); }
+      50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 16px rgba(56,189,248,0.85)); }
+    }
+    @keyframes spin-cw {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spin-ccw {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    @keyframes dash-orbit {
+      0% { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: 360; }
+    }
+    @keyframes breath-ring {
+      0%, 100% { opacity: 0.3; transform: scale(0.96); }
+      50% { opacity: 0.8; transform: scale(1.03); }
+    }
+    .core-diamond {
+      transform-origin: 150px 150px;
+      animation: pulse-core 2.6s ease-in-out infinite;
+    }
+    .orbit-outer {
+      transform-origin: 150px 150px;
+      animation: spin-cw 9s linear infinite;
+    }
+    .orbit-mid {
+      transform-origin: 150px 150px;
+      animation: spin-ccw 6s linear infinite;
+    }
+    .orbit-dash {
+      animation: dash-orbit 4s linear infinite;
+    }
+    .ambient-halo {
+      transform-origin: 150px 150px;
+      animation: breath-ring 3.4s ease-in-out infinite;
+    }
+</style>
+</defs>
+<!-- Ambient Glow -->
+<circle class="ambient-halo" cx="150" cy="150" fill="url(#halo-glow)" r="110"/>
+<!-- Static Track Rings -->
+<circle cx="150" cy="150" fill="none" r="88" stroke="#262626" stroke-opacity="0.6" stroke-width="1.2"/>
+<circle cx="150" cy="150" fill="none" r="62" stroke="#262626" stroke-opacity="0.5" stroke-width="1.2"/>
+<!-- Outer Orbit Segment -->
+<g class="orbit-outer">
+<circle cx="150" cy="150" fill="none" filter="url(#bloom)" r="88" stroke="url(#ring-grad-1)" stroke-dasharray="70 210" stroke-linecap="round" stroke-width="2.5"/>
+<circle cx="238" cy="150" fill="#38bdf8" filter="url(#bloom)" r="4"/>
+<circle cx="62" cy="150" fill="#818cf8" r="2.5"/>
+</g>
+<!-- Mid Counter-Rotating Orbit -->
+<g class="orbit-mid">
+<circle cx="150" cy="150" fill="none" filter="url(#bloom)" r="62" stroke="#6366f1" stroke-dasharray="45 150" stroke-linecap="round" stroke-width="2"/>
+<circle cx="150" cy="88" fill="#6366f1" filter="url(#bloom)" r="3.5"/>
+<circle cx="150" cy="212" fill="#38bdf8" r="2"/>
+</g>
+<!-- Central Diamond AI / Telemetry Spark -->
+<g class="core-diamond">
+<!-- Outer Glow Rhombus -->
+<path d="M 150 116 C 150 134 166 150 184 150 C 166 150 150 166 150 184 C 150 166 134 150 116 150 C 134 150 150 134 150 116 Z" fill="url(#primary-grad)" filter="url(#bloom)"/>
+<!-- Precision Inner Highlight -->
+<circle cx="150" cy="150" fill="#ffffff" filter="url(#bloom)" r="3.5"/>
+</g>
+</svg>

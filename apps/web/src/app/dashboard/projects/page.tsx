@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   useProjects,
   useCreateProject,
@@ -19,8 +19,11 @@ import {
   CheckCircle2,
   Pencil,
   Search,
+  X,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import posthog from "posthog-js";
+
 
 function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -51,6 +54,19 @@ export default function ProjectsDashboardPage() {
   const [inlineTagInput, setInlineTagInput] = useState<{ id: string; value: string } | null>(null);
   const [statusFilter, setStatusFilter] = useState<"all" | "in-progress" | "completed">("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Dismiss on Escape key
+  useEffect(() => {
+    if (!dialogOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDialogOpen(false);
+        setEditingProjectId(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [dialogOpen]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,89 +292,145 @@ export default function ProjectsDashboardPage() {
           </div>
         )}
 
-        {/* BEGIN: Create / Edit Project Form */}
-        {dialogOpen && (
-          <section className="rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] p-6 space-y-4 shadow-xl animate-in fade-in duration-200">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              {editingProjectId ? "Edit Project" : "Log New Engineering Project"}
-            </h3>
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-xs text-slate-600 dark:text-neutral-400 font-medium">
-                    Project Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Prep OS"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2 focus:outline-none focus:border-sky-500 transition-colors"
-                  />
+        {/* BEGIN: Create / Edit Project Modal with Blur Background */}
+        <AnimatePresence>
+          {dialogOpen && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 dark:bg-black/75 backdrop-blur-md"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setDialogOpen(false);
+                  setEditingProjectId(null);
+                }
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="project-modal-title"
+                className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] shadow-2xl flex flex-col max-h-[90vh] text-slate-800 dark:text-neutral-200"
+              >
+                {/* Modal Header */}
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/70 dark:bg-[#161616] px-6 py-4.5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-sky-500/10 dark:bg-sky-500/15 border border-sky-500/20 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+                      <FolderKanban className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3
+                        id="project-modal-title"
+                        className="text-base font-bold text-slate-900 dark:text-white"
+                      >
+                        {editingProjectId ? "Edit Project" : "Log New Engineering Project"}
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-neutral-400">
+                        {editingProjectId
+                          ? "Update tech stack, architecture notes, and repository info"
+                          : "Track technical achievements, tech stack tags, and repository links"}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDialogOpen(false);
+                      setEditingProjectId(null);
+                    }}
+                    className="text-slate-400 hover:text-slate-700 dark:text-neutral-400 dark:hover:text-white p-1.5 rounded-lg bg-slate-100 dark:bg-neutral-800/60 hover:bg-slate-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                    aria-label="Close dialog"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-                <div>
-                  <label className="mb-1 block text-xs text-slate-600 dark:text-neutral-400 font-medium">
-                    Repo URL
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://github.com/..."
-                    value={repoUrl}
-                    onChange={(e) => setRepoUrl(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2 focus:outline-none focus:border-sky-500 transition-colors"
-                  />
-                </div>
-              </div>
 
-              <div>
-                <label className="mb-1 block text-xs text-slate-600 dark:text-neutral-400 font-medium">
-                  Tech Stack Tags (comma separated)
-                </label>
-                <input
-                  type="text"
-                  placeholder="Next.js, Node.js, Express, Redis, MongoDB"
-                  value={techStackInput}
-                  onChange={(e) => setTechStackInput(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2 focus:outline-none focus:border-sky-500 transition-colors"
-                />
-              </div>
+                {/* Modal Form */}
+                <form onSubmit={handleSave} className="flex flex-col flex-1 overflow-hidden">
+                  <div className="p-6 space-y-4 overflow-y-auto flex-1">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-neutral-300">
+                          Project Name *
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Prep OS"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                          className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-neutral-300">
+                          Repo URL
+                        </label>
+                        <input
+                          type="url"
+                          placeholder="https://github.com/..."
+                          value={repoUrl}
+                          onChange={(e) => setRepoUrl(e.target.value)}
+                          className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors"
+                        />
+                      </div>
+                    </div>
 
-              <div>
-                <label className="mb-1 block text-xs text-slate-600 dark:text-neutral-400 font-medium">
-                  Architecture Notes / Key Achievements
-                </label>
-                <input
-                  type="text"
-                  placeholder="System design key points, performance benchmarks..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2 focus:outline-none focus:border-sky-500 transition-colors"
-                />
-              </div>
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-neutral-300">
+                        Tech Stack Tags (comma separated)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Next.js, Node.js, Express, Redis, MongoDB"
+                        value={techStackInput}
+                        onChange={(e) => setTechStackInput(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors"
+                      />
+                    </div>
 
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDialogOpen(false);
-                    setEditingProjectId(null);
-                  }}
-                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/[0.08] text-xs font-medium text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-medium text-xs shadow-sm shadow-sky-500/20 transition-all cursor-pointer"
-                >
-                  {editingProjectId ? "Update Project" : "Save Project"}
-                </button>
-              </div>
-            </form>
-          </section>
-        )}
-        {/* END: Create / Edit Project Form */}
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-neutral-300">
+                        Architecture Notes / Key Achievements
+                      </label>
+                      <textarea
+                        rows={3}
+                        placeholder="System design key points, performance benchmarks, challenging problems solved..."
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="flex justify-end gap-2.5 px-6 py-4 border-t border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#161616]/50">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDialogOpen(false);
+                        setEditingProjectId(null);
+                      }}
+                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0e0e0e] text-xs font-medium text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={createMutation.isPending || updateMutation.isPending}
+                      className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-medium text-xs shadow-sm shadow-sky-500/20 transition-all cursor-pointer disabled:opacity-60"
+                    >
+                      {editingProjectId ? "Update Project" : "Save Project"}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+        {/* END: Create / Edit Project Modal */}
 
         {/* Filter & Search Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

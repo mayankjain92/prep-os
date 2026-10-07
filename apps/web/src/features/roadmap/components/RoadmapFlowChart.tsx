@@ -11,25 +11,8 @@ import type { NodeStatus } from "@/features/roadmap/api";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { AnimatedProgressBar } from "@/components/shared/PageTransition";
 
-export interface RoadmapNodeItem {
-  id: string;
-  title: string;
-  category?: string;
-  description?: string;
-  subNodes?: RoadmapNodeItem[];
-}
-
-export interface RoadmapSection {
-  mainTitle: string;
-  mainId: string;
-  description?: string;
-  leftNodes?: RoadmapNodeItem[];
-  rightNodes?: RoadmapNodeItem[];
-  subSections?: {
-    title: string;
-    nodes: RoadmapNodeItem[];
-  }[];
-}
+import type { RoadmapNodeItem, RoadmapSection } from "@/features/roadmap/types";
+export type { RoadmapNodeItem, RoadmapSection };
 
 interface RoadmapFlowChartProps {
   title: string;

@@ -77,8 +77,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --color-xblue: #1d9bf0;
-  --color-xhover: #1a8cd8;
+  --color-xblue: #0ea5e9;
+  --color-xhover: #0284c7;
 }
 
 html {
@@ -117,4 +117,24 @@ select:-webkit-autofill:active {
   -webkit-text-fill-color: var(--foreground) !important;
   caret-color: var(--foreground) !important;
   transition: background-color 50000s ease-in-out 0s;
+}
+
+/* Custom sleek scrollbar for code blocks and chat messages */
+pre::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+pre::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+pre::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+pre::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
 }

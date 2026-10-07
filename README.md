@@ -23,31 +23,81 @@
 - 🎨 **Accessibility & Design System:** WCAG AA contrast compliant dark/light themes, card layering hierarchy, project tag management, and 6-month activity heatmaps.
 - 🔒 **Secure Authentication:** HttpOnly cookie-based session management with JWT, bcrypt password hashing, CSRF defense, and strict user-tenant data isolation.
 - 📈 **Unified Analytics Dashboard:** Modern responsive dashboard powered by Next.js App Router, Recharts, Framer Motion, and Lucide React.
+- 🎯 **Dedicated Doubts Queue & Modal:** Revision queue with blurred backdrop popups, priority levels, and one-click resolution.
+- 💻 **Expandable Code Reader & LaTeX Math:** AI Copilot with expandable wide IDE view (up to 780px), one-click code copy, and styled $O(n)$ math chips.
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+graph TB
+  subgraph Client ["Client Application (apps/web - Next.js 16 + React 19)"]
+    direction TB
+    AppRouter["App Router (app/)<br/>• /dashboard/dsa<br/>• /dashboard/doubts<br/>• /dashboard/theory<br/>• /dashboard/projects<br/>• /dashboard/profile"]
+    FeatureSlices["Feature Slices (src/features/)<br/>• dsa • doubts • roadmap<br/>• profile • agent • projects • auth"]
+    UIPrimitives["Shared & Primitives (src/components/)<br/>• ui/ (Button, Input, Badge)<br/>• providers/ (Theme, Query)<br/>• shared/ (Logo, Emblem, Nav)"]
+    
+    AppRouter --> FeatureSlices
+    FeatureSlices --> UIPrimitives
+  end
+
+  subgraph Gateway ["Transport & Security"]
+    HttpOnlyCookie["HttpOnly Cookies + JWT<br/>CSRF Origin Check + SameSite"]
+  end
+
+  subgraph Server ["Backend API Layer (apps/api - Express 5 ESM)"]
+    direction TB
+    Controllers["Express Controllers & Middlewares<br/>(Auth, DSA, Doubts, Roadmap, Projects)"]
+    AgentService["agentService (ReAct Loop)<br/>Google Gemini 2.5 Flash Lite"]
+  end
+
+  subgraph Storage ["Datastore & Cache Layer"]
+    Mongo[("MongoDB 7.0<br/>• Users & Streaks<br/>• RoadmapProgress (KV Map)<br/>• Doubts & Projects")]
+    Redis[("Redis 7 (ioredis)<br/>Cache-Aside (TTL 1h)<br/>LeetCode Profile Stats")]
+  end
+
+  subgraph External ["External Third-Party APIs"]
+    LeetCodeAPI["LeetCode GraphQL API"]
+    GeminiAPI["Google Gemini AI API"]
+    GitHubAPI["GitHub REST API"]
+  end
+
+  Client -- "REST / JSON (Credentials: Include)" --> Gateway
+  Gateway --> Server
+
+  Controllers --> Redis
+  Controllers -- "On Cache Miss / Sync" --> LeetCodeAPI
+  Controllers --> Mongo
+
+  AgentService -- "Multi-turn ReAct" --> GeminiAPI
+  AgentService -- "Deterministic Tools" --> Mongo
+```
 
 ---
 
 ## 🛠️ Tech Stack & Architecture
 
 ### Frontend (`apps/web`)
-- **Framework:** Next.js (App Router)
-- **Styling:** Tailwind CSS
-- **Data Fetching:** TanStack Query
-- **Visualization:** Recharts
-- **Icons & Animation:** Lucide React, Framer Motion
+- **Framework:** Next.js 16 (App Router), React 19
+- **Architecture:** Feature-Sliced Design (Vertical Slices)
+- **Styling:** Tailwind CSS v4
+- **Data Fetching:** TanStack Query v5
+- **Icons & Motion:** Lucide React, Framer Motion
 
 ### Backend (`apps/api`)
-- **Framework:** Node.js, Express (ESM)
-- **Database:** MongoDB (Mongoose)
-- **Caching:** Redis (ioredis)
+- **Framework:** Node.js, Express 5 (ESM)
+- **Database:** MongoDB 7.0 (Mongoose 9)
+- **Caching:** Redis 7 (ioredis) Cache-Aside pattern
 - **AI / LLM:** Google Gemini 2.5 Flash Lite (`@google/genai`), Autonomous ReAct Tool Calling
-- **Validation:** Zod
-- **Auth:** bcryptjs, jsonwebtoken
+- **Validation:** Zod (shared with client via `@prep-os/shared`)
+- **Auth:** HttpOnly cookies, JWT, bcryptjs
 
 ### Tooling & DevOps
 - **Monorepo:** pnpm workspaces
 - **Testing:** Vitest
 - **Containerization:** Docker & Docker Compose
-- **CI/CD:** GitHub Actions (ready)
+- **CI/CD:** GitHub Actions
 
 > 📖 **Read more about architectural decisions in [ARCHITECTURE.md](./ARCHITECTURE.md) and prepare for campus rounds with the [Master Interview Guide](./docs/INTERVIEW_QUESTIONS.md).**
 
@@ -104,8 +154,15 @@ prep-os/
 ├── .github/
 │   └── workflows/      # CI/CD (ci.yml) & keepalive cron (keepalive.yml)
 ├── apps/
-│   ├── api/            # Express ESM backend service (TypeScript + Node.js)
-│   └── web/            # Next.js 16 frontend application (React 19 + Tailwind v4)
+│   ├── api/            # Express 5 ESM backend service (TypeScript + Node.js)
+│   │   ├── src/config/ # DB, Redis & Zod environment validation
+│   │   ├── src/models/ # Mongoose schemas (User, Doubt, Project, RoadmapProgress)
+│   │   └── src/services/agent/ # ReAct loop & deterministic tools (Gemini 2.5)
+│   └── web/            # Next.js 16 frontend (React 19 + Tailwind v4)
+│       ├── src/app/    # Next.js App Router (pages & layouts)
+│       ├── src/features/ # Domain slices (agent, doubts, dsa, profile, projects, roadmap)
+│       ├── src/components/ # Primitives (ui/), providers/, and shared/ widgets
+│       └── src/data/   # Static curricula (neetcode150, dsa-roadmap, theory-roadmap)
 ├── packages/
 │   └── shared/         # Shared Zod validation schemas & TypeScript types
 ├── docs/               # Architecture audits, system design reports & checklists

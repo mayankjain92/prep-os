@@ -114,7 +114,6 @@ export function ProfileDropdown() {
               <div className="text-xs text-slate-500 dark:text-neutral-400 truncate mt-0.5">
                 {user.email}
               </div>
-              {/* Streak Display without yellow background */}
               <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-amber-500 dark:text-amber-400">
                 <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                 <span>{streak} Days Daily Streak</span>

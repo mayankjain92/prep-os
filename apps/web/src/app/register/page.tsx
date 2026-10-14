@@ -26,7 +26,10 @@ export default function RegisterPage() {
       return { status: "invalid" as const, msg: "Must be 3-20 characters" };
     }
     if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
-      return { status: "invalid" as const, msg: "Only letters, numbers, and underscores allowed" };
+      return {
+        status: "invalid" as const,
+        msg: "Only letters, numbers, and underscores allowed",
+      };
     }
     return null;
   }, [cleanUsername]);
@@ -36,7 +39,9 @@ export default function RegisterPage() {
     msg: string;
   }>({ status: "idle", msg: "" });
 
-  const usernameStatus = clientValidation ? clientValidation.status : asyncStatus.status;
+  const usernameStatus = clientValidation
+    ? clientValidation.status
+    : asyncStatus.status;
   const usernameMsg = clientValidation ? clientValidation.msg : asyncStatus.msg;
 
   useEffect(() => {
@@ -46,12 +51,18 @@ export default function RegisterPage() {
       setAsyncStatus({ status: "checking", msg: "Checking availability..." });
       try {
         const res = await apiFetch<{ available: boolean; message: string }>(
-          `/api/auth/check-username?username=${encodeURIComponent(cleanUsername)}`
+          `/api/auth/check-username?username=${encodeURIComponent(cleanUsername)}`,
         );
         if (res.available) {
-          setAsyncStatus({ status: "available", msg: `@${cleanUsername} is available!` });
+          setAsyncStatus({
+            status: "available",
+            msg: `@${cleanUsername} is available!`,
+          });
         } else {
-          setAsyncStatus({ status: "taken", msg: res.message || "Username already taken" });
+          setAsyncStatus({
+            status: "taken",
+            msg: res.message || "Username already taken",
+          });
         }
       } catch {
         setAsyncStatus({ status: "idle", msg: "" });
@@ -73,7 +84,11 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await register({ username: username.trim().toLowerCase(), email, password });
+      await register({
+        username: username.trim().toLowerCase(),
+        email,
+        password,
+      });
     } catch (err: unknown) {
       setError((err as Error).message || "Registration failed");
     } finally {
@@ -90,8 +105,12 @@ export default function RegisterPage() {
         <div className="w-full max-w-md space-y-6 rounded-2xl border border-border bg-card p-8 shadow-sm">
           <div className="space-y-3 text-center flex flex-col items-center">
             <Logo size="lg" />
-            <h1 className="text-2xl font-black tracking-tight text-foreground">Create Account</h1>
-            <p className="text-xs font-semibold text-muted-foreground">Join PrepOS to track your placement prep</p>
+            <h1 className="text-2xl font-black tracking-tight text-foreground">
+              Create Account
+            </h1>
+            <p className="text-xs font-semibold text-muted-foreground">
+              Join PrepOS to track your placement prep
+            </p>
           </div>
 
           {error && (
@@ -105,7 +124,10 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="register-username" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <label
+                htmlFor="register-username"
+                className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground"
+              >
                 Unique Username
               </label>
               <div className="relative">
@@ -123,9 +145,16 @@ export default function RegisterPage() {
                   className="bg-background text-foreground border-border rounded-xl pr-10"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  {usernameStatus === "checking" && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-                  {usernameStatus === "available" && <Check className="h-4 w-4 text-emerald-500" />}
-                  {(usernameStatus === "taken" || usernameStatus === "invalid") && <X className="h-4 w-4 text-rose-500" />}
+                  {usernameStatus === "checking" && (
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  )}
+                  {usernameStatus === "available" && (
+                    <Check className="h-4 w-4 text-emerald-500" />
+                  )}
+                  {(usernameStatus === "taken" ||
+                    usernameStatus === "invalid") && (
+                    <X className="h-4 w-4 text-rose-500" />
+                  )}
                 </div>
               </div>
               {usernameMsg && (
@@ -134,8 +163,8 @@ export default function RegisterPage() {
                     usernameStatus === "available"
                       ? "text-emerald-500"
                       : usernameStatus === "checking"
-                      ? "text-muted-foreground"
-                      : "text-rose-500"
+                        ? "text-muted-foreground"
+                        : "text-rose-500"
                   }`}
                 >
                   {usernameMsg}
@@ -144,7 +173,10 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="register-email" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <label
+                htmlFor="register-email"
+                className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground"
+              >
                 Email Address
               </label>
               <Input
@@ -161,7 +193,10 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="register-password" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <label
+                htmlFor="register-password"
+                className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground"
+              >
                 Password (min 6 chars)
               </label>
               <Input
@@ -180,7 +215,11 @@ export default function RegisterPage() {
 
             <Button
               type="submit"
-              disabled={loading || usernameStatus === "checking" || usernameStatus === "taken"}
+              disabled={
+                loading ||
+                usernameStatus === "checking" ||
+                usernameStatus === "taken"
+              }
               className="w-full rounded-xl font-bold bg-sky-500 hover:bg-sky-400 text-white cursor-pointer shadow-sm shadow-sky-500/20"
             >
               {loading ? "Creating Account..." : "Register"}
@@ -189,7 +228,10 @@ export default function RegisterPage() {
 
           <p className="text-center text-xs font-semibold text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="font-bold text-sky-500 hover:underline">
+            <Link
+              href="/login"
+              className="font-bold text-sky-500 hover:underline"
+            >
               Sign in here
             </Link>
           </p>

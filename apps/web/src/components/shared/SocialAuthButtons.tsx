@@ -9,6 +9,7 @@ declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     google?: any;
+    _googleGsiInitialized?: boolean;
   }
 }
 
@@ -35,35 +36,53 @@ function GoogleIcon() {
   );
 }
 
+let activeGoogleCallback: ((response: { credential?: string }) => void) | null = null;
+
 export function SocialAuthButtons({ onError }: { onError?: (err: string) => void }) {
   const { oauthLogin } = useAuth();
   const [loading, setLoading] = useState(false);
   const googleBtnRef = useRef<HTMLDivElement>(null);
+  const oauthLoginRef = useRef(oauthLogin);
+  const onErrorRef = useRef(onError);
+
+  oauthLoginRef.current = oauthLogin;
+  onErrorRef.current = onError;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "526783459737-eb5t23vkogpqclauvc126sm93n7gkn4l.apps.googleusercontent.com";
 
+    const handleCredentialResponse = async (response: { credential?: string }) => {
+      if (response.credential) {
+        setLoading(true);
+        try {
+          await oauthLoginRef.current({ credential: response.credential, provider: "google" });
+        } catch (err: unknown) {
+          const error = err instanceof Error ? err.message : "Google Sign In failed";
+          if (onErrorRef.current) onErrorRef.current(error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    activeGoogleCallback = handleCredentialResponse;
+
     const initGoogleGSI = () => {
       if (!window.google?.accounts?.id) return;
 
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response: { credential?: string }) => {
-          if (response.credential) {
-            setLoading(true);
-            try {
-              await oauthLogin({ credential: response.credential, provider: "google" });
-            } catch (err: unknown) {
-              const error = err instanceof Error ? err.message : "Google Sign In failed";
-              if (onError) onError(error);
-            } finally {
-              setLoading(false);
-            }
-          }
-        },
-      });
+      if (!window._googleGsiInitialized) {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response: { credential?: string }) => {
+            activeGoogleCallback?.(response);
+          },
+        });
+        window._googleGsiInitialized = true;
+      }
 
       if (googleBtnRef.current) {
         googleBtnRef.current.innerHTML = "";
@@ -80,39 +99,35 @@ export function SocialAuthButtons({ onError }: { onError?: (err: string) => void
     if (window.google?.accounts?.id) {
       initGoogleGSI();
     } else {
-      const script = document.createElement("script");
-      script.id = "google-gsi-sdk";
-      script.src = "https://accounts.google.com/gsi/client";
-      script.async = true;
-      script.defer = true;
-      script.onload = initGoogleGSI;
-      document.head.appendChild(script);
+      const existingScript = document.getElementById("google-gsi-sdk");
+      if (!existingScript) {
+        const script = document.createElement("script");
+        script.id = "google-gsi-sdk";
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+        script.onload = initGoogleGSI;
+        document.head.appendChild(script);
+      } else {
+        existingScript.addEventListener("load", initGoogleGSI);
+      }
     }
-  }, [oauthLogin, onError]);
+
+    return () => {
+      if (activeGoogleCallback === handleCredentialResponse) {
+        activeGoogleCallback = null;
+      }
+    };
+  }, []);
 
   const handleCustomGoogleClick = () => {
     setLoading(true);
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "526783459737-eb5t23vkogpqclauvc126sm93n7gkn4l.apps.googleusercontent.com";
-
     if (window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response: { credential?: string }) => {
-          if (response.credential) {
-            try {
-              await oauthLogin({ credential: response.credential, provider: "google" });
-            } catch (err: unknown) {
-              const error = err instanceof Error ? err.message : "Google Sign In failed";
-              if (onError) onError(error);
-            } finally {
-              setLoading(false);
-            }
-          } else {
-            setLoading(false);
-          }
-        },
+      window.google.accounts.id.prompt((notification: { isNotDisplayed?: () => boolean; isSkippedMoment?: () => boolean }) => {
+        if (notification?.isNotDisplayed?.() || notification?.isSkippedMoment?.()) {
+          setLoading(false);
+        }
       });
-      window.google.accounts.id.prompt();
     } else {
       setLoading(false);
     }

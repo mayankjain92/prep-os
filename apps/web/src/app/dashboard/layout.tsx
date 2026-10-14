@@ -83,7 +83,6 @@ export default function DashboardLayout({
             <Logo href="/dashboard" size="md" />
           </div>
 
-          {/* Desktop Navigation Links (Centered) */}
           <nav
             aria-label="Global Navigation"
             className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-neutral-400"

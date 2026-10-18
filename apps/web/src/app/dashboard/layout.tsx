@@ -36,10 +36,6 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, router]);
 
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
 
   if (isLoading) {
     return (
@@ -75,10 +71,8 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 flex flex-col font-sans selection:bg-sky-500/20 selection:text-sky-300 transition-colors duration-200">
-      {/* BEGIN: MainNavbar - Stitch Style with Original PrepOS Logo */}
       <header className="sticky top-0 z-40 border-b border-slate-200 dark:border-white/[0.08] bg-white/85 dark:bg-[#0A0A0A]/85 backdrop-blur-md transition-colors duration-200">
         <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
-          {/* Brand Logo */}
           <div className="flex items-center shrink-0">
             <Logo href="/dashboard" size="md" />
           </div>
@@ -111,7 +105,6 @@ export default function DashboardLayout({
             })}
           </nav>
 
-          {/* Right Profile & Mobile Trigger */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {user ? (
               <ProfileDropdown />
@@ -137,7 +130,6 @@ export default function DashboardLayout({
               </div>
             )}
 
-            {/* Mobile Hamburger Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -153,7 +145,6 @@ export default function DashboardLayout({
           </div>
         </div>
 
-        {/* Mobile Dropdown Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#0A0A0A] px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-150 shadow-md">
             {navItems.map((item) => {
@@ -182,9 +173,7 @@ export default function DashboardLayout({
           </div>
         )}
       </header>
-      {/* END: MainNavbar */}
 
-      {/* Main Content Area */}
       <main className="flex-1 bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 transition-colors duration-200">
         {children}
       </main>

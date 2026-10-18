@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
 import { RoadmapFlowChart } from "@/features/roadmap/components/RoadmapFlowChart";
-import type { RoadmapNodeItem } from "@/features/roadmap/types";
+import { getRoadmapMetrics } from "@/features/roadmap/tree-algorithms";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { AnimatedProgressBar } from "@/components/shared/PageTransition";
 import { THEORY_ROADMAP_SECTIONS } from "@/data/theory-roadmap";
@@ -21,46 +21,25 @@ export default function TheoryDashboardPage() {
   const { data: roadmapStatus = {} } = useRoadmapProgress("prep_os_theory_roadmap");
   const [activeSubjectId, setActiveSubjectId] = useState<string>(SUBJECTS[0].mainId);
 
-  // Compute stats per section & overall stats
   const { subjectStats, overallStats } = useMemo(() => {
     const stats = SUBJECTS.map((sub) => {
       const section = THEORY_ROADMAP_SECTIONS.find((s) => s.mainId === sub.mainId);
-      let total = 0;
-      let completed = 0;
-      let learning = 0;
-
-      if (section) {
-        const traverse = (nodes?: RoadmapNodeItem[]) => {
-          nodes?.forEach((n) => {
-            total++;
-            const st = roadmapStatus[n.id];
-            if (st === "done") completed++;
-            else if (st === "in-progress") learning++;
-            if (n.subNodes) traverse(n.subNodes);
-          });
-        };
-        traverse(section.leftNodes);
-        traverse(section.rightNodes);
-      }
-
-      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-      return { ...sub, total, completed, learning, percentage };
+      const m = section
+        ? getRoadmapMetrics([section], roadmapStatus)
+        : { total: 0, done: 0, inProgress: 0, percentage: 0 };
+      return { ...sub, total: m.total, completed: m.done, learning: m.inProgress, percentage: m.percentage };
     });
 
-    const grandTotal = stats.reduce((acc, s) => acc + s.total, 0);
-    const grandDone = stats.reduce((acc, s) => acc + s.completed, 0);
-    const grandLearning = stats.reduce((acc, s) => acc + s.learning, 0);
-    const grandPending = grandTotal - grandDone - grandLearning;
-    const grandPct = grandTotal > 0 ? Math.round((grandDone / grandTotal) * 100) : 0;
+    const grand = getRoadmapMetrics(THEORY_ROADMAP_SECTIONS, roadmapStatus);
 
     return {
       subjectStats: stats,
       overallStats: {
-        total: grandTotal,
-        done: grandDone,
-        learning: grandLearning,
-        pending: grandPending,
-        pct: grandPct,
+        total: grand.total,
+        done: grand.done,
+        learning: grand.inProgress,
+        pending: grand.pending,
+        pct: grand.percentage,
       },
     };
   }, [roadmapStatus]);
@@ -71,7 +50,6 @@ export default function TheoryDashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 pb-28 transition-colors duration-200">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-300">
-        {/* BEGIN: PageHeader */}
         <section className="space-y-1" data-purpose="header-section">
           <div className="flex items-center space-x-2">
             <span className="text-[11px] font-semibold tracking-wider text-sky-600 dark:text-sky-400 uppercase">
@@ -93,9 +71,7 @@ export default function TheoryDashboardPage() {
             </div>
           </div>
         </section>
-        {/* END: PageHeader */}
 
-        {/* BEGIN: OverallProgressSummary */}
         <section
           className="rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] p-5 space-y-4 shadow-xs dark:shadow-none"
           data-purpose="overall-progress"
@@ -110,7 +86,6 @@ export default function TheoryDashboardPage() {
               </p>
             </div>
 
-            {/* Counts Badges */}
             <div className="flex items-center gap-2 text-xs font-medium flex-wrap">
               <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 Done: <AnimatedNumber value={overallStats.done} />
@@ -147,11 +122,8 @@ export default function TheoryDashboardPage() {
             />
           </div>
         </section>
-        {/* END: OverallProgressSummary */}
 
-        {/* BEGIN: Split View Layout - Curated Modules Sidebar (4 cols) & Interactive Roadmap Canvas (8 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* LEFT COLUMN: Curated Theory Modules Sidebar (4 cols) */}
           <aside className="lg:col-span-4 flex flex-col space-y-3 lg:sticky lg:top-20">
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center space-x-2">
@@ -164,7 +136,6 @@ export default function TheoryDashboardPage() {
               </div>
             </div>
 
-            {/* Vertical Module Selection List */}
             <div className="space-y-2.5" role="tablist">
               {subjectStats.map((stat) => {
                 const isActive = activeSubjectId === stat.mainId;
@@ -181,7 +152,6 @@ export default function TheoryDashboardPage() {
                         : "border border-slate-200 dark:border-white/[0.08] hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50/60 dark:hover:bg-white/[0.02] shadow-xs"
                     }`}
                   >
-                    {/* Active Left Indicator Bar */}
                     {isActive && (
                       <div className="absolute left-0 top-3 bottom-3 w-1 bg-sky-500 dark:bg-sky-400 rounded-r" />
                     )}
@@ -215,7 +185,6 @@ export default function TheoryDashboardPage() {
                       </span>
                     </div>
 
-                    {/* Module Progress Bar */}
                     <div className={`mt-3 ${isActive ? "pl-2" : "pl-0"}`}>
                       <AnimatedProgressBar
                         pct={stat.percentage}
@@ -229,7 +198,6 @@ export default function TheoryDashboardPage() {
             </div>
           </aside>
 
-          {/* RIGHT COLUMN: Interactive Roadmap Canvas (8 cols) */}
           <section className="lg:col-span-8 w-full min-w-0" data-purpose="roadmap-canvas">
             <RoadmapFlowChart
               title={`${activeLabel} Roadmap`}
@@ -238,7 +206,6 @@ export default function TheoryDashboardPage() {
             />
           </section>
         </div>
-        {/* END: Split View Layout */}
       </main>
     </div>
   );

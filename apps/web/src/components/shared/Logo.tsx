@@ -22,7 +22,6 @@ export function Logo({ size = "md", iconOnly = false, href, className = "" }: Lo
 
   const content = (
     <div className={`inline-flex items-center gap-2.5 group cursor-pointer select-none ${className}`}>
-      {/* Pure Cutout Emblem Icon */}
       <Image
         src="/logo.svg"
         alt="PrepOS Emblem Cutout"

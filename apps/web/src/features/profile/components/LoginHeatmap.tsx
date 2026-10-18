@@ -86,9 +86,7 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch w-full">
-      {/* Telemetry 3-Card Metric Strip (Left 4 cols) */}
       <div className="lg:col-span-4 flex flex-col gap-3.5 justify-between">
-        {/* Metric 1: Current Streak */}
         <div className="rounded-2xl bg-white dark:bg-[#121212] border border-amber-500/25 dark:border-amber-500/20 p-4.5 flex-1 flex items-center gap-4 transition-all hover:border-amber-500/40 shadow-xs">
           <div className="w-12 h-12 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-amber-500 dark:text-amber-400 shrink-0">
             <Flame className="w-6 h-6 fill-amber-400" />
@@ -103,7 +101,6 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
           </div>
         </div>
 
-        {/* Metric 2: Longest Streak */}
         <div className="rounded-2xl bg-white dark:bg-[#121212] border border-sky-500/25 dark:border-sky-500/20 p-4.5 flex-1 flex items-center gap-4 transition-all hover:border-sky-500/40 shadow-xs">
           <div className="w-12 h-12 rounded-xl bg-sky-500/10 dark:bg-sky-500/15 border border-sky-500/25 flex items-center justify-center text-sky-500 dark:text-sky-400 shrink-0">
             <Trophy className="w-6 h-6" />
@@ -118,7 +115,6 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
           </div>
         </div>
 
-        {/* Metric 3: Total Active Days */}
         <div className="rounded-2xl bg-white dark:bg-[#121212] border border-emerald-500/25 dark:border-emerald-500/20 p-4.5 flex-1 flex items-center gap-4 transition-all hover:border-emerald-500/40 shadow-xs">
           <div className="w-12 h-12 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-500 dark:text-emerald-400 shrink-0">
             <Zap className="w-6 h-6" />
@@ -134,9 +130,7 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
         </div>
       </div>
 
-      {/* 6-Month Heatmap Card (Right 8 cols) */}
       <div className="lg:col-span-8 flex flex-col justify-between rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 p-5 sm:p-6 space-y-4 overflow-hidden shadow-xs">
-        {/* Heatmap Header & Legend */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-sky-500" />
@@ -145,7 +139,6 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
             </span>
           </div>
 
-          {/* High-Contrast Legend */}
           <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-neutral-400 font-medium">
             <span>Less</span>
             <span className="w-2.5 h-2.5 rounded-xs bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-white/10" />
@@ -157,10 +150,8 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
           </div>
         </div>
 
-        {/* Heatmap Grid Container */}
         <div className="overflow-x-auto py-3 bg-slate-50/70 dark:bg-[#0c0c0c] rounded-xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-white/[0.06]">
           <div className="min-w-[620px] flex flex-col gap-2">
-            {/* Month Labels Header */}
             <div className="flex text-[11px] text-slate-400 dark:text-neutral-400 font-medium pl-8 justify-between pr-2 select-none">
               {monthLabels.map((m, idx) => (
                 <span key={idx} className="w-14 text-left">
@@ -169,7 +160,6 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
               ))}
             </div>
 
-            {/* Matrix Row with Mon/Wed/Fri labels and Weeks */}
             <div className="flex gap-2.5 items-center">
               <div className="flex flex-col justify-between text-[11px] text-slate-400 dark:text-neutral-500 font-mono py-1 w-6 text-right h-[86px] select-none">
                 <span>Mon</span>
@@ -205,7 +195,6 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
           </div>
         </div>
 
-        {/* Hover / Detail Status Bar */}
         <div className="h-8 px-3 py-1 bg-slate-100/70 dark:bg-neutral-800/50 border border-slate-200/70 dark:border-white/[0.06] rounded-xl flex items-center justify-between text-xs">
           {hoveredDay ? (
             <div className="flex items-center gap-2 font-medium">

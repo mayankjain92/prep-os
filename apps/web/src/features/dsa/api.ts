@@ -33,3 +33,22 @@ export async function fetchLeetCodeProfile(): Promise<LeetCodeProfileStats | nul
   const res = await apiFetch<{ profile: LeetCodeProfileStats | null }>("/api/problems/leetcode-profile");
   return res.profile;
 }
+
+export interface NeetcodeProgressData {
+  solved: string[];
+  starred: string[];
+}
+
+export async function saveNeetcodeProgressApi(
+  solved: string[],
+  starred: string[]
+): Promise<{ message: string; neetcodeProgress: NeetcodeProgressData }> {
+  return apiFetch<{ message: string; neetcodeProgress: NeetcodeProgressData }>(
+    "/api/problems/neetcode-progress",
+    {
+      method: "PUT",
+      body: JSON.stringify({ solved, starred }),
+    }
+  );
+}
+

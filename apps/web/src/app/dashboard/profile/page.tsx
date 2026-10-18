@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { LoginHeatmap } from "@/features/profile/components/LoginHeatmap";
@@ -34,13 +34,8 @@ export default function ProfilePage() {
   const syncMutation = useSyncLeetCode();
   const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
 
-  const [handleInput, setHandleInput] = useState("");
-
-  useEffect(() => {
-    if (activeProfile?.username) {
-      setHandleInput(activeProfile.username);
-    }
-  }, [activeProfile?.username]);
+  const [customInput, setCustomInput] = useState<string | null>(null);
+  const handleInput = customInput ?? (activeProfile?.username || "");
 
   if (!user) return null;
 
@@ -57,6 +52,7 @@ export default function ProfilePage() {
       { username: handle, force: true },
       {
         onSuccess: (data) => {
+          setCustomInput(null);
           posthog.capture("leetcode_profile_synced_profile_page", {
             handle,
             total_solved: data.profile?.totalSolved,
@@ -73,7 +69,6 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-300">
-      {/* Top Action Bar & Header Breadcrumb */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
         <div className="space-y-1.5">
           <Link
@@ -98,7 +93,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Segmented Mode Control (Theme Toggle Aligned) */}
         <div className="p-1 rounded-xl bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-white/10 flex items-center gap-1 shadow-xs shrink-0 self-start md:self-center">
           <button
             type="button"
@@ -128,10 +122,8 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Unified Profile Banner & Streak Summary Card */}
       <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 p-5 sm:p-6 shadow-xs relative overflow-hidden transition-all hover:border-slate-300 dark:hover:border-white/20">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-          {/* User Metadata Info */}
           <div className="flex items-center gap-4 sm:gap-5">
             <div className="relative shrink-0">
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-sky-500 to-cyan-500 flex items-center justify-center font-black text-white text-2xl sm:text-3xl shadow-sm border border-slate-200 dark:border-white/10 overflow-hidden">
@@ -179,7 +171,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Highlight Streak Widget */}
           <div className="rounded-2xl border border-amber-500/30 p-4 sm:px-6 sm:py-4 flex items-center gap-4 shrink-0 shadow-sm bg-amber-500/5 dark:bg-[#181613]">
             <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 dark:text-amber-400 shrink-0">
               <Flame className="w-7 h-7 fill-amber-400 animate-pulse" />
@@ -197,7 +188,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Section: Connected Platforms & Integrations */}
       <div id="integrations" className="space-y-4 scroll-mt-20">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -212,7 +202,6 @@ export default function ProfilePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* LeetCode Integration Card */}
           <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#121212] p-5 space-y-4 shadow-xs">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -237,7 +226,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Handle Form */}
             <form onSubmit={handleLeetcodeSync} className="space-y-3 pt-1">
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
@@ -250,7 +238,7 @@ export default function ProfilePage() {
                     autoComplete="off"
                     placeholder="leetcode_username"
                     value={handleInput}
-                    onChange={(e) => setHandleInput(e.target.value)}
+                    onChange={(e) => setCustomInput(e.target.value)}
                     className="w-full pl-7 pr-3 py-2 bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-xs font-mono text-slate-900 dark:text-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-sky-500"
                   />
                 </div>
@@ -266,7 +254,6 @@ export default function ProfilePage() {
                 </button>
               </div>
 
-              {/* Status / Feedback */}
               {syncMutation.isError && (
                 <div className="flex items-center gap-1.5 text-xs text-rose-500 dark:text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -280,7 +267,6 @@ export default function ProfilePage() {
               )}
             </form>
 
-            {/* Quick Stats Grid */}
             <div className="grid grid-cols-4 gap-2 pt-2 border-t border-slate-100 dark:border-white/[0.06] text-center">
               <div className="bg-slate-50 dark:bg-[#0e0e0e] rounded-xl p-2 border border-slate-200/60 dark:border-white/[0.04]">
                 <div className="text-[10px] text-slate-500 dark:text-neutral-500 uppercase font-semibold">Total</div>
@@ -309,7 +295,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* GitHub Integration Card */}
           <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#121212] p-5 space-y-4 shadow-xs flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
@@ -351,7 +336,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Section 1: Daily Login Heatmap */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
@@ -367,7 +351,6 @@ export default function ProfilePage() {
         />
       </div>
 
-      {/* Section 2: Shareable Progress Card */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-md bg-sky-500/20 flex items-center justify-center text-sky-500 font-bold text-xs">

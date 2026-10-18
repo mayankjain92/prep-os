@@ -45,8 +45,10 @@ export function SocialAuthButtons({ onError }: { onError?: (err: string) => void
   const oauthLoginRef = useRef(oauthLogin);
   const onErrorRef = useRef(onError);
 
-  oauthLoginRef.current = oauthLogin;
-  onErrorRef.current = onError;
+  useEffect(() => {
+    oauthLoginRef.current = oauthLogin;
+    onErrorRef.current = onError;
+  }, [oauthLogin, onError]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -136,10 +138,8 @@ export function SocialAuthButtons({ onError }: { onError?: (err: string) => void
   return (
     <div className="space-y-3">
       <div className="flex justify-center w-full">
-        {/* Render Official Google GSI Button Container */}
         <div ref={googleBtnRef} className="hidden sm:block w-full flex justify-center" />
 
-        {/* Fallback Custom Button */}
         <Button
           type="button"
           onClick={handleCustomGoogleClick}

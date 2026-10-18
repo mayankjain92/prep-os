@@ -83,7 +83,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 flex flex-col justify-between selection:bg-sky-500/20 selection:text-sky-300 transition-colors duration-200 relative overflow-x-hidden font-sans">
-      {/* Background Grid Pattern & Ambient Glows */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.04)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px]" />
         <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)] bg-radial from-transparent to-slate-50 dark:to-[#0A0A0A]" />
@@ -91,7 +90,6 @@ export default function Home() {
         <div className="absolute top-[900px] left-1/3 -translate-x-1/2 w-[500px] h-[300px] bg-indigo-500/10 blur-[150px] rounded-full" />
       </div>
 
-      {/* Stitch Navbar with Original PrepOS Logo */}
       <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#0A0A0A]/85 backdrop-blur-md transition-colors duration-200">
         <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
           <div className="flex items-center shrink-0">
@@ -152,9 +150,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="flex-1 space-y-24 py-12 sm:py-20">
-        {/* HERO SECTION */}
         <section className="mx-auto max-w-5xl px-4 sm:px-6 text-center space-y-8 relative">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-[#EDEDED] leading-[1.08]">
             Crack Your Tech Placements{" "}
@@ -199,7 +195,6 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Student Metric Strip */}
           <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-3.5 max-w-4xl mx-auto text-left">
             {studentMetrics.map((stat, i) => (
               <div
@@ -222,7 +217,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION: UNIFIED DASHBOARD PREVIEW */}
         <section
           id="overview"
           className="mx-auto max-w-7xl px-4 sm:px-6 space-y-6"
@@ -242,9 +236,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Feature Showcase Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* CARD 1: DSA Dependency Roadmap (Span 2) */}
             <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-6 sm:p-7 space-y-5 shadow-xs relative overflow-hidden group hover:border-sky-500/30 transition-all duration-300">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-4">
                 <div className="flex items-center gap-2.5">
@@ -266,7 +258,6 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* Roadmap Mini Progress Visual */}
               <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-[#0A0A0A]/60 border border-slate-200/60 dark:border-white/[0.04] space-y-3 font-sans">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-slate-700 dark:text-neutral-300 flex items-center gap-1.5">
@@ -337,7 +328,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* CARD 2: Live LeetCode Sync (Span 1) */}
             <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-6 sm:p-7 space-y-5 shadow-xs relative overflow-hidden group hover:border-amber-500/30 transition-all duration-300 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-3">
@@ -421,7 +411,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* CARD 3: Daily Consistency & Heatmap (Span 1) */}
             <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-6 sm:p-7 space-y-5 shadow-xs relative overflow-hidden group hover:border-rose-500/30 transition-all duration-300 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-3">
@@ -496,7 +485,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* CARD 4: AI Placement Mentor (Span 2) */}
             <div
               id="mentor"
               className="lg:col-span-2 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#121212]/90 p-6 sm:p-7 space-y-5 shadow-xs relative overflow-hidden group hover:border-indigo-500/30 transition-all duration-300"
@@ -593,7 +581,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION: PLACEMENT ROADMAP PATHWAYS */}
         <section id="roadmaps" className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-sky-500/5 via-white dark:via-[#121212] to-indigo-500/5 border border-slate-200/80 dark:border-white/[0.08] space-y-8 relative overflow-hidden shadow-xs">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -689,14 +676,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Interactive Visual Roadmap Tree Graph */}
             <div className="pt-6">
               <RoadmapTreePreview />
             </div>
           </div>
         </section>
 
-        {/* SECTION: MINIMAL FEATURE PILLARS */}
         <section
           id="features"
           className="mx-auto max-w-7xl px-4 sm:px-6 space-y-8"
@@ -741,7 +726,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION: FINAL CALL TO ACTION BANNER */}
         <section className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="p-8 sm:p-12 rounded-3xl bg-white dark:bg-[#121212] border border-slate-200/80 dark:border-white/[0.08] text-center space-y-6 shadow-xs relative overflow-hidden">
             <div className="flex justify-center">
@@ -781,7 +765,6 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Stitch Minimal Footer with Original Logo */}
       <footer className="border-t border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#0A0A0A]/90 py-8 transition-colors duration-200">
         <div className="mx-auto max-w-[1520px] px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Logo size="sm" />

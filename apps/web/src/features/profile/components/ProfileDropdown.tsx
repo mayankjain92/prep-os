@@ -49,14 +49,12 @@ export function ProfileDropdown() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Profile Trigger Button in Header (Rounded Rectangle aligned with navbar theme) */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/[0.08] hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50 dark:hover:bg-neutral-800/60 transition-all text-slate-700 dark:text-neutral-300 cursor-pointer group focus:outline-none shadow-xs"
         title="Account & Profile"
       >
-        {/* User Avatar Circle */}
         <div className="relative w-6 h-6 rounded-full overflow-hidden bg-slate-200 dark:bg-neutral-700 flex items-center justify-center text-xs text-slate-800 dark:text-white shrink-0">
           {user.avatarUrl ? (
             <Image
@@ -71,12 +69,10 @@ export function ProfileDropdown() {
           )}
         </div>
 
-        {/* User Handle */}
         <span className="text-xs font-medium text-slate-800 dark:text-neutral-200 hidden sm:inline max-w-[120px] truncate">
           @{user.username || user.email.split("@")[0]}
         </span>
 
-        {/* Streak: Clean logo and count without background or border */}
         <div className="flex items-center gap-1 text-xs font-semibold text-amber-500 dark:text-amber-400">
           <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
           <span>{streak}</span>
@@ -89,10 +85,8 @@ export function ProfileDropdown() {
         />
       </button>
 
-      {/* Stitch-Styled Dropdown Popover */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#161616] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl p-4 z-50 text-slate-800 dark:text-neutral-200 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-150">
-          {/* User Info & Streak Header */}
           <div className="flex items-start gap-3 pb-3">
             <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-200 dark:bg-neutral-700 flex items-center justify-center text-sm font-bold text-slate-800 dark:text-white shrink-0 border border-slate-300 dark:border-white/15 shadow-sm mt-0.5">
               {user.avatarUrl ? (
@@ -121,7 +115,6 @@ export function ProfileDropdown() {
             </div>
           </div>
 
-          {/* LeetCode Detailed Status & 1-Click Sync */}
           {activeProfile?.username && (
             <div className="mb-2 bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-xl p-2.5 space-y-2">
               <div className="flex items-center justify-between">
@@ -201,12 +194,9 @@ export function ProfileDropdown() {
             </div>
           )}
 
-          {/* Divider */}
           <div className="border-t border-slate-200 dark:border-white/[0.08] my-2.5 -mx-4" />
 
-          {/* Menu Actions */}
           <div className="space-y-1">
-            {/* Theme Mode Toggle Row */}
             <div
               onClick={toggleTheme}
               role="button"
@@ -244,7 +234,6 @@ export function ProfileDropdown() {
               </div>
             </div>
 
-            {/* Profile & Activity Item */}
             <Link
               href="/dashboard/profile"
               onClick={() => setIsOpen(false)}
@@ -261,7 +250,6 @@ export function ProfileDropdown() {
 
             <div className="border-t border-slate-200 dark:border-white/[0.08] my-1 -mx-4" />
 
-            {/* Sign Out Item */}
             <button
               type="button"
               onClick={() => {

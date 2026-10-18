@@ -230,7 +230,6 @@ export function RoadmapTreePreview() {
 
   return (
     <div className="space-y-6">
-      {/* Interactive Topic Selector Tabs */}
       <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl bg-white/70 dark:bg-[#121212]/80 border border-slate-200/80 dark:border-white/[0.08] backdrop-blur-md max-w-2xl mx-auto shadow-xs">
         {TREE_SECTIONS.map((sec) => {
           const isActive = sec.id === activeTab;
@@ -254,12 +253,9 @@ export function RoadmapTreePreview() {
         })}
       </div>
 
-      {/* Main Roadmap Tree Canvas */}
       <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#0A0A0A]/90 p-6 sm:p-10 shadow-xs relative overflow-hidden space-y-8">
-        {/* Subtle Tree Background Grid Lines */}
         <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:24px_24px] -z-10" />
 
-        {/* Central Milestone Spine Header */}
         <div className="text-center max-w-xl mx-auto space-y-2 relative">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
             <GitBranch className="w-3.5 h-3.5" /> {currentSection.phase}
@@ -272,12 +268,9 @@ export function RoadmapTreePreview() {
           </p>
         </div>
 
-        {/* Tree Layout: Left Nodes | Central Spine | Right Nodes */}
         <div className="relative">
-          {/* Vertical Central Trunk Line */}
           <div className="hidden md:block absolute left-1/2 top-4 bottom-4 -translate-x-1/2 w-0.5 bg-gradient-to-b from-sky-500/30 via-indigo-500/20 to-slate-200 dark:to-neutral-800" />
 
-          {/* Node Grid Pairs */}
           <div className="space-y-6 sm:space-y-8">
             {currentSection.leftNodes.map((leftNode, idx) => {
               const rightNode = currentSection.rightNodes[idx];
@@ -289,14 +282,11 @@ export function RoadmapTreePreview() {
                   key={idx}
                   className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16 items-center relative"
                 >
-                  {/* Central Spine Node Circle (Desktop only) */}
                   <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white dark:bg-[#121212] border-2 border-sky-500 items-center justify-center text-[10px] font-black text-sky-500 z-10 shadow-xs">
                     0{idx + 1}
                   </div>
 
-                  {/* LEFT BRANCH NODE */}
                   <div className="relative flex justify-end">
-                    {/* Horizontal Connector Line (Desktop) */}
                     <div className="hidden md:block absolute right-0 top-1/2 translate-x-full w-8 h-0.5 bg-slate-300 dark:bg-neutral-800" />
 
                     <div
@@ -339,7 +329,6 @@ export function RoadmapTreePreview() {
                         {leftNode.description}
                       </p>
 
-                      {/* Sub-problem chips */}
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         {leftNode.subProblems?.map((sp, i) => (
                           <span
@@ -357,10 +346,8 @@ export function RoadmapTreePreview() {
                     </div>
                   </div>
 
-                  {/* RIGHT BRANCH NODE */}
                   {rightNode && (
                     <div className="relative flex justify-start">
-                      {/* Horizontal Connector Line (Desktop) */}
                       <div className="hidden md:block absolute left-0 top-1/2 -translate-x-full w-8 h-0.5 bg-slate-300 dark:bg-neutral-800" />
 
                       <div
@@ -428,7 +415,6 @@ export function RoadmapTreePreview() {
           </div>
         </div>
 
-        {/* Selected Node Details Drawer Bar */}
         <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-[#121212] border border-slate-200/80 dark:border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">

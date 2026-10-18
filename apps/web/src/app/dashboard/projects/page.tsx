@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   useProjects,
   useCreateProject,
@@ -9,21 +9,16 @@ import {
 } from "@/features/projects/useProjects";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { GitHubSyncModal, type GitHubRepo } from "@/features/projects/components/GitHubSyncModal";
+import { ProjectCard } from "@/features/projects/components/ProjectCard";
+import { ProjectFormModal, type ProjectFormData } from "@/features/projects/components/ProjectFormModal";
 import type { ProjectItem } from "@/features/projects/api";
 import {
   FolderKanban,
-  ExternalLink,
   Plus,
-  Trash2,
-  Code,
   CheckCircle2,
-  Pencil,
   Search,
-  X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import posthog from "posthog-js";
-
 
 function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -43,79 +38,43 @@ export default function ProjectsDashboardPage() {
   const updateMutation = useUpdateProject();
   const deleteMutation = useDeleteProject();
 
-  const [name, setName] = useState("");
-  const [techStackInput, setTechStackInput] = useState("");
-  const [repoUrl, setRepoUrl] = useState("");
-  const [notes, setNotes] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
   const [githubModalOpen, setGithubModalOpen] = useState(false);
   const [importNotification, setImportNotification] = useState("");
-  const [inlineTagInput, setInlineTagInput] = useState<{ id: string; value: string } | null>(null);
   const [statusFilter, setStatusFilter] = useState<"all" | "in-progress" | "completed">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Dismiss on Escape key
-  useEffect(() => {
-    if (!dialogOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setDialogOpen(false);
-        setEditingProjectId(null);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [dialogOpen]);
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-
-    const customTags = techStackInput
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-
-    if (editingProjectId) {
+  const handleFormSubmit = (data: ProjectFormData) => {
+    if (editingProject) {
       updateMutation.mutate({
-        id: editingProjectId,
+        id: editingProject._id,
         data: {
-          name: name.trim(),
-          customTags,
-          repoUrl: repoUrl.trim(),
-          notes: notes.trim(),
+          name: data.name,
+          customTags: data.customTags,
+          repoUrl: data.repoUrl,
+          notes: data.notes,
         },
       });
-      setEditingProjectId(null);
+      setEditingProject(null);
     } else {
       createMutation.mutate({
-        name: name.trim(),
-        customTags,
+        name: data.name,
+        customTags: data.customTags,
         status: "in-progress",
-        repoUrl: repoUrl.trim(),
-        notes: notes.trim(),
+        repoUrl: data.repoUrl,
+        notes: data.notes,
       });
       posthog.capture("project_created", {
-        has_repo_url: Boolean(repoUrl.trim()),
-        tag_count: customTags.length,
+        has_repo_url: Boolean(data.repoUrl),
+        tag_count: data.customTags.length,
       });
     }
 
-    setName("");
-    setTechStackInput("");
-    setRepoUrl("");
-    setNotes("");
     setDialogOpen(false);
   };
 
-  const handleAddInlineTag = (e: React.FormEvent, proj: ProjectItem) => {
-    e.preventDefault();
-    if (!inlineTagInput || !inlineTagInput.value.trim()) {
-      setInlineTagInput(null);
-      return;
-    }
-    const newTag = inlineTagInput.value.trim();
+  const handleAddInlineTag = (proj: ProjectItem, newTag: string) => {
     const currentTags = proj.customTags || [];
     if (!currentTags.includes(newTag)) {
       updateMutation.mutate({
@@ -123,7 +82,6 @@ export default function ProjectsDashboardPage() {
         data: { customTags: [...currentTags, newTag] },
       });
     }
-    setInlineTagInput(null);
   };
 
   const handleGitHubImport = (
@@ -159,9 +117,7 @@ export default function ProjectsDashboardPage() {
   };
 
   const existingRepoUrls = projects.map((p) => p.repoUrl).filter(Boolean);
-  const inProgressCount = projects.filter(
-    (p) => p.status === "in-progress",
-  ).length;
+  const inProgressCount = projects.filter((p) => p.status === "in-progress").length;
   const completedCount = projects.filter((p) => p.status === "completed").length;
 
   const filteredProjects = useMemo(() => {
@@ -184,7 +140,6 @@ export default function ProjectsDashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 pb-28 transition-colors duration-200">
       <main className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
-        {/* BEGIN: PageHeader */}
         <section
           className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
           data-purpose="header-section"
@@ -213,12 +168,8 @@ export default function ProjectsDashboardPage() {
             <button
               type="button"
               onClick={() => {
-                setEditingProjectId(null);
-                setName("");
-                setTechStackInput("");
-                setRepoUrl("");
-                setNotes("");
-                setDialogOpen(!dialogOpen);
+                setEditingProject(null);
+                setDialogOpen(true);
               }}
               className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs shadow-sm shadow-sky-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
             >
@@ -227,15 +178,13 @@ export default function ProjectsDashboardPage() {
             </button>
           </div>
         </section>
-        {/* END: PageHeader */}
 
-        {/* BEGIN: Project Stats KPI Card */}
         <section
           className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs dark:shadow-none"
           data-purpose="projects-kpi-card"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-neutral-900 p-0.5 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+            <div className="w-12 h-12 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:neutral-900 p-0.5 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
               <FolderKanban className="h-6 w-6" />
             </div>
             <div>
@@ -248,191 +197,48 @@ export default function ProjectsDashboardPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">
-                Portfolio inventory tracked for recruiter technical review
+                Showcase technical complexity, system design, and production code for interviewers.
               </p>
             </div>
           </div>
 
-          <div className="h-px md:h-12 w-full md:w-px bg-slate-200 dark:bg-white/[0.06]" />
-
-          <div className="grid grid-cols-3 gap-3 sm:gap-6 bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.06] rounded-xl px-6 py-3 items-center shrink-0">
-            <div className="text-center">
-              <div className="text-[10px] uppercase font-semibold text-slate-500 dark:text-neutral-500 tracking-wider">
-                Total
-              </div>
-              <div className="text-xl font-bold text-sky-600 dark:text-sky-400 font-mono">
+          <div className="flex items-center gap-6 self-start md:self-auto border-t md:border-t-0 md:border-l border-slate-100 dark:border-white/[0.06] pt-4 md:pt-0 md:pl-6">
+            <div className="text-left">
+              <span className="text-[10px] uppercase font-semibold text-slate-500 dark:text-neutral-400 tracking-wider block">
+                Total Projects
+              </span>
+              <span className="text-xl font-bold text-slate-900 dark:text-white font-mono">
                 <AnimatedNumber value={projects.length} />
-              </div>
+              </span>
             </div>
-            <div className="text-center border-l border-slate-200 dark:border-white/[0.06] pl-3 sm:pl-6">
-              <div className="text-[10px] uppercase font-semibold text-slate-500 dark:text-neutral-500 tracking-wider">
+            <div className="text-left">
+              <span className="text-[10px] uppercase font-semibold text-slate-500 dark:text-neutral-400 tracking-wider block">
                 In Progress
-              </div>
-              <div className="text-xl font-bold text-amber-600 dark:text-amber-400 font-mono">
+              </span>
+              <span className="text-xl font-bold text-sky-600 dark:text-sky-400 font-mono">
                 <AnimatedNumber value={inProgressCount} />
-              </div>
+              </span>
             </div>
-            <div className="text-center border-l border-slate-200 dark:border-white/[0.06] pl-3 sm:pl-6">
-              <div className="text-[10px] uppercase font-semibold text-slate-500 dark:text-neutral-500 tracking-wider">
+            <div className="text-left">
+              <span className="text-[10px] uppercase font-semibold text-slate-500 dark:text-neutral-400 tracking-wider block">
                 Completed
-              </div>
-              <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+              </span>
+              <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
                 <AnimatedNumber value={completedCount} />
-              </div>
+              </span>
             </div>
           </div>
         </section>
-        {/* END: Project Stats KPI Card */}
 
-        {/* Import Notification Banner */}
         {importNotification && (
-          <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-            <span>{importNotification}</span>
+          <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-medium flex items-center justify-between animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+              <span>{importNotification}</span>
+            </div>
           </div>
         )}
 
-        {/* BEGIN: Create / Edit Project Modal with Blur Background */}
-        <AnimatePresence>
-          {dialogOpen && (
-            <div
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 dark:bg-black/75 backdrop-blur-md"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  setDialogOpen(false);
-                  setEditingProjectId(null);
-                }
-              }}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 12 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 12 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="project-modal-title"
-                className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] shadow-2xl flex flex-col max-h-[90vh] text-slate-800 dark:text-neutral-200"
-              >
-                {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/70 dark:bg-[#161616] px-6 py-4.5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-sky-500/10 dark:bg-sky-500/15 border border-sky-500/20 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
-                      <FolderKanban className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3
-                        id="project-modal-title"
-                        className="text-base font-bold text-slate-900 dark:text-white"
-                      >
-                        {editingProjectId ? "Edit Project" : "Log New Engineering Project"}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-neutral-400">
-                        {editingProjectId
-                          ? "Update tech stack, architecture notes, and repository info"
-                          : "Track technical achievements, tech stack tags, and repository links"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDialogOpen(false);
-                      setEditingProjectId(null);
-                    }}
-                    className="text-slate-400 hover:text-slate-700 dark:text-neutral-400 dark:hover:text-white p-1.5 rounded-lg bg-slate-100 dark:bg-neutral-800/60 hover:bg-slate-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
-                    aria-label="Close dialog"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-
-                {/* Modal Form */}
-                <form onSubmit={handleSave} className="flex flex-col flex-1 overflow-hidden">
-                  <div className="p-6 space-y-4 overflow-y-auto flex-1">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-neutral-300">
-                          Project Name *
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g. Prep OS"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          required
-                          className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-neutral-300">
-                          Repo URL
-                        </label>
-                        <input
-                          type="url"
-                          placeholder="https://github.com/..."
-                          value={repoUrl}
-                          onChange={(e) => setRepoUrl(e.target.value)}
-                          className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-neutral-300">
-                        Tech Stack Tags (comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Next.js, Node.js, Express, Redis, MongoDB"
-                        value={techStackInput}
-                        onChange={(e) => setTechStackInput(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-neutral-300">
-                        Architecture Notes / Key Achievements
-                      </label>
-                      <textarea
-                        rows={3}
-                        placeholder="System design key points, performance benchmarks, challenging problems solved..."
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Modal Footer */}
-                  <div className="flex justify-end gap-2.5 px-6 py-4 border-t border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#161616]/50">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDialogOpen(false);
-                        setEditingProjectId(null);
-                      }}
-                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0e0e0e] text-xs font-medium text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={createMutation.isPending || updateMutation.isPending}
-                      className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-medium text-xs shadow-sm shadow-sky-500/20 transition-all cursor-pointer disabled:opacity-60"
-                    >
-                      {editingProjectId ? "Update Project" : "Save Project"}
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-        {/* END: Create / Edit Project Modal */}
-
-        {/* Filter & Search Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.06] rounded-xl self-start sm:self-auto">
             <button
@@ -484,7 +290,6 @@ export default function ProjectsDashboardPage() {
           </div>
         </div>
 
-        {/* BEGIN: Project Grid */}
         {isPending ? (
           <div className="rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] py-16 text-center text-sm font-semibold text-slate-400 dark:text-neutral-400 animate-pulse shadow-xs dark:shadow-none">
             Loading projects...
@@ -514,137 +319,41 @@ export default function ProjectsDashboardPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredProjects.map((proj) => (
-              <div
+              <ProjectCard
                 key={proj._id}
-                className="rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] p-5 space-y-3.5 hover:border-slate-300 dark:hover:border-white/20 transition-all flex flex-col justify-between group shadow-xs dark:shadow-none"
-              >
-                <div className="space-y-3">
-                  {/* Title & Status */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 truncate">
-                        <Code className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
-                        <span className="truncate">{proj.name}</span>
-                      </h3>
-                      {proj.repoUrl && (
-                        <a
-                          href={proj.repoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-1 inline-flex items-center text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 font-mono transition-colors"
-                        >
-                          <span className="truncate max-w-[280px]">
-                            {proj.repoUrl.replace(/^https?:\/\/github\.com\//, "")}
-                          </span>
-                          <ExternalLink className="ml-1 h-3 w-3 shrink-0" />
-                        </a>
-                      )}
-                    </div>
-
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 capitalize ${
-                        proj.status === "completed"
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                          : "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20"
-                      }`}
-                    >
-                      {proj.status.replace("-", " ")}
-                    </span>
-                  </div>
-
-                  {/* Notes / Description */}
-                  {proj.notes && (
-                    <p className="text-xs text-slate-600 dark:text-neutral-400 leading-relaxed bg-slate-50 dark:bg-[#0e0e0e] p-3 rounded-xl border border-slate-100 dark:border-white/[0.04]">
-                      {proj.notes}
-                    </p>
-                  )}
-
-                  {/* Tech Stack Tags */}
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    {/* Primary Language */}
-                    {proj.techStack && proj.techStack.length > 0 && (
-                      <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 text-[11px] font-mono font-medium text-sky-600 dark:text-sky-400">
-                        {proj.techStack[0]}
-                      </span>
-                    )}
-
-                    {/* Custom Tags */}
-                    {(proj.customTags || []).map((tech: string) => (
-                      <span
-                        key={tech}
-                        className="rounded-md bg-slate-100 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.06] px-2 py-0.5 text-[11px] font-mono font-medium text-slate-700 dark:text-neutral-300"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-
-                    {/* Add Inline Tag */}
-                    {inlineTagInput?.id === proj._id ? (
-                      <form
-                        onSubmit={(e) => handleAddInlineTag(e, proj)}
-                        className="inline-block"
-                      >
-                        <input
-                          autoFocus
-                          value={inlineTagInput.value}
-                          onChange={(e) =>
-                            setInlineTagInput({
-                              id: proj._id,
-                              value: e.target.value,
-                            })
-                          }
-                          onBlur={() => setInlineTagInput(null)}
-                          className="h-6 w-24 text-[10px] px-2 rounded-md bg-slate-50 dark:bg-[#0e0e0e] border border-sky-500 text-slate-900 dark:text-white inline-flex ml-1 focus:outline-none"
-                          placeholder="Tag..."
-                        />
-                      </form>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setInlineTagInput({ id: proj._id, value: "" })
-                        }
-                        className="rounded-md border border-dashed border-slate-300 dark:border-neutral-700 hover:border-slate-500 dark:hover:border-neutral-500 px-2 py-0.5 text-[10px] font-medium text-slate-500 dark:text-neutral-400 hover:text-slate-800 dark:hover:text-white transition ml-1 cursor-pointer"
-                      >
-                        + Add tag
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Footer Actions */}
-                <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-white/[0.06] gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingProjectId(proj._id);
-                      setName(proj.name);
-                      setRepoUrl(proj.repoUrl || "");
-                      setNotes(proj.notes || "");
-                      setTechStackInput((proj.customTags || []).join(", "));
-                      setDialogOpen(true);
-                    }}
-                    className="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-neutral-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    <span>Edit</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => deleteMutation.mutate(proj._id)}
-                    className="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-rose-600 dark:text-neutral-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span>Delete</span>
-                  </button>
-                </div>
-              </div>
+                project={proj}
+                onEdit={(p) => {
+                  setEditingProject(p);
+                  setDialogOpen(true);
+                }}
+                onDelete={(id) => deleteMutation.mutate(id)}
+                onAddTag={handleAddInlineTag}
+              />
             ))}
           </div>
         )}
-        {/* END: Project Grid */}
 
-        {/* GitHub Sync Modal */}
+        <ProjectFormModal
+          isOpen={dialogOpen}
+          onClose={() => {
+            setDialogOpen(false);
+            setEditingProject(null);
+          }}
+          isEditing={Boolean(editingProject)}
+          initialData={
+            editingProject
+              ? {
+                  name: editingProject.name,
+                  repoUrl: editingProject.repoUrl || "",
+                  notes: editingProject.notes || "",
+                  customTags: editingProject.customTags || [],
+                }
+              : undefined
+          }
+          onSubmit={handleFormSubmit}
+          isPending={createMutation.isPending || updateMutation.isPending}
+        />
+
         <GitHubSyncModal
           isOpen={githubModalOpen}
           onClose={() => setGithubModalOpen(false)}

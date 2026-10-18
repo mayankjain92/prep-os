@@ -116,7 +116,6 @@ export function GitHubSyncModal({
           exit={{ opacity: 0, scale: 0.95 }}
           className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] shadow-2xl flex flex-col max-h-[85vh] text-slate-800 dark:text-neutral-200"
         >
-          {/* Modal Header */}
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] bg-slate-50 dark:bg-[#161616] px-6 py-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-800 dark:text-white">
@@ -140,7 +139,6 @@ export function GitHubSyncModal({
             </button>
           </div>
 
-          {/* Search Form */}
           <div className="p-6 border-b border-slate-100 dark:border-white/[0.06] bg-white dark:bg-[#121212] space-y-3">
             <form onSubmit={fetchRepos} className="flex gap-2">
               <div className="relative flex-1">
@@ -174,7 +172,6 @@ export function GitHubSyncModal({
             )}
           </div>
 
-          {/* Repositories List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-3">
             {repos.length === 0 && !isLoading && !error && (
               <div className="text-center py-12 space-y-2">
@@ -242,7 +239,6 @@ export function GitHubSyncModal({
                     </div>
                   </div>
 
-                  {/* Status Picker & Action */}
                   {!isAlreadyAdded && (
                     <div
                       className="flex items-center gap-2 shrink-0 self-end sm:self-center"
@@ -270,7 +266,6 @@ export function GitHubSyncModal({
             })}
           </div>
 
-          {/* Modal Footer */}
           <div className="border-t border-slate-100 dark:border-white/[0.06] px-6 py-4 flex items-center justify-between bg-slate-50 dark:bg-[#161616]">
             <span className="text-xs text-slate-500 dark:text-neutral-400">
               {Object.values(selectedRepoIds).filter(Boolean).length} repository(s) selected

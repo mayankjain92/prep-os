@@ -163,7 +163,6 @@ export function AgentCopilot() {
 
   return (
     <>
-      {/* 1. Animated Logo Floating Trigger with Stitch Orbital Diamond Emblem */}
       <div className="fixed bottom-6 right-6 z-50">
         <motion.button
           whileHover={{ scale: 1.08 }}
@@ -180,7 +179,6 @@ export function AgentCopilot() {
         </motion.button>
       </div>
 
-      {/* 2. Native Application Theme Chat Drawer with macOS Genie Lamp Effect */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -217,7 +215,6 @@ export function AgentCopilot() {
                 : "w-[calc(100vw-1.5rem)] sm:w-[450px] md:w-[480px] h-[580px]"
             }`}
           >
-            {/* Header: Clean dark style matching Prep OS */}
             <div className="px-4 py-3.5 border-b border-border bg-card flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-white/[0.06] border border-slate-200 dark:border-white/10 flex items-center justify-center shrink-0 p-0.5">
@@ -269,7 +266,6 @@ export function AgentCopilot() {
               </div>
             </div>
 
-            {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs custom-scrollbar">
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col justify-center items-center text-center p-4">
@@ -429,7 +425,6 @@ export function AgentCopilot() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Bar */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();

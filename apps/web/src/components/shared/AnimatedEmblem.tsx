@@ -156,7 +156,6 @@ export function AnimatedEmblem({
           </>
         )}
 
-        {/* Orbital Track Ring 1 (Inner Track) */}
         <g className="emb-orbit-cw">
           <circle
             cx="256"
@@ -179,7 +178,6 @@ export function AnimatedEmblem({
           />
         </g>
 
-        {/* Orbital Track Ring 2 (Outer Track) */}
         <g className="emb-orbit-ccw">
           <circle
             cx="256"
@@ -202,7 +200,6 @@ export function AnimatedEmblem({
           <circle cx="122" cy="232" r="4" fill="#38bdf8" opacity="0.75" />
         </g>
 
-        {/* Core Diamond Star Emblem */}
         <g className="emb-core">
           <path
             d="M 256 64 C 256 160 256 160 352 256 C 256 256 256 352 256 448 C 256 352 256 352 160 256 C 256 160 256 160 256 64 Z"

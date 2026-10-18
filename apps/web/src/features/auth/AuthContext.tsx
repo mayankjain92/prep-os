@@ -55,7 +55,6 @@ interface AuthContextType {
   register: (credentials: RegisterInput) => Promise<void>;
   oauthLogin: (providerData: OAuthInput) => Promise<void>;
   refreshProfile: () => Promise<void>;
-  saveNeetcodeProgress: (solved: string[], starred: string[]) => Promise<void>;
   setUsername: (username: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -154,24 +153,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await fetchProfile();
   };
 
-  const saveNeetcodeProgress = async (solved: string[], starred: string[]) => {
-    try {
-      const data = await apiFetch<{ message: string; neetcodeProgress: { solved: string[]; starred: string[] } }>(
-        "/api/problems/neetcode-progress",
-        {
-          method: "PUT",
-          body: JSON.stringify({ solved, starred }),
-        }
-      );
-
-      if (data?.neetcodeProgress && user) {
-        setUser({ ...user, neetcodeProgress: data.neetcodeProgress });
-      }
-    } catch (err) {
-      console.error("Failed to save NeetCode progress to server:", err);
-    }
-  };
-
   const setUsername = async (newUsername: string) => {
     const data = await apiFetch<{ message: string; user: User }>("/api/auth/set-username", {
       method: "POST",
@@ -205,7 +186,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         oauthLogin,
         refreshProfile,
-        saveNeetcodeProgress,
         setUsername,
         logout,
       }}

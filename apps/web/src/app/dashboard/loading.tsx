@@ -3,7 +3,6 @@
 export default function DashboardLoading() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-8 space-y-8 animate-in fade-in duration-200">
-      {/* Top Banner Skeleton */}
       <div className="p-8 rounded-3xl bg-card/60 border border-border/60 relative overflow-hidden space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2.5 w-full sm:w-2/3">
@@ -19,7 +18,6 @@ export default function DashboardLoading() {
         </div>
       </div>
 
-      {/* Grid Cards Skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
           <div key={i} className="p-6 rounded-2xl bg-card/50 border border-border/50 space-y-4 shadow-sm">
@@ -38,7 +36,6 @@ export default function DashboardLoading() {
         ))}
       </div>
 
-      {/* Main Content Area Skeleton */}
       <div className="p-6 rounded-3xl bg-card/40 border border-border/40 space-y-6">
         <div className="flex items-center justify-between border-b border-border/40 pb-4">
           <div className="h-6 w-48 bg-muted/70 rounded-md animate-pulse" />

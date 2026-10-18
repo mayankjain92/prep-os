@@ -8,7 +8,7 @@ import {
   useLeetCodeProfile,
 } from "@/features/dsa/useProblems";
 import { RoadmapFlowChart } from "@/features/roadmap/components/RoadmapFlowChart";
-import type { RoadmapNodeItem } from "@/features/roadmap/types";
+import { getRoadmapMetrics } from "@/features/roadmap/tree-algorithms";
 import { DSA_ROADMAP_SECTIONS } from "@/data/dsa-roadmap";
 import { Neetcode150Section } from "@/features/dsa/components/Neetcode150Section";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
@@ -43,6 +43,7 @@ export default function DsaDashboardPage() {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab");
       if (tabParam === "neetcode" || tabParam === "practice") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveTab("neetcode");
       }
     }
@@ -86,57 +87,30 @@ export default function DsaDashboardPage() {
   const hardSolved = activeProfile?.hardSolved ?? 0;
 
   const { categoryProgress, overallStats } = useMemo(() => {
-    const gatherNodeStats = (nodes?: RoadmapNodeItem[]) => {
-      if (!nodes) return { total: 0, completed: 0, learning: 0 };
-      let t = 0,
-        c = 0,
-        l = 0;
-      const traverse = (list: RoadmapNodeItem[]) => {
-        list.forEach((n) => {
-          t++;
-          const st = dsaFlowchartStatus[n.id];
-          if (st === "done") c++;
-          else if (st === "in-progress") l++;
-          if (n.subNodes) traverse(n.subNodes);
-        });
-      };
-      traverse(nodes);
-      return { total: t, completed: c, learning: l };
-    };
-
     const categories = DSA_ROADMAP_SECTIONS.map((sec) => {
       const name = sec.mainTitle.replace(/^\d+\.\s*/, "");
-      const left = gatherNodeStats(sec.leftNodes);
-      const right = gatherNodeStats(sec.rightNodes);
-      const tot = left.total + right.total;
-      const com = left.completed + right.completed;
-      const lrn = left.learning + right.learning;
+      const m = getRoadmapMetrics([sec], dsaFlowchartStatus);
 
       return {
         mainId: sec.mainId,
         title: name,
-        total: tot,
-        completed: com,
-        learning: lrn,
-        pct: tot > 0 ? Math.round((com / tot) * 100) : 0,
+        total: m.total,
+        completed: m.done,
+        learning: m.inProgress,
+        pct: m.percentage,
       };
     });
 
-    const totalAll = categories.reduce((acc, c) => acc + c.total, 0);
-    const doneAll = categories.reduce((acc, c) => acc + c.completed, 0);
-    const learningAll = categories.reduce((acc, c) => acc + c.learning, 0);
-    const pendingAll = totalAll - doneAll - learningAll;
-    const overallPct =
-      totalAll > 0 ? Math.round((doneAll / totalAll) * 100) : 0;
+    const grand = getRoadmapMetrics(DSA_ROADMAP_SECTIONS, dsaFlowchartStatus);
 
     return {
       categoryProgress: categories,
       overallStats: {
-        total: totalAll,
-        done: doneAll,
-        learning: learningAll,
-        pending: pendingAll,
-        pct: overallPct,
+        total: grand.total,
+        done: grand.done,
+        learning: grand.inProgress,
+        pending: grand.pending,
+        pct: grand.percentage,
       },
     };
   }, [dsaFlowchartStatus]);
@@ -154,7 +128,6 @@ export default function DsaDashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 pb-28 transition-colors duration-200">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-300">
-        {/* BEGIN: PageHeader */}
         <section className="space-y-1" data-purpose="header-section">
           <span className="text-[11px] font-semibold tracking-wider text-sky-600 dark:text-sky-400 uppercase">
             PROBLEM SOLVING
@@ -166,9 +139,7 @@ export default function DsaDashboardPage() {
             Interactive curriculum roadmaps and NeetCode 150 practice with live LeetCode synchronization.
           </p>
         </section>
-        {/* END: PageHeader */}
 
-        {/* BEGIN: Primary View Switcher */}
         <section
           aria-label="DSA Modes Switcher"
           className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/[0.08] pb-4"
@@ -209,12 +180,9 @@ export default function DsaDashboardPage() {
             <ArrowRight className="w-3 h-3 text-slate-400 dark:text-neutral-500" />
           </Link>
         </section>
-        {/* END: Primary View Switcher */}
 
-        {/* VIEW 1: INTERACTIVE ROADMAP (Curriculum & Concepts) */}
         {activeTab === "flowchart" && (
           <div className="space-y-6 animate-in fade-in duration-300">
-            {/* Overall Roadmap Progress Summary */}
             <section
               className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] p-5 space-y-3 shadow-xs dark:shadow-none"
               data-purpose="overall-progress"
@@ -230,7 +198,6 @@ export default function DsaDashboardPage() {
                   </span>
                 </div>
 
-                {/* Counts Badges */}
                 <div className="flex items-center gap-2 text-xs font-medium flex-wrap">
                   <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                     Done: <AnimatedNumber value={overallStats.done} />
@@ -252,7 +219,6 @@ export default function DsaDashboardPage() {
                 </div>
               </div>
 
-              {/* Progress Bar */}
               <div className="pt-1">
                 <AnimatedProgressBar
                   pct={overallStats.pct}
@@ -262,9 +228,7 @@ export default function DsaDashboardPage() {
               </div>
             </section>
 
-            {/* Modules Sidebar + Interactive Canvas */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* LEFT COLUMN: Curated Roadmap Modules Sidebar (4 cols) */}
               <aside className="lg:col-span-4 flex flex-col space-y-3 lg:sticky lg:top-20">
                 <div className="flex items-center justify-between px-1">
                   <div className="flex items-center space-x-2">
@@ -277,7 +241,6 @@ export default function DsaDashboardPage() {
                   </div>
                 </div>
 
-                {/* Vertical Module Selection List */}
                 <div className="space-y-2.5" role="tablist">
                   {categoryProgress.map((cat) => {
                     const isActive = activeSectionId === cat.mainId;
@@ -294,7 +257,6 @@ export default function DsaDashboardPage() {
                             : "border border-slate-200 dark:border-white/[0.08] hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50/60 dark:hover:bg-white/[0.02] shadow-xs"
                         }`}
                       >
-                        {/* Active Left Indicator Bar */}
                         {isActive && (
                           <div className="absolute left-0 top-3 bottom-3 w-1 bg-sky-500 dark:bg-sky-400 rounded-r" />
                         )}
@@ -328,7 +290,6 @@ export default function DsaDashboardPage() {
                           </span>
                         </div>
 
-                        {/* Module Progress Bar */}
                         <div className={`mt-3 ${isActive ? "pl-2" : "pl-0"}`}>
                           <AnimatedProgressBar
                             pct={cat.pct}
@@ -342,7 +303,6 @@ export default function DsaDashboardPage() {
                 </div>
               </aside>
 
-              {/* RIGHT COLUMN: Interactive Roadmap Canvas (8 cols) */}
               <section className="lg:col-span-8 w-full min-w-0" data-purpose="roadmap-canvas">
                 <RoadmapFlowChart
                   title={`${activeLabel} Roadmap`}
@@ -354,15 +314,12 @@ export default function DsaDashboardPage() {
           </div>
         )}
 
-        {/* VIEW 2: NEETCODE 150 PRACTICE (Problems & LeetCode Sync) */}
         {activeTab === "neetcode" && (
           <div className="space-y-6 animate-in fade-in duration-300">
-            {/* BEGIN: Compact LeetCode Stats & 1-Click Sync Bar */}
             <section
               className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs dark:shadow-none"
               data-purpose="compact-leetcode-stats-bar"
             >
-              {/* Left: User identity & rank */}
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-neutral-900 p-0.5 relative overflow-hidden flex items-center justify-center shrink-0">
                   {activeProfile?.userAvatar ? (
@@ -398,7 +355,6 @@ export default function DsaDashboardPage() {
                 </div>
               </div>
 
-              {/* Right: Breakdown Pill, 1-Click Sync, and Settings Link */}
               <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto flex-wrap">
                 <div className="flex items-center gap-2 bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.06] rounded-lg px-2.5 py-1 text-xs font-mono">
                   <span className="text-sky-600 dark:text-sky-400 font-bold">
@@ -443,9 +399,7 @@ export default function DsaDashboardPage() {
                 </Link>
               </div>
             </section>
-            {/* END: Compact LeetCode Stats Bar */}
 
-            {/* Sync Feedback Alerts */}
             {syncMutation.isError && (
               <div className="flex items-center gap-2 rounded-xl bg-rose-500/10 border border-rose-500/20 px-4 py-2.5 text-xs text-rose-600 dark:text-rose-400">
                 <AlertCircle className="h-4 w-4 shrink-0" />
@@ -460,7 +414,6 @@ export default function DsaDashboardPage() {
               </div>
             )}
 
-            {/* NeetCode 150 Problems Section */}
             <Neetcode150Section />
           </div>
         )}

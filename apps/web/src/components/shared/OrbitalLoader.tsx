@@ -144,7 +144,6 @@ export function OrbitalLoaderSVG({
           }
         `}</style>
 
-        {/* Ambient Glow */}
         {showAmbientGlow && (
           <circle
             className="pol-ambient-halo"
@@ -155,7 +154,6 @@ export function OrbitalLoaderSVG({
           />
         )}
 
-        {/* Static Track Rings */}
         <circle
           cx="150"
           cy="150"
@@ -175,7 +173,6 @@ export function OrbitalLoaderSVG({
           strokeWidth="1.2"
         />
 
-        {/* Outer Orbit Segment */}
         <g className="pol-orbit-outer">
           <circle
             cx="150"
@@ -198,7 +195,6 @@ export function OrbitalLoaderSVG({
           <circle cx="62" cy="150" r="2.5" fill="#818cf8" />
         </g>
 
-        {/* Mid Counter-Rotating Orbit */}
         <g className="pol-orbit-mid">
           <circle
             cx="150"
@@ -221,15 +217,12 @@ export function OrbitalLoaderSVG({
           <circle cx="150" cy="212" r="2" fill="#38bdf8" />
         </g>
 
-        {/* Central Diamond AI / Telemetry Spark */}
         <g className="pol-core-diamond">
-          {/* Outer Glow Rhombus */}
           <path
             d="M 150 116 C 150 134 166 150 184 150 C 166 150 150 166 150 184 C 150 166 134 150 116 150 C 134 150 150 134 150 116 Z"
             fill={`url(#${primaryGradId})`}
             filter={`url(#${bloomId})`}
           />
-          {/* Precision Inner Highlight */}
           <circle
             cx="150"
             cy="150"
@@ -259,12 +252,10 @@ export function OrbitalLoader({
 }: OrbitalLoaderProps) {
   const content = (
     <div className={`relative flex flex-col items-center gap-4 ${fullScreen ? "p-8 max-w-sm sm:max-w-md w-full" : ""}`}>
-      {/* Background radial glow */}
       {showAmbientGlow && (
         <div className="absolute -inset-6 rounded-full bg-gradient-to-r from-indigo-500/20 via-sky-500/15 to-purple-600/20 blur-3xl opacity-75 pointer-events-none" />
       )}
 
-      {/* Telemetry Badge / Pill */}
       {badge && (
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] dark:bg-white/[0.04] border border-white/10 dark:border-white/10 text-[11px] font-mono text-muted-foreground shadow-sm">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
@@ -273,14 +264,12 @@ export function OrbitalLoader({
         </div>
       )}
 
-      {/* Orbital Animated SVG */}
       <OrbitalLoaderSVG
         size={size}
         showAmbientGlow={showAmbientGlow}
         className="transition-transform duration-300"
       />
 
-      {/* Optional Title & Subtitle */}
       {(title || subtitle) && (
         <div className="flex flex-col items-center gap-1.5 z-10 text-center">
           {title && (
@@ -305,7 +294,6 @@ export function OrbitalLoader({
         </div>
       )}
 
-      {/* Shimmer Progress Bar */}
       {showProgressBar && (
         <div className="w-48 sm:w-56 h-1 bg-muted/60 rounded-full overflow-hidden relative mt-2 border border-border/30">
           <div className="h-full w-1/2 bg-gradient-to-r from-indigo-500 via-sky-400 to-cyan-400 rounded-full animate-[shimmer_1.8s_infinite] shadow-[0_0_12px_rgba(56,189,248,0.8)]" />

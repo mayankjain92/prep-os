@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/features/auth/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Modal } from "@/components/ui/modal";
 import { Sparkles, Loader2, ArrowRight } from "lucide-react";
 
 export function SetUsernameModal() {
@@ -41,8 +42,12 @@ export function SetUsernameModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="w-full max-w-md bg-card border border-border rounded-3xl p-7 shadow-2xl space-y-6">
+    <Modal
+      isOpen={true}
+      preventClose={true}
+      showCloseButton={false}
+    >
+      <div className="p-7 space-y-6">
         <div className="text-center space-y-2">
           <div className="inline-flex p-3.5 rounded-2xl bg-sky-500/10 text-sky-500 mb-1">
             <Sparkles className="h-6 w-6" />
@@ -100,6 +105,6 @@ export function SetUsernameModal() {
           </Button>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 }

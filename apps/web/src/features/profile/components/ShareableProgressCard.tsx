@@ -49,7 +49,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
 
   const projectsBuilt = user.stats?.projectsCompleted || user.stats?.projectsTotal || 0;
 
-  // LeetCode Stats
   const leetcode = user.leetcodeProfile || {
     username: "",
     totalSolved: 0,
@@ -61,12 +60,10 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
 
   const totalLeetCodeSolved = leetcode.totalSolved || (dsaSolved * 2);
 
-  // Derived consistency score & level
   const totalScore = streak * 3 + dsaSolved * 4 + totalLeetCodeSolved * 3 + theoryDone * 2 + projectsBuilt * 8;
   const consistencyScore = Math.min(99, Math.max(78, Math.round(82 + (streak % 18))));
   const level = Math.max(1, Math.floor(totalScore / 20));
 
-  // Rank title calculation
   const getRankTitle = () => {
     if (totalScore >= 120) return { title: "Prep Grandmaster 🏆", badgeClass: "bg-amber-500 text-white shadow-amber-300/50" };
     if (totalScore >= 60) return { title: "Code Warrior 🔥", badgeClass: "bg-indigo-600 text-white shadow-indigo-300/50" };
@@ -228,9 +225,7 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
-      {/* Left Column (5 cols): Palette Picker & Share Controls */}
       <div className="lg:col-span-5 flex flex-col gap-6">
-        {/* Theme Palette Card */}
         <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 p-5 space-y-4 shadow-xs">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-200/80 dark:border-white/[0.08]">
             <Palette className="w-4 h-4 text-sky-500" />
@@ -267,7 +262,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
           </div>
         </div>
 
-        {/* Export & Share Panel */}
         <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 p-5 space-y-4 shadow-xs">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-200/80 dark:border-white/[0.08]">
             <Share2 className="w-4 h-4 text-sky-500" />
@@ -323,25 +317,19 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
         </div>
       </div>
 
-      {/* Right Column (7 cols): Card Canvas Studio */}
       <div className="lg:col-span-7 flex items-center justify-center">
         <div className="relative group p-1.5 sm:p-2 rounded-[2rem] max-w-sm sm:max-w-md w-full transition-all duration-300">
-          {/* Ambient Glow Backdrop */}
           <div className="absolute -right-8 -top-8 w-48 h-48 bg-amber-400/20 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Placement Card Container */}
           <div
             ref={cardRef}
             className={`w-full transition-all duration-300 transform-gpu hover:scale-[1.01] ${currentTheme.goldFrame}`}
           >
-            {/* Inner Card Body with Zero Empty Space */}
             <div
               className={`p-4 sm:p-5 rounded-[23px] relative overflow-hidden ${currentTheme.cardBg} shadow-[0_18px_40px_rgba(0,0,0,0.15)] space-y-3.5`}
             >
-              {/* Top Metallic Accent Bar */}
               <div className={`h-2.5 w-full absolute top-0 left-0 bg-gradient-to-r ${currentTheme.accentGradient}`} />
 
-              {/* Vertical Header - User Badge */}
               <div
                 className={`p-3 rounded-2xl ${currentTheme.headerBg} border ${currentTheme.tileBorder} shadow-xs flex items-center justify-between gap-3 mt-1`}
               >
@@ -381,7 +369,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                 </div>
               </div>
 
-              {/* Consistency Progress Bar Ribbon */}
               <div
                 className={`p-2.5 rounded-xl ${currentTheme.tileBg} border ${currentTheme.tileBorder} shadow-xs flex flex-col gap-1.5`}
               >
@@ -401,9 +388,7 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                 </div>
               </div>
 
-              {/* Dense 2x2 Prep OS Stats Grid */}
               <div className="grid grid-cols-2 gap-2">
-                {/* Active Streak Tile */}
                 <div
                   className={`p-2.5 rounded-xl ${currentTheme.tileBg} border ${currentTheme.tileBorder} flex flex-col items-center justify-center text-center shadow-xs`}
                 >
@@ -416,7 +401,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                   </div>
                 </div>
 
-                {/* Prep DSA Tile */}
                 <div
                   className={`p-2.5 rounded-xl ${currentTheme.tileBg} border ${currentTheme.tileBorder} flex flex-col items-center justify-center text-center shadow-xs`}
                 >
@@ -429,7 +413,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                   </div>
                 </div>
 
-                {/* CS Theory Tile */}
                 <div
                   className={`p-2.5 rounded-xl ${currentTheme.tileBg} border ${currentTheme.tileBorder} flex flex-col items-center justify-center text-center shadow-xs`}
                 >
@@ -442,7 +425,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                   </div>
                 </div>
 
-                {/* Projects Tile */}
                 <div
                   className={`p-2.5 rounded-xl ${currentTheme.tileBg} border ${currentTheme.tileBorder} flex flex-col items-center justify-center text-center shadow-xs`}
                 >
@@ -456,7 +438,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                 </div>
               </div>
 
-              {/* Compact LeetCode Activity Tile */}
               <div className={`p-3 rounded-xl ${currentTheme.tileBg} border ${currentTheme.tileBorder} shadow-xs space-y-2`}>
                 <div className={`flex items-center justify-between pb-1.5 border-b ${
                   isDarkCard ? "border-white/10" : "border-slate-200"
@@ -485,7 +466,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                   )}
                 </div>
 
-                {/* 4-Pill LeetCode Breakdown */}
                 <div className="grid grid-cols-4 gap-1.5 text-center">
                   <div className={`p-1.5 rounded-lg border ${
                     isDarkCard
@@ -541,7 +521,6 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                 </div>
               </div>
 
-              {/* Compact Rank & Serial Stamp Footer */}
               <div className={`flex items-center justify-between text-xs pt-2 border-t ${
                 isDarkCard ? "border-white/10 text-neutral-400" : "border-slate-200 text-slate-700"
               }`}>

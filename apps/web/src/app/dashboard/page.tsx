@@ -12,6 +12,7 @@ import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
 import { useDoubts } from "@/features/doubts/useDoubts";
 import { DSA_ROADMAP_SECTIONS } from "@/data/dsa-roadmap";
 import { THEORY_ROADMAP_SECTIONS } from "@/data/theory-roadmap";
+import { getRoadmapMetrics } from "@/features/roadmap/tree-algorithms";
 import type { RoadmapNodeItem } from "@/features/roadmap/types";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { AnimatedProgressBar } from "@/components/shared/PageTransition";
@@ -38,59 +39,37 @@ export default function UnifiedDashboardPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const syncLeetcode = useSyncLeetCode();
 
-  // ── DSA Progress ─────────────────────────────────────────────────────────
   const { totalDsaNodes, doneDsaNodes, inProgressDsaNodes } = useMemo(() => {
-    const inProgressDsaNodes: { title: string; section: string }[] = [];
+    const dsaMetrics = getRoadmapMetrics(DSA_ROADMAP_SECTIONS, dsaFlowchartStatus);
+    const inProgressList: { title: string; section: string }[] = [];
 
-    const gatherNodeStats = (nodes?: RoadmapNodeItem[], sectionName = "") => {
-      if (!nodes) return { total: 0, completed: 0 };
-      let t = 0,
-        c = 0;
+    DSA_ROADMAP_SECTIONS.forEach((sec) => {
+      const sectionName = sec.mainTitle.replace(/^\d+\.\s*/, "");
+      const nodes = [...(sec.leftNodes || []), ...(sec.rightNodes || [])];
       const traverse = (list: RoadmapNodeItem[]) => {
         list.forEach((n) => {
-          t++;
-          const st = dsaFlowchartStatus[n.id];
-          if (st === "done") c++;
-          if (st === "in-progress")
-            inProgressDsaNodes.push({ title: n.title, section: sectionName });
+          if (dsaFlowchartStatus[n.id] === "in-progress") {
+            inProgressList.push({ title: n.title, section: sectionName });
+          }
           if (n.subNodes) traverse(n.subNodes);
         });
       };
       traverse(nodes);
-      return { total: t, completed: c };
-    };
-
-    const categoryProgress = DSA_ROADMAP_SECTIONS.map((sec) => {
-      const name = sec.mainTitle.replace(/^\d+\.\s*/, "");
-      const l = gatherNodeStats(sec.leftNodes, name);
-      const r = gatherNodeStats(sec.rightNodes, name);
-      const tot = l.total + r.total;
-      const com = l.completed + r.completed;
-      return {
-        title: name,
-        total: tot,
-        completed: com,
-      };
     });
 
-    const totalDsaNodes = categoryProgress.reduce(
-      (acc, curr) => acc + curr.total,
-      0,
-    );
-    const doneDsaNodes = categoryProgress.reduce(
-      (acc, curr) => acc + curr.completed,
-      0,
-    );
-
-    return { totalDsaNodes, doneDsaNodes, inProgressDsaNodes };
+    return {
+      totalDsaNodes: dsaMetrics.total,
+      doneDsaNodes: dsaMetrics.done,
+      inProgressDsaNodes: inProgressList,
+    };
   }, [dsaFlowchartStatus]);
 
   const dsaPct =
     totalDsaNodes > 0 ? Math.round((doneDsaNodes / totalDsaNodes) * 100) : 0;
 
-  // ── Theory Progress ──────────────────────────────────────────────────────
   const { totalTheory, doneTheory, inProgressTheory } = useMemo(() => {
-    const inProgressTheory: { title: string; subject: string }[] = [];
+    const theoryMetrics = getRoadmapMetrics(THEORY_ROADMAP_SECTIONS, theoryFlowchartStatus);
+    const inProgressList: { title: string; subject: string }[] = [];
 
     const SUBJECT_MAP: Record<string, string> = {
       "theory-os": "Operating Systems",
@@ -100,59 +79,39 @@ export default function UnifiedDashboardPage() {
       "theory-aptitude": "Aptitude",
     };
 
-    const theorySubjectStats = THEORY_ROADMAP_SECTIONS.map((sec) => {
+    THEORY_ROADMAP_SECTIONS.forEach((sec) => {
       const subjectName = SUBJECT_MAP[sec.mainId] || sec.mainTitle;
-      let sTotal = 0;
-      let sCompleted = 0;
-
-      const traverse = (nodes?: RoadmapNodeItem[]) => {
-        nodes?.forEach((n) => {
-          sTotal++;
-          const st = theoryFlowchartStatus[n.id];
-          if (st === "done") sCompleted++;
-          if (st === "in-progress")
-            inProgressTheory.push({ title: n.title, subject: subjectName });
+      const nodes = [...(sec.leftNodes || []), ...(sec.rightNodes || [])];
+      const traverse = (list: RoadmapNodeItem[]) => {
+        list.forEach((n) => {
+          if (theoryFlowchartStatus[n.id] === "in-progress") {
+            inProgressList.push({ title: n.title, subject: subjectName });
+          }
           if (n.subNodes) traverse(n.subNodes);
         });
       };
-
-      traverse(sec.leftNodes);
-      traverse(sec.rightNodes);
-
-      return {
-        subject: subjectName,
-        total: sTotal,
-        completed: sCompleted,
-      };
+      traverse(nodes);
     });
 
-    const totalTheory = theorySubjectStats.reduce(
-      (acc, curr) => acc + curr.total,
-      0,
-    );
-    const doneTheory = theorySubjectStats.reduce(
-      (acc, curr) => acc + curr.completed,
-      0,
-    );
-
-    return { totalTheory, doneTheory, inProgressTheory };
+    return {
+      totalTheory: theoryMetrics.total,
+      doneTheory: theoryMetrics.done,
+      inProgressTheory: inProgressList,
+    };
   }, [theoryFlowchartStatus]);
 
   const theoryPct =
     totalTheory > 0 ? Math.round((doneTheory / totalTheory) * 100) : 0;
 
-  // ── Projects ─────────────────────────────────────────────────────────────
   const inProgressProjects = projects.filter((p) => p.status === "in-progress");
   const doneProjects = projects.filter((p) => p.status === "completed").length;
 
-  // ── LeetCode Stats ───────────────────────────────────────────────────────
   const { data: dbLeetcodeProfile } = useLeetCodeProfile();
   const totalSolved = dbLeetcodeProfile?.totalSolved ?? 0;
   const easy = dbLeetcodeProfile?.easySolved ?? 0;
   const medium = dbLeetcodeProfile?.mediumSolved ?? 0;
   const hard = dbLeetcodeProfile?.hardSolved ?? 0;
 
-  // ── Doubts ───────────────────────────────────────────────────────────────
   const unresolvedDoubts = doubts.filter((d) => !d.resolved);
 
   const handleRefreshAll = async () => {
@@ -175,7 +134,6 @@ export default function UnifiedDashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-900 dark:text-[#EDEDED] flex flex-col antialiased transition-colors duration-200">
       <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10 space-y-8">
-        {/* Header Section with Title, Subtitle, and Primary Actions */}
         <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
@@ -212,12 +170,10 @@ export default function UnifiedDashboardPage() {
           </div>
         </section>
 
-        {/* Key Performance Indicators (KPIs) */}
         <section
           aria-label="Key Performance Indicators"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
         >
-          {/* Metric Card 1: Problems Solved */}
           <div className="p-5 bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
             <div className="text-sm font-bold text-slate-800 dark:text-neutral-200">
               Problems solved
@@ -242,7 +198,6 @@ export default function UnifiedDashboardPage() {
             </div>
           </div>
 
-          {/* Metric Card 2: DSA Roadmap Progress */}
           <div className="p-5 bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
             <div className="text-sm font-bold text-slate-800 dark:text-neutral-200">
               DSA roadmap progress
@@ -258,7 +213,6 @@ export default function UnifiedDashboardPage() {
             </div>
           </div>
 
-          {/* Metric Card 3: CS Theory Topics */}
           <div className="p-5 bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
             <div className="text-sm font-bold text-slate-800 dark:text-neutral-200">
               CS theory completed
@@ -274,7 +228,6 @@ export default function UnifiedDashboardPage() {
             </div>
           </div>
 
-          {/* Metric Card 4: Projects Completed */}
           <div className="p-5 bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
             <div className="text-sm font-bold text-slate-800 dark:text-neutral-200">
               Projects completed
@@ -296,11 +249,8 @@ export default function UnifiedDashboardPage() {
           </div>
         </section>
 
-        {/* Detailed Content Columns */}
         <div className="space-y-6">
-          {/* Row 1: In Progress DSA & CS Theory */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Column A: DSA Topics In Progress */}
             <div className="bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/[0.08]">
                 <div>
@@ -370,7 +320,6 @@ export default function UnifiedDashboardPage() {
               </div>
             </div>
 
-            {/* Column B: CS Theory Topics In Progress */}
             <div className="bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/[0.08]">
                 <div>
@@ -441,9 +390,7 @@ export default function UnifiedDashboardPage() {
             </div>
           </section>
 
-          {/* Row 2: Doubt Queue & Active Projects */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Column C: Doubt Queue */}
             <div className="bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/[0.08]">
                 <div>
@@ -544,7 +491,6 @@ export default function UnifiedDashboardPage() {
               </div>
             </div>
 
-            {/* Column D: Active Projects */}
             <div className="bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/[0.08]">
                 <div>
@@ -564,7 +510,6 @@ export default function UnifiedDashboardPage() {
                 </Link>
               </div>
 
-              {/* 3 Stats Overview */}
               <div className="grid grid-cols-3 gap-2.5 py-4 border-b border-slate-100 dark:border-white/[0.08]">
                 <div className="p-3 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.08] rounded-lg text-center">
                   <div className="text-lg font-semibold text-slate-800 dark:text-neutral-200 tracking-tight">
@@ -592,7 +537,6 @@ export default function UnifiedDashboardPage() {
                 </div>
               </div>
 
-              {/* Projects List or Empty State */}
               <div className="py-4 flex-1">
                 {inProgressProjects.length === 0 ? (
                   <div className="flex flex-col items-center justify-center text-center space-y-3 py-2">
@@ -639,7 +583,6 @@ export default function UnifiedDashboardPage() {
                 )}
               </div>
 
-              {/* Bottom Actions */}
               <div className="flex items-center space-x-2 pt-2 border-t border-slate-100 dark:border-white/[0.08]">
                 <Link href="/dashboard/projects">
                   <button
@@ -650,16 +593,6 @@ export default function UnifiedDashboardPage() {
                     <span>Log project</span>
                   </button>
                 </Link>
-
-                <a
-                  href="https://github.com/mayankjain92/prep-os"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-neutral-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] border border-slate-200 dark:border-white/[0.08] hover:border-slate-300 dark:hover:border-white/[0.12] rounded-lg transition-colors"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
-                  <span>GitHub synced</span>
-                </a>
               </div>
             </div>
           </section>

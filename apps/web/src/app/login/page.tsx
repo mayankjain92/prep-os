@@ -48,7 +48,6 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Google & GitHub Social Buttons */}
           <SocialAuthButtons onError={(err) => setError(err)} />
 
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -12,47 +12,63 @@ The codebase strictly follows a **Feature-Sliced Architecture** pattern. Feature
 apps/web/src/
 ├── app/                          # Next.js App Router (pages & layouts only)
 │   ├── dashboard/
+│   │   ├── layout.tsx            # Protected dashboard shell & client auth route guard
 │   │   ├── doubts/page.tsx       # Dedicated revision & blocker target queue
 │   │   ├── dsa/page.tsx          # NeetCode 150 & topic roadmaps
 │   │   ├── profile/page.tsx      # Heatmap calendar & shareable card generator
 │   │   ├── projects/page.tsx     # Portfolio planner & GitHub repository sync
 │   │   └── theory/page.tsx       # CS Theory roadmaps (OS, DBMS, CN, OOP, Aptitude)
-│   └── layout.tsx                # App shell (QueryProvider, ThemeProvider, AuthProvider)
+│   ├── (auth)/                   # Authentication pages (login, register)
+│   └── layout.tsx                # App root shell (QueryProvider, ThemeProvider, AuthProvider)
 │
-├── features/                     # Self-contained domain modules
+├── features/                     # Self-contained domain modules (Vertical Slices)
 │   ├── agent/                    # AI Copilot API & expandable IDE reader
 │   │   ├── api.ts
 │   │   └── components/AgentCopilot.tsx
 │   ├── auth/                     # Authentication context & session state
 │   │   └── AuthContext.tsx
-│   ├── doubts/                   # Doubts queue, target revision & logging popup
+│   ├── doubts/                   # Doubts queue, target revision & logging modal
 │   │   ├── api.ts
 │   │   ├── useDoubts.ts
-│   │   └── components/DoubtSection.tsx
+│   │   └── components/
+│   │       ├── DoubtSection.tsx
+│   │       ├── DoubtCard.tsx
+│   │       └── DoubtFormModal.tsx
 │   ├── dsa/                      # NeetCode 150 & LeetCode profile integration
 │   │   ├── api.ts
 │   │   ├── useProblems.ts
-│   │   └── components/Neetcode150Section.tsx
+│   │   └── components/
+│   │       ├── Neetcode150Section.tsx
+│   │       ├── NeetCodeCategoryGroup.tsx
+│   │       └── NeetCodeFilters.tsx
 │   ├── profile/                  # Profile dropdown, handle claim, heatmap & cards
 │   │   └── components/
 │   │       ├── ProfileDropdown.tsx
 │   │       ├── SetUsernameModal.tsx
 │   │       ├── LoginHeatmap.tsx
 │   │       └── ShareableProgressCard.tsx
-│   ├── projects/                 # Portfolio projects & GitHub sync modal
+│   ├── projects/                 # Portfolio projects & GitHub sync
 │   │   ├── api.ts
 │   │   ├── useProjects.ts
-│   │   └── components/GitHubSyncModal.tsx
-│   └── roadmap/                  # Visual roadmap flowcharts & decoupled types
+│   │   └── components/
+│   │       ├── ProjectCard.tsx
+│   │       ├── ProjectFormModal.tsx
+│   │       └── GitHubSyncModal.tsx
+│   └── roadmap/                  # Visual roadmap flowcharts & graph algorithms
 │       ├── api.ts
 │       ├── types.ts              # Domain types (RoadmapNodeItem, RoadmapSection)
-│       ├── useRoadmap.ts
+│       ├── tree-algorithms.ts    # Recursive graph cascade, rollup & cycle algorithms
+│       ├── useRoadmap.ts         # Server progress query & mutation hook
+│       ├── useRoadmapTree.ts     # Client tree selection & filter state hook
 │       └── components/
 │           ├── RoadmapFlowChart.tsx
+│           ├── RoadmapToolbar.tsx
+│           ├── RoadmapNode.tsx
+│           ├── NodeDetailsModal.tsx
 │           └── RoadmapTreePreview.tsx
 │
 ├── components/                   # Domain-agnostic UI only
-│   ├── ui/                       # Design system primitives (Button, Input, Badge)
+│   ├── ui/                       # Design system primitives (Button, Input, Badge, Modal, CustomSelect)
 │   ├── providers/                # ThemeProvider, QueryProvider
 │   └── shared/                   # Logo, ThemeToggle, AnimatedEmblem, PageTransition
 │

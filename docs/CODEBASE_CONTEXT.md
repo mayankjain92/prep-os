@@ -119,37 +119,27 @@ Request ──► Middleware (CORS, CookieParser, CSRF, Auth, Validation) ──
 
 ### Feature-Sliced Structure (`src/features/`)
 * `features/agent/`: AI Copilot API client (`api.ts`) & Expandable IDE reader drawer (`components/AgentCopilot.tsx`).
-* `features/doubts/`: Doubts data layer (`api.ts`, `useDoubts.ts`) & full revision UI (`components/DoubtSection.tsx`).
-* `features/dsa/`: Problems API (`api.ts`, `useProblems.ts`) & NeetCode 150 component (`components/Neetcode150Section.tsx`).
+* `features/doubts/`: Doubts data layer (`api.ts`, `useDoubts.ts`) & modular revision UI (`components/DoubtSection.tsx`, `components/DoubtCard.tsx`, `components/DoubtFormModal.tsx`).
+* `features/dsa/`: Problems API (`api.ts`, `useProblems.ts`) & modular checklist UI (`components/Neetcode150Section.tsx`, `components/NeetCodeCategoryGroup.tsx`, `components/NeetCodeFilters.tsx`).
 * `features/profile/`: Profile UI slices (`components/ProfileDropdown.tsx`, `components/SetUsernameModal.tsx`, `components/LoginHeatmap.tsx`, `components/ShareableProgressCard.tsx`).
-* `features/projects/`: Project planner API & GitHub sync modal (`components/GitHubSyncModal.tsx`).
-* `features/roadmap/`: FlowChart & Tree components, hooks, and decoupled types (`types.ts`).
+* `features/projects/`: Project planner API & modular portfolio UI (`components/ProjectCard.tsx`, `components/ProjectFormModal.tsx`, `components/GitHubSyncModal.tsx`).
+* `features/roadmap/`: Pure recursive graph algorithms (`tree-algorithms.ts`), tree state hook (`useRoadmapTree.ts`), flowchart & preview components (`RoadmapFlowChart.tsx`, `RoadmapToolbar.tsx`, `RoadmapNode.tsx`, `NodeDetailsModal.tsx`, `RoadmapTreePreview.tsx`), server hook (`useRoadmap.ts`), and decoupled types (`types.ts`).
 * `features/auth/`: Global auth context & token management (`AuthContext.tsx`).
+* `components/ui/`: Reusable accessible primitives (`modal.tsx`, `custom-select.tsx`, `button.tsx`, `input.tsx`, `badge.tsx`).
 
 ---
 
-## 5. Major "AI Code Smells" & Improvement Backlog
+## 5. Architectural Improvements & Refactoring Log
 
-### Backend (`apps/api`)
-1. **Database Writes on `GET` Requests (Critical Anti-Pattern)**:
-   * `listTheoryTopics` and `listProblems` auto-insert standard roadmap documents on simple `GET` requests. In REST, `GET` requests must be strictly read-only and idempotent.
-2. **Inconsistent Validation Strategy**:
-   * Zod schemas exist in `@prep-os/shared`, but controllers either do manual `safeParse` boilerplate or bypass validation completely (`req.body` directly passed to `Model.create()`). The clean `validate.ts` middleware is neglected.
-3. **TypeScript Escapes (`userId as any`)**:
-   * In `problemControllers.ts`, `userId as any` is used because Mongoose types `userId: Types.ObjectId` while `req.userId` is `string`.
-4. **Naming Inconsistencies**:
-   * `ProblemRoutes.ts` (PascalCase) vs `authRoutes.ts` (camelCase).
-   * `problemControllers.ts` (plural) vs `doubtController.ts` (singular).
-5. **Dead Code**:
-   * `apps/api/src/middleware/auth.stub.ts` is abandoned and unused.
-6. **Hardcoded Secrets**:
-   * Fallback JWT secret `"prep-os-super-secret-key-12345"` duplicated across files instead of a central configuration module.
+### Frontend Refactoring Status (Completed ✅)
+1. **Modularized Monolithic Components**: Decomposed previously monolithic components into single-responsibility sub-components (`DoubtCard`, `DoubtFormModal`, `NeetCodeCategoryGroup`, `NeetCodeFilters`, `ProjectCard`, `ProjectFormModal`, `RoadmapNode`, `RoadmapToolbar`).
+2. **Accessible UI Primitives**: Extracted accessible `Modal` (backdrop click, escape dismiss, body scroll lock) and `CustomSelect` (keyboard friendly, outside-click close, colored badges) to replace native unstyled selects.
+3. **Decoupled Recursive Graph Logic**: Extracted pure tree traversal algorithms (`cascadeStatusDown`, `rollupStatusUp`, `cycleNodeStatus`, `calculateTreeProgress`) into `tree-algorithms.ts` with custom hook `useRoadmapTree.ts`.
+4. **Clean Code & Zero Clutter**: Cleaned up excessive AI comments and dividers while preserving true technical documentation.
+5. **Decoupled Auth Protection**: Protected dashboard pages via client-side `DashboardLayout` route guard with loading spinner, keeping frontend decoupled from cross-origin cookie scoping issues.
 
-### Frontend (`apps/web`)
-1. **React 19 / Hooks Violations**:
-   * **Synchronous `setState` in `useEffect`**: In `ThemeProvider.tsx`, `AuthContext.tsx`, and `register/page.tsx`, causing cascading re-renders.
-   * **Render Impurity**: In `dashboard/page.tsx`, `totalDsaNodes += tot` mutates a local variable across render loops.
-2. **Performance (LCP / Core Web Vitals)**:
-   * Raw `<img>` elements used in 12+ components instead of Next.js `<Image />`.
-3. **Bundle Optimization**:
-   * Over 20 unused icon imports from `lucide-react`.
+### Backend Refactoring Opportunities (`apps/api`)
+1. **Validation Strategy**: Standardize controllers to utilize `validate.ts` middleware with `@prep-os/shared` schemas across all endpoints.
+2. **TypeScript Typing**: Replace remaining `userId as any` with typed `Types.ObjectId` conversions.
+3. **Naming Consistency**: Standardize route and controller file naming (e.g., singular vs plural).
+4. **Dead Code Cleanup**: Remove unused stubs.

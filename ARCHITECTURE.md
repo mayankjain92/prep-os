@@ -25,7 +25,7 @@ graph TB
     end
     
     subgraph UIPrimitives ["Shared & Primitives (src/components/)"]
-      UI_P["components/ui (Button, Input, Badge)"]
+      UI_P["components/ui (Button, Input, Badge, Modal, CustomSelect)"]
       UI_Prov["components/providers (Theme, Query)"]
       UI_Shared["components/shared (Logo, Emblem, Nav)"]
     end
@@ -108,21 +108,22 @@ graph TD
 
   subgraph FeatureLayer ["Domain Feature Slices (apps/web/src/features/)"]
     subgraph Feat_DSA ["features/dsa/"]
-      DSA_UI["components/Neetcode150Section.tsx"]
+      DSA_UI["components/Neetcode150Section.tsx<br/>components/NeetCodeCategoryGroup.tsx<br/>components/NeetCodeFilters.tsx"]
       DSA_Hooks["useProblems.ts"]
       DSA_API["api.ts"]
     end
     
     subgraph Feat_Doubts ["features/doubts/"]
-      Doubt_UI["components/DoubtSection.tsx"]
+      Doubt_UI["components/DoubtSection.tsx<br/>components/DoubtCard.tsx<br/>components/DoubtFormModal.tsx"]
       Doubt_Hooks["useDoubts.ts"]
       Doubt_API["api.ts"]
     end
 
     subgraph Feat_Roadmap ["features/roadmap/"]
-      Roadmap_UI["components/RoadmapFlowChart.tsx<br/>components/RoadmapTreePreview.tsx"]
+      Roadmap_UI["components/RoadmapFlowChart.tsx<br/>components/RoadmapToolbar.tsx<br/>components/RoadmapNode.tsx<br/>components/NodeDetailsModal.tsx<br/>components/RoadmapTreePreview.tsx"]
+      Roadmap_Algo["tree-algorithms.ts"]
       Roadmap_Types["types.ts"]
-      Roadmap_Hooks["useRoadmap.ts"]
+      Roadmap_Hooks["useRoadmap.ts<br/>useRoadmapTree.ts"]
       Roadmap_API["api.ts"]
     end
 
@@ -136,14 +137,14 @@ graph TD
     end
 
     subgraph Feat_Projects ["features/projects/"]
-      Proj_UI["components/GitHubSyncModal.tsx"]
+      Proj_UI["components/ProjectCard.tsx<br/>components/ProjectFormModal.tsx<br/>components/GitHubSyncModal.tsx"]
       Proj_Hooks["useProjects.ts"]
       Proj_API["api.ts"]
     end
   end
 
   subgraph SharedLayer ["Design Primitives & Providers (apps/web/src/components/)"]
-    UI_Primitives["components/ui/<br/>• Button, Input, Badge"]
+    UI_Primitives["components/ui/<br/>• Button, Input, Badge<br/>• Modal, CustomSelect"]
     Providers["components/providers/<br/>• ThemeProvider<br/>• QueryProvider"]
     Shared_Widgets["components/shared/<br/>• Logo, AnimatedEmblem<br/>• PageTransition, ThemeToggle"]
   end

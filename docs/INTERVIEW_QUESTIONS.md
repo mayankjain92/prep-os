@@ -84,6 +84,12 @@ Storing JWTs in `localStorage` leaves tokens vulnerable to **Cross-Site Scriptin
 * **Testing Fallback:** The backend middleware checks `req.cookies.token` first, with an explicit fallback to `Authorization: Bearer <token>` for automated CLI and Vitest test suites.
 * **CSRF Defense:** State-mutating requests (`POST`, `PUT`, `DELETE`) require custom headers (`x-requested-with` or origin matching), preventing unauthorized cross-origin requests.
 
+### Q4.2: In a decoupled architecture (e.g. Next.js on Vercel and Express on Render), why does a Next.js Server Middleware cookie check fail in production while working locally?
+**Answer:**  
+* **Localhost Port-Agnostic Behavior (RFC 6265 §8.5):** In local development (`http://localhost:3000` and `http://localhost:4000`), both services share the hostname `localhost`. Under RFC 6265, cookies do not isolate by port number. Therefore, when Express on port 4000 sets a cookie, the browser attaches it to port 3000 as well, allowing Next.js server middleware to read it.
+* **Production Cross-Origin Scoping:** In production, frontend (`prep-os.vercel.app`) and backend (`prep-os-api.onrender.com`) are distinct domains. The browser associates the backend's `Set-Cookie` strictly with `onrender.com`. When the user navigates to `/dashboard` on `vercel.app`, the browser only attaches cookies scoped to `vercel.app`.
+* **The Resolution:** Edge/server middleware on the frontend domain cannot read cookies set on an external backend domain. Route protection is either handled client-side via layout session guards (`DashboardLayout` + `AuthContext`), or by proxying API calls through Next.js rewrites so frontend and backend share the same origin.
+
 ---
 
 ## Category 5: Monorepo Architecture

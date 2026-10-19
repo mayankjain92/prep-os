@@ -36,7 +36,7 @@ graph TB
     direction TB
     AppRouter["App Router (app/)<br/>• /dashboard/dsa<br/>• /dashboard/doubts<br/>• /dashboard/theory<br/>• /dashboard/projects<br/>• /dashboard/profile"]
     FeatureSlices["Feature Slices (src/features/)<br/>• dsa • doubts • roadmap<br/>• profile • agent • projects • auth"]
-    UIPrimitives["Shared & Primitives (src/components/)<br/>• ui/ (Button, Input, Badge)<br/>• providers/ (Theme, Query)<br/>• shared/ (Logo, Emblem, Nav)"]
+    UIPrimitives["Shared & Primitives (src/components/)<br/>• ui/ (Button, Input, Badge, Modal, CustomSelect)<br/>• providers/ (Theme, Query)<br/>• shared/ (Logo, Emblem, Nav)"]
     
     AppRouter --> FeatureSlices
     FeatureSlices --> UIPrimitives

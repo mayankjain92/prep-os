@@ -1,7 +1,7 @@
 # Prep OS — Codebase Architecture & Context Guide
 
 > **Instant Context Document**  
-> *Purpose:* Provides a dense, token-efficient reference for the entire Prep OS monorepo. Use this guide to understand data flows, component relationships, and key architectural decisions for interviews and refactoring.
+> *Purpose:* Provides a dense, token-efficient reference for the entire Prep OS monorepo. Use this guide to understand data flows, component relationships, and key architectural decisions for onboarding and refactoring.
 
 ---
 

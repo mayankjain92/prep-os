@@ -19,7 +19,7 @@
 - 🧠 **DSA Problem Tracker & NeetCode 150:** Full lifecycle tracking with difficulty filters, topic roadmaps, NeetCode 150 interactive checklist, and LeetCode profile synchronization.
 - 🤖 **Autonomous AI Copilot (ReAct Agent):** Integrated AI mentor powered by Google Gemini 2.5 Flash Lite (`@google/genai`). Performs live database telemetry audits, cross-references CS Theory and DSA progress, auto-syncs live LeetCode stats, and mutates MongoDB state (logging doubts) with a macOS Genie Lamp animated UI drawer.
 - ⚡ **High-Performance Architecture:** Implements a Redis Cache-Aside pattern for LeetCode synchronization with automatic fallbacks and write-through invalidation.
-- 📊 **Theory Aggregation Engine:** Leverages MongoDB aggregation pipelines to dynamically compute progress percentages across core CS subjects (OS, DBMS, CN, OOP, Aptitude).
+- 📊 **Interactive CS Theory & DSA Roadmaps:** Tree-structured roadmap navigation with recursive node status roll-ups (pending / in-progress / done) dynamically computed across core CS subjects (OS, DBMS, CN, OOP, Aptitude).
 - 🎨 **Accessibility & Design System:** WCAG AA contrast compliant dark/light themes, card layering hierarchy, project tag management, and 6-month activity heatmaps.
 - 🔒 **Secure Authentication:** HttpOnly cookie-based session management with JWT, bcrypt password hashing, CSRF defense, and strict user-tenant data isolation.
 - 📈 **Unified Analytics Dashboard:** Modern responsive dashboard powered by Next.js App Router, Recharts, Framer Motion, and Lucide React.
@@ -99,7 +99,7 @@ graph TB
 - **Containerization:** Docker & Docker Compose
 - **CI/CD:** GitHub Actions
 
-> 📖 **Read more about architectural decisions in [ARCHITECTURE.md](./ARCHITECTURE.md) and prepare for campus rounds with the [Master Interview Guide](./docs/INTERVIEW_QUESTIONS.md).**
+> 📖 **Read more about architectural decisions in [ARCHITECTURE.md](./ARCHITECTURE.md) and storage design in [STORAGE_ARCHITECTURE.md](./docs/STORAGE_ARCHITECTURE.md).**
 
 ---
 
@@ -165,7 +165,7 @@ prep-os/
 │       └── src/data/   # Static curricula (neetcode150, dsa-roadmap, theory-roadmap)
 ├── packages/
 │   └── shared/         # Shared Zod validation schemas & TypeScript types
-├── docs/               # Architecture audits, system design reports & checklists
+├── docs/               # Storage architecture guides & codebase context references
 ├── ARCHITECTURE.md     # In-depth technical rationale & storage design
 ├── docker-compose.yml  # Multi-container orchestration (API, Web, Mongo, Redis)
 └── pnpm-workspace.yaml # Monorepo workspace configuration

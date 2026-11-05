@@ -224,13 +224,13 @@ In a multi-tenant SaaS application, preventing cross-tenant data leaks and keepi
 
 ---
 
-## 5. Architectural FAQ & Interview Guide 🌟
+## 5. Architectural FAQ & Design Rationale
 
-### Q1: *"Why not store the entire roadmap tree inside MongoDB?"*
-> **Answer:** *"Storing static curriculum trees in the database creates schema rigidity, inflates database size, and forces database migrations whenever curriculum is edited. By using the **Sparse State** pattern, static content is bundled and served at the edge by Next.js, while MongoDB only stores small mutation overrides (`done`/`in-progress`). A brand new user takes 0 extra bytes."*
+### Q1: Why not store the entire roadmap tree inside MongoDB?
+**Rationale:** Storing static curriculum trees in the database creates schema rigidity, inflates database size, and forces database migrations whenever curriculum is edited. By using the **Sparse State** pattern, static content is bundled and served at the edge by Next.js, while MongoDB only stores small mutation overrides (`done`/`in-progress`). A brand new user takes 0 extra bytes.
 
-### Q2: *"Why embed NeetCode progress on the User document instead of a separate collection?"*
-> **Answer:** *"The 1:1 relationship between a user and their personal NeetCode checklist is read on almost every authenticated session. Embedding `{ solved: [], starred: [] }` on the `User` avoids an additional database query join, ensuring profile loads complete in a single round-trip."*
+### Q2: Why embed NeetCode progress on the User document instead of a separate collection?
+**Rationale:** The 1:1 relationship between a user and their personal NeetCode checklist is read on almost every authenticated session. Embedding `{ solved: [], starred: [] }` on the `User` avoids an additional database query join, ensuring profile loads complete in a single round-trip.
 
-### Q3: *"How do you handle Redis cache failures in production?"*
-> **Answer:** *"We use the **Cache-Aside with Graceful Degradation** pattern. If Redis crashes or fails to connect, the application catches the event, logs a warning, and falls back to querying the external service directly. The user experience remains uninterrupted."*
+### Q3: How do you handle Redis cache failures in production?
+**Rationale:** We use the **Cache-Aside with Graceful Degradation** pattern. If Redis crashes or fails to connect, the application catches the event, logs a warning, and falls back to querying the external service directly. The user experience remains uninterrupted.

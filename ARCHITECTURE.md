@@ -6,7 +6,7 @@ This document outlines key technical decisions and architectural patterns implem
 
 ## 1. System-Level Architecture Overview
 
-Prep OS is designed as a distributed, high-throughput monorepo platform connecting student client interfaces, an Express API gateway, intelligent caching, deterministic datastores, and an autonomous AI agent reasoning loop.
+Prep OS is designed as a fullstack monorepo platform connecting a Next.js client interface with an Express API backend, Redis caching layer, MongoDB datastore, and an integrated AI copilot reasoning loop.
 
 ```mermaid
 graph TB

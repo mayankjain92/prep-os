@@ -6,6 +6,6 @@
     "dev:web": "pnpm --filter @prep-os/web dev",
     "dev:api": "pnpm --filter @prep-os/api dev",
     "start:api": "pnpm --filter @prep-os/api start",
-    "build": "pnpm -r build"
+    "build": "pnpm -r --workspace-concurrency=1 build"
   }
 }

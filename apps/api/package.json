@@ -7,6 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "tsx src/index.ts",
+    "pretest": "pnpm --filter @prep-os/shared build",
     "test": "vitest run src"
   },
   "keywords": [],

@@ -19,7 +19,6 @@ app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Lightweight CSRF defense for state-mutating requests
 app.use((req, res, next) => {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
     return next();
@@ -31,10 +30,8 @@ app.use((req, res, next) => {
   return res.status(403).json({ error: "Cross-site request blocked" });
 });
 
-// Auth routes (Public)
 app.use("/api/auth", authRoutes);
 
-// Health check (Public / Auth optional) - Supports both /health and /api/health
 app.get(["/health", "/api/health"], (req, res) => {
   res.status(200).json({
     status: "ok",
@@ -43,7 +40,6 @@ app.get(["/health", "/api/health"], (req, res) => {
   });
 });
 
-// Protected routes (require authMiddleware)
 app.use("/api/problems", authMiddleware, problemRoutes);
 app.use("/api/projects", authMiddleware, projectRoutes);
 app.use("/api/doubts", authMiddleware, doubtRoutes);

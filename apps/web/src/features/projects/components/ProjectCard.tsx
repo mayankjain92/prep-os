@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Code, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { safeExternalUrl } from "@/lib/utils";
 import type { ProjectItem } from "../api";
 
 export interface ProjectCardProps {
@@ -38,9 +39,9 @@ export function ProjectCard({
               <Code className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
               <span className="truncate">{project.name}</span>
             </h3>
-            {project.repoUrl && (
+            {safeExternalUrl(project.repoUrl) && (
               <a
-                href={project.repoUrl}
+                href={safeExternalUrl(project.repoUrl)!}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-1 inline-flex items-center text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 font-mono transition-colors"
@@ -57,7 +58,11 @@ export function ProjectCard({
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 capitalize ${
               project.status === "completed"
                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                : "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20"
+                : project.status === "planning"
+                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                  : project.status === "archived"
+                    ? "bg-slate-500/10 text-slate-600 dark:text-neutral-400 border border-slate-500/20"
+                    : "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20"
             }`}
           >
             {project.status.replace("-", " ")}
@@ -71,11 +76,14 @@ export function ProjectCard({
         )}
 
         <div className="flex flex-wrap items-center gap-1.5 pt-1">
-          {project.techStack && project.techStack.length > 0 && (
-            <span className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 text-[11px] font-mono font-medium text-sky-600 dark:text-sky-400">
-              {project.techStack[0]}
+          {(project.techStack || []).map((stack) => (
+            <span
+              key={stack}
+              className="rounded-md bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 text-[11px] font-mono font-medium text-sky-600 dark:text-sky-400"
+            >
+              {stack}
             </span>
-          )}
+          ))}
 
           {(project.customTags || []).map((tech: string) => (
             <span

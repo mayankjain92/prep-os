@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { BookOpen, Sparkles } from "lucide-react";
 import { NEETCODE_150_PROBLEMS, NeetcodeProblem } from "@/data/neetcode150";
 import { useAuth } from "@/features/auth/AuthContext";
@@ -24,6 +24,9 @@ export function Neetcode150Section() {
 
   const [solvedMap, setSolvedMap] = useState<Record<string, boolean>>({});
   const [starredMap, setStarredMap] = useState<Record<string, boolean>>({});
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const solvedRef = useRef<Record<string, boolean>>({});
+  const starredRef = useRef<Record<string, boolean>>({});
   const [openTopics, setOpenTopics] = useState<Record<string, boolean>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -35,36 +38,36 @@ export function Neetcode150Section() {
   // Initial load from user profile (MongoDB) & localStorage fallback
   useEffect(() => {
     try {
-      const savedSolved = localStorage.getItem(solvedKey);
-      const localSolved: Record<string, boolean> = savedSolved ? JSON.parse(savedSolved) : {};
+      let nextSolved: Record<string, boolean> = {};
+      let nextStarred: Record<string, boolean> = {};
 
-      const savedStarred = localStorage.getItem(starredKey);
-      const localStarred: Record<string, boolean> = savedStarred ? JSON.parse(savedStarred) : {};
-
-      const mergedSolved: Record<string, boolean> = { ...localSolved };
-      const mergedStarred: Record<string, boolean> = { ...localStarred };
-
-      // Load DB progress from user profile
       if (user?.neetcodeProgress) {
         if (Array.isArray(user.neetcodeProgress.solved)) {
           user.neetcodeProgress.solved.forEach((id) => {
-            mergedSolved[id] = true;
+            nextSolved[id] = true;
           });
         }
         if (Array.isArray(user.neetcodeProgress.starred)) {
           user.neetcodeProgress.starred.forEach((id) => {
-            mergedStarred[id] = true;
+            nextStarred[id] = true;
           });
         }
+      } else {
+        const savedSolved = localStorage.getItem(solvedKey);
+        nextSolved = savedSolved ? JSON.parse(savedSolved) : {};
+        const savedStarred = localStorage.getItem(starredKey);
+        nextStarred = savedStarred ? JSON.parse(savedStarred) : {};
       }
 
+      solvedRef.current = nextSolved;
+      starredRef.current = nextStarred;
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSolvedMap(mergedSolved);
-      setStarredMap(mergedStarred);
+      setSolvedMap(nextSolved);
+      setStarredMap(nextStarred);
 
       if (userId && userId !== "guest") {
-        localStorage.setItem(solvedKey, JSON.stringify(mergedSolved));
-        localStorage.setItem(starredKey, JSON.stringify(mergedStarred));
+        localStorage.setItem(solvedKey, JSON.stringify(nextSolved));
+        localStorage.setItem(starredKey, JSON.stringify(nextStarred));
       }
     } catch (e) {
       console.error("Failed to load NeetCode 150 state:", e);
@@ -82,10 +85,12 @@ export function Neetcode150Section() {
     const prob = NEETCODE_150_PROBLEMS.find((p) => p.id === id);
     if (!prob) return;
 
-    const nextSolvedState = !solvedMap[id];
-    const newSolvedMap = { ...solvedMap, [id]: nextSolvedState };
+    const prevSolvedMap = solvedRef.current;
+    const nextSolvedState = !prevSolvedMap[id];
+    const newSolvedMap = { ...prevSolvedMap, [id]: nextSolvedState };
 
-    // 1. Optimistic Local Update
+    setSaveError(null);
+    solvedRef.current = newSolvedMap;
     setSolvedMap(newSolvedMap);
     localStorage.setItem(solvedKey, JSON.stringify(newSolvedMap));
 
@@ -97,13 +102,16 @@ export function Neetcode150Section() {
       });
     }
 
-    // 2. Direct Backend Persistence
-    const solvedList = getActiveArray(newSolvedMap);
-    const starredList = getActiveArray(starredMap);
     try {
-      await saveNeetcode.mutateAsync({ solved: solvedList, starred: starredList });
-    } catch (err) {
-      console.error("Failed to save NeetCode progress:", err);
+      await saveNeetcode.mutateAsync({
+        solved: getActiveArray(newSolvedMap),
+        starred: getActiveArray(starredRef.current),
+      });
+    } catch {
+      solvedRef.current = prevSolvedMap;
+      setSolvedMap(prevSolvedMap);
+      localStorage.setItem(solvedKey, JSON.stringify(prevSolvedMap));
+      setSaveError("Failed to save progress. Please try again.");
     }
   };
 
@@ -113,10 +121,12 @@ export function Neetcode150Section() {
     const prob = NEETCODE_150_PROBLEMS.find((p) => p.id === id);
     if (!prob) return;
 
-    const nextStarredState = !starredMap[id];
-    const newStarredMap = { ...starredMap, [id]: nextStarredState };
+    const prevStarredMap = starredRef.current;
+    const nextStarredState = !prevStarredMap[id];
+    const newStarredMap = { ...prevStarredMap, [id]: nextStarredState };
 
-    // 1. Optimistic Local Update
+    setSaveError(null);
+    starredRef.current = newStarredMap;
     setStarredMap(newStarredMap);
     localStorage.setItem(starredKey, JSON.stringify(newStarredMap));
 
@@ -127,13 +137,16 @@ export function Neetcode150Section() {
       });
     }
 
-    // 2. Direct Backend Persistence
-    const solvedList = getActiveArray(solvedMap);
-    const starredList = getActiveArray(newStarredMap);
     try {
-      await saveNeetcode.mutateAsync({ solved: solvedList, starred: starredList });
-    } catch (err) {
-      console.error("Failed to save NeetCode starred progress:", err);
+      await saveNeetcode.mutateAsync({
+        solved: getActiveArray(solvedRef.current),
+        starred: getActiveArray(newStarredMap),
+      });
+    } catch {
+      starredRef.current = prevStarredMap;
+      setStarredMap(prevStarredMap);
+      localStorage.setItem(starredKey, JSON.stringify(prevStarredMap));
+      setSaveError("Failed to save starred state. Please try again.");
     }
   };
 
@@ -260,6 +273,11 @@ export function Neetcode150Section() {
 
   return (
     <div className="space-y-6">
+      {saveError && (
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-2.5 text-xs font-medium text-rose-600 dark:text-rose-400">
+          {saveError}
+        </div>
+      )}
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

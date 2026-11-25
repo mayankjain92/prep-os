@@ -19,8 +19,12 @@ export async function recordDailyLogin(user: IUser): Promise<IUser> {
 
   const lastDate = new Date(user.lastLoginDate);
   const currentDate = new Date(todayStr);
-  const diffTime = Math.abs(currentDate.getTime() - lastDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffTime = currentDate.getTime() - lastDate.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays <= 0) {
+    return user;
+  }
 
   if (diffDays === 1) {
     user.currentStreak = (user.currentStreak || 0) + 1;

@@ -5,7 +5,11 @@ import { useAuth } from "@/features/auth/AuthContext";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { LoginHeatmap } from "@/features/profile/components/LoginHeatmap";
 import { ShareableProgressCard } from "@/features/profile/components/ShareableProgressCard";
-import { useLeetCodeProfile, useSyncLeetCode } from "@/features/dsa/useProblems";
+import {
+  useLeetCodeProfile,
+  useSyncLeetCode,
+  useDisconnectLeetCode,
+} from "@/features/dsa/useProblems";
 import {
   Sun,
   Moon,
@@ -32,7 +36,8 @@ export default function ProfilePage() {
 
   const { data: dbLeetcodeProfile } = useLeetCodeProfile();
   const syncMutation = useSyncLeetCode();
-  const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
+  const disconnectMutation = useDisconnectLeetCode();
+  const activeProfile = dbLeetcodeProfile;
 
   const [customInput, setCustomInput] = useState<string | null>(null);
   const handleInput = customInput ?? (activeProfile?.username || "");
@@ -162,11 +167,6 @@ export default function ProfilePage() {
                   <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />
                   {user.authProvider ? `${user.authProvider.charAt(0).toUpperCase() + user.authProvider.slice(1)} Verified` : "Google Verified"}
                 </span>
-                <span>•</span>
-                <span className="inline-flex items-center gap-1 text-slate-700 dark:text-neutral-300 font-medium">
-                  <GitBranch className="w-3.5 h-3.5 text-amber-500" />
-                  GitHub Synced
-                </span>
               </div>
             </div>
           </div>
@@ -252,6 +252,24 @@ export default function ProfilePage() {
                   />
                   <span>{syncMutation.isPending ? "Syncing..." : "Sync"}</span>
                 </button>
+                {activeProfile?.username && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      disconnectMutation.mutate(undefined, {
+                        onSuccess: () => {
+                          setCustomInput("");
+                          posthog.capture("leetcode_profile_disconnected");
+                        },
+                      });
+                    }}
+                    disabled={disconnectMutation.isPending}
+                    className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-semibold text-xs rounded-xl transition-all flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                    title="Unlink LeetCode account"
+                  >
+                    <span>{disconnectMutation.isPending ? "Unlinking..." : "Disconnect"}</span>
+                  </button>
+                )}
               </div>
 
               {syncMutation.isError && (
@@ -260,9 +278,20 @@ export default function ProfilePage() {
                   <span>Failed to sync LeetCode profile. Please check the handle.</span>
                 </div>
               )}
+              {disconnectMutation.isError && (
+                <div className="flex items-center gap-1.5 text-xs text-rose-500 dark:text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>Failed to disconnect LeetCode profile.</span>
+                </div>
+              )}
               {syncMutation.isSuccess && syncMutation.data && (
                 <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-2">
                   {syncMutation.data.message}
+                </div>
+              )}
+              {disconnectMutation.isSuccess && (
+                <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-2">
+                  LeetCode account unlinked successfully.
                 </div>
               )}
             </form>
@@ -306,9 +335,6 @@ export default function ProfilePage() {
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                       GitHub Repositories
                     </h3>
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                      Active
-                    </span>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-neutral-400">
                     Sync public GitHub repositories to showcase on your portfolio

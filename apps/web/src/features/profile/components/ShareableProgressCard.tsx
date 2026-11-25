@@ -47,7 +47,7 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
     return doneCount || user.stats?.theoryCompleted || 0;
   }, [theoryStatus, user.stats?.theoryCompleted]);
 
-  const projectsBuilt = user.stats?.projectsCompleted || user.stats?.projectsTotal || 0;
+  const projectsBuilt = user.stats?.projectsCompleted ?? 0;
 
   const leetcode = user.leetcodeProfile || {
     username: "",
@@ -58,10 +58,20 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
     ranking: 0,
   };
 
-  const totalLeetCodeSolved = leetcode.totalSolved || (dsaSolved * 2);
+  const totalLeetCodeSolved = leetcode.totalSolved || 0;
 
   const totalScore = streak * 3 + dsaSolved * 4 + totalLeetCodeSolved * 3 + theoryDone * 2 + projectsBuilt * 8;
-  const consistencyScore = Math.min(99, Math.max(78, Math.round(82 + (streak % 18))));
+  const consistencyScore = useMemo(() => {
+    const loginSet = new Set(user.loginDates || []);
+    const now = new Date();
+    const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    let activeLast30 = 0;
+    for (let i = 0; i < 30; i++) {
+      const dateStr = new Date(todayUtc - i * 86_400_000).toISOString().split("T")[0];
+      if (loginSet.has(dateStr)) activeLast30++;
+    }
+    return Math.min(100, Math.round((activeLast30 / 30) * 100));
+  }, [user.loginDates]);
   const level = Math.max(1, Math.floor(totalScore / 20));
 
   const getRankTitle = () => {
@@ -165,11 +175,15 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
   const currentTheme = themeStyles[selectedTheme];
   const isDarkCard = selectedTheme === "obsidian";
 
-  const handleCopyText = () => {
+  const handleCopyText = async () => {
     const text = `🚀 My Prep OS Progress Card:\n🔥 ${streak} Days Streak\n🧩 ${dsaSolved} Prep DSA | ⚡ ${totalLeetCodeSolved} LeetCode Solved\n📚 ${theoryDone} CS Theory | 🛠️ ${projectsBuilt} Projects\nRank: ${rank.title} (Level ${level})\nConsistency Rating: ${consistencyScore}%\n\nTrack your preparation with Prep OS!`;
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (e) {
+      console.warn("Clipboard write failed:", e);
+    }
   };
 
   const handleCopyCard = async () => {
@@ -337,7 +351,7 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                   <div className="relative">
                     <div className="h-11 w-11 rounded-xl bg-gradient-to-tr from-amber-400 via-amber-500 to-yellow-400 flex items-center justify-center font-black text-white text-base shadow-sm ring-2 ring-white">
                       {user.avatarUrl ? (
-                        <img src={user.avatarUrl} alt="Avatar" className="h-11 w-11 rounded-xl object-cover" />
+                        <img src={user.avatarUrl} alt="Avatar" crossOrigin="anonymous" className="h-11 w-11 rounded-xl object-cover" />
                       ) : (
                         user.email.charAt(0).toUpperCase()
                       )}
@@ -458,10 +472,10 @@ export function ShareableProgressCard({ user }: ShareableProgressCardProps) {
                   ) : (
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                       isDarkCard
-                        ? "text-amber-300 bg-amber-500/20 border border-amber-500/30"
-                        : "text-amber-950 bg-amber-100 border border-amber-300"
+                        ? "text-neutral-300 bg-white/10 border border-white/15"
+                        : "text-slate-700 bg-slate-100 border border-slate-300"
                     }`}>
-                      LeetCode Synced
+                      Not Linked
                     </span>
                   )}
                 </div>

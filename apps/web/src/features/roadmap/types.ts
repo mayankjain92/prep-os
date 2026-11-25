@@ -12,8 +12,4 @@ export interface RoadmapSection {
   description?: string;
   leftNodes?: RoadmapNodeItem[];
   rightNodes?: RoadmapNodeItem[];
-  subSections?: {
-    title: string;
-    nodes: RoadmapNodeItem[];
-  }[];
 }

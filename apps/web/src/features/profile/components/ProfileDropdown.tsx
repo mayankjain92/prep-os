@@ -24,7 +24,7 @@ export function ProfileDropdown() {
   const { theme, toggleTheme } = useTheme();
   const { data: dbLeetcodeProfile } = useLeetCodeProfile();
   const syncMutation = useSyncLeetCode();
-  const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
+  const activeProfile = dbLeetcodeProfile;
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -115,7 +115,7 @@ export function ProfileDropdown() {
             </div>
           </div>
 
-          {activeProfile?.username && (
+          {activeProfile?.username ? (
             <div className="mb-2 bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-xl p-2.5 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 min-w-0">
@@ -191,6 +191,23 @@ export function ProfileDropdown() {
                   </div>
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="mb-2 bg-slate-50 dark:bg-white/[0.03] border border-dashed border-slate-200 dark:border-white/[0.08] rounded-xl p-2.5 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Code2 className="w-4 h-4 text-sky-500 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-slate-800 dark:text-neutral-200">Connect LeetCode</p>
+                  <p className="text-[10px] text-slate-500 dark:text-neutral-400 truncate">Sync solved stats & rankings</p>
+                </div>
+              </div>
+              <Link
+                href="/dashboard/profile#integrations"
+                onClick={() => setIsOpen(false)}
+                className="text-xs font-medium text-sky-600 hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300 px-2 py-1 bg-sky-500/10 hover:bg-sky-500/15 rounded-lg border border-sky-500/20 shrink-0 transition-colors"
+              >
+                Connect →
+              </Link>
             </div>
           )}
 

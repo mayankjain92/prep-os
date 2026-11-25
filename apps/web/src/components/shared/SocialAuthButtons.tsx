@@ -138,7 +138,7 @@ export function SocialAuthButtons({ onError }: { onError?: (err: string) => void
   return (
     <div className="space-y-3">
       <div className="flex justify-center w-full">
-        <div ref={googleBtnRef} className="hidden sm:block w-full flex justify-center" />
+        <div ref={googleBtnRef} className="hidden sm:flex w-full justify-center" />
 
         <Button
           type="button"

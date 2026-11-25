@@ -14,14 +14,14 @@ export interface LeetCodeProfileStats {
 }
 
 export interface LeetCodeUserDataResult {
-  profile: LeetCodeProfileStats;
+  profile: LeetCodeProfileStats | null;
   fromCache?: boolean;
 }
 
 async function fetchFromExternalLeetCode(
   username: string,
 ): Promise<LeetCodeUserDataResult> {
-  let profileStats: LeetCodeProfileStats = {
+  const profileStats: LeetCodeProfileStats = {
     username,
     totalSolved: 0,
     easySolved: 0,
@@ -29,6 +29,7 @@ async function fetchFromExternalLeetCode(
     hardSolved: 0,
     ranking: 0,
   };
+  let fetched = false;
 
   try {
     const query = `
@@ -69,6 +70,7 @@ async function fetchFromExternalLeetCode(
       const data = await res.json();
       const user = data?.data?.matchedUser;
       if (user) {
+        fetched = true;
         profileStats.ranking = user.profile?.ranking || 0;
         profileStats.userAvatar = user.profile?.userAvatar || "";
         const acStats = user.submitStats?.acSubmissionNum || [];
@@ -88,15 +90,17 @@ async function fetchFromExternalLeetCode(
     );
   }
 
-  // Fallback to Alfa LeetCode API if totalSolved is still 0
-  if (profileStats.totalSolved === 0) {
+  // Fallback to Alfa LeetCode API if primary GraphQL did not return a user
+  if (!fetched) {
     try {
       const res = await fetch(
-        `https://alfa-leetcode-api.onrender.com/userProfile/${username}`,
+        `https://alfa-leetcode-api.onrender.com/userProfile/${encodeURIComponent(username)}`,
+        { signal: AbortSignal.timeout(6000) },
       );
       if (res.ok) {
         const data = await res.json();
         if (data && typeof data.totalSolved === "number") {
+          fetched = true;
           profileStats.totalSolved = data.totalSolved;
           profileStats.easySolved = data.easySolved || 0;
           profileStats.mediumSolved = data.mediumSolved || 0;
@@ -112,13 +116,16 @@ async function fetchFromExternalLeetCode(
     }
   }
 
-  return { profile: profileStats };
+  return { profile: fetched ? profileStats : null };
 }
 
 export async function getLeetCodeUserData(
   userId: string,
-  username: string = "demo",
+  username: string,
 ): Promise<LeetCodeUserDataResult> {
+  if (!username) {
+    return { profile: null };
+  }
   const cacheKey = `leetcode:${userId}:${username}`;
 
   try {
@@ -140,18 +147,20 @@ export async function getLeetCodeUserData(
   );
   const freshData = await fetchFromExternalLeetCode(username);
 
-  try {
-    await redis.set(
-      cacheKey,
-      JSON.stringify(freshData),
-      "EX",
-      CACHE_TTL_SECONDS,
-    );
-  } catch (err: any) {
-    console.warn(
-      `[cache warn] Redis write failed for ${cacheKey}:`,
-      err.message,
-    );
+  if (freshData.profile) {
+    try {
+      await redis.set(
+        cacheKey,
+        JSON.stringify(freshData),
+        "EX",
+        CACHE_TTL_SECONDS,
+      );
+    } catch (err: any) {
+      console.warn(
+        `[cache warn] Redis write failed for ${cacheKey}:`,
+        err.message,
+      );
+    }
   }
 
   return { ...freshData, fromCache: false };
@@ -159,8 +168,9 @@ export async function getLeetCodeUserData(
 
 export async function invalidateLeetCodeCache(
   userId: string,
-  username: string = "demo",
+  username: string,
 ): Promise<void> {
+  if (!username) return;
   const cacheKey = `leetcode:${userId}:${username}`;
   try {
     await redis.del(cacheKey);
@@ -176,11 +186,11 @@ export async function invalidateLeetCodeCache(
 export async function syncUserLeetCodeProfile(
   userId: string,
   username?: string,
-  force: boolean = true,
+  force: boolean = false,
 ): Promise<{ profile: LeetCodeProfileStats; synced: boolean; error?: string }> {
   try {
     const user = await User.findById(userId);
-    const targetUsername = username || user?.leetcodeProfile?.username;
+    const targetUsername = username?.trim() || user?.leetcodeProfile?.username;
     if (!targetUsername) {
       return {
         profile: user?.leetcodeProfile || {
@@ -216,8 +226,16 @@ export async function syncUserLeetCodeProfile(
     }
 
     return {
-      profile: user?.leetcodeProfile || dataResult.profile,
+      profile: user?.leetcodeProfile || {
+        username: targetUsername,
+        totalSolved: 0,
+        easySolved: 0,
+        mediumSolved: 0,
+        hardSolved: 0,
+        ranking: 0,
+      },
       synced: false,
+      error: "Could not fetch LeetCode profile. Please check the username.",
     };
   } catch (err: any) {
     console.warn(`[syncUserLeetCodeProfile] Sync failed:`, err.message);

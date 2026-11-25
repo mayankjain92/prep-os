@@ -49,7 +49,6 @@ export interface OAuthInput {
 
 interface AuthContextType {
   user: User | null;
-  token?: string | null;
   isLoading: boolean;
   login: (credentials: LoginInput) => Promise<void>;
   register: (credentials: RegisterInput) => Promise<void>;
@@ -180,7 +179,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        token: null,
         isLoading,
         login,
         register,

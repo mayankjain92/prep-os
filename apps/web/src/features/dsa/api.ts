@@ -34,6 +34,12 @@ export async function fetchLeetCodeProfile(): Promise<LeetCodeProfileStats | nul
   return res.profile;
 }
 
+export async function disconnectLeetCode(): Promise<{ message: string; profile: null }> {
+  return apiFetch<{ message: string; profile: null }>("/api/problems/leetcode-profile", {
+    method: "DELETE",
+  });
+}
+
 export interface NeetcodeProgressData {
   solved: string[];
   starred: string[];

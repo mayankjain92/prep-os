@@ -13,33 +13,31 @@ interface LoginHeatmapProps {
 export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak = 0 }: LoginHeatmapProps) {
   const [hoveredDay, setHoveredDay] = useState<{ dateStr: string; isActive: boolean; formatted: string } | null>(null);
 
-  // Compute active days set, automatically including streak days if loginDates array is sparse
+  // Compute active days set in UTC (matching backend streakService)
   const loginSet = useMemo(() => {
     const set = new Set(loginDates);
     if (currentStreak > 0) {
-      const today = new Date();
+      const now = new Date();
+      const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
       for (let i = 0; i < currentStreak; i++) {
-        const d = new Date(today);
-        d.setDate(today.getDate() - i);
+        const d = new Date(todayUtc - i * 86_400_000);
         set.add(d.toISOString().split("T")[0]);
       }
     }
     return set;
   }, [loginDates, currentStreak]);
 
-  // Generate 26 weeks (182 days) leading up to today (~6 months)
-  const { weeks, monthLabels, totalActiveDays } = useMemo(() => {
-    const today = new Date();
+  // Generate 26 weeks (182 days) leading up to today (~6 months) in UTC
+  const { weeks, monthLabels, totalActiveDays, rowLabels } = useMemo(() => {
+    const now = new Date();
+    const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
     const days: { dateStr: string; date: Date; isActive: boolean; formatted: string }[] = [];
 
-    // Calculate start date (182 days ago)
-    const startDate = new Date(today);
-    startDate.setDate(today.getDate() - 182);
+    const startUtc = todayUtc - 182 * 86_400_000;
 
     let activeCount = 0;
     for (let i = 0; i <= 182; i++) {
-      const d = new Date(startDate);
-      d.setDate(startDate.getDate() + i);
+      const d = new Date(startUtc + i * 86_400_000);
       const dateStr = d.toISOString().split("T")[0];
       const isActive = loginSet.has(dateStr);
       if (isActive) activeCount++;
@@ -49,6 +47,7 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
         month: "short",
         day: "numeric",
         year: "numeric",
+        timeZone: "UTC",
       });
 
       days.push({ dateStr, date: d, isActive, formatted });
@@ -66,11 +65,14 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
     let lastAddedIdx = -10;
     weekCols.forEach((w, idx) => {
       const firstDayInWeek = w[0].date;
-      const monthIdx = firstDayInWeek.getMonth();
+      const monthIdx = firstDayInWeek.getUTCMonth();
       if (monthIdx !== lastMonth) {
         if (idx - lastAddedIdx >= 3 || idx === 0) {
           months.push({
-            label: firstDayInWeek.toLocaleDateString("en-US", { month: "short" }),
+            label: firstDayInWeek.toLocaleDateString("en-US", {
+              month: "short",
+              timeZone: "UTC",
+            }),
             index: idx,
           });
           lastAddedIdx = idx;
@@ -79,7 +81,22 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
       }
     });
 
-    return { weeks: weekCols, monthLabels: months, totalActiveDays: activeCount };
+    const firstCol = weekCols[0] || [];
+    const labels = [1, 3, 5].map((rowIdx) =>
+      firstCol[rowIdx]
+        ? firstCol[rowIdx].date.toLocaleDateString("en-US", {
+            weekday: "short",
+            timeZone: "UTC",
+          })
+        : ""
+    );
+
+    return {
+      weeks: weekCols,
+      monthLabels: months,
+      totalActiveDays: activeCount,
+      rowLabels: labels,
+    };
   }, [loginSet]);
 
   const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
@@ -162,9 +179,9 @@ export function LoginHeatmap({ loginDates = [], currentStreak = 0, longestStreak
 
             <div className="flex gap-2.5 items-center">
               <div className="flex flex-col justify-between text-[11px] text-slate-400 dark:text-neutral-500 font-mono py-1 w-6 text-right h-[86px] select-none">
-                <span>Mon</span>
-                <span>Wed</span>
-                <span>Fri</span>
+                {rowLabels.map((lbl, idx) => (
+                  <span key={idx}>{lbl}</span>
+                ))}
               </div>
 
               <div className="grid grid-flow-col grid-rows-7 flex-1 gap-1 max-w-2xl">

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Check, Star, GitFork, Loader2, Sparkles, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Search, Check, Star, GitFork, Loader2, Sparkles } from "lucide-react";
+import { Modal } from "@/components/ui/modal";
 
 function GitHubIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -62,7 +62,7 @@ export function GitHubSyncModal({
     setError("");
     try {
       const res = await fetch(
-        `https://api.github.com/users/${handle}/repos?sort=updated&per_page=50`,
+        `https://api.github.com/users/${encodeURIComponent(handle)}/repos?sort=updated&per_page=50`,
       );
       if (!res.ok) {
         if (res.status === 404)
@@ -94,6 +94,11 @@ export function GitHubSyncModal({
     }));
   };
 
+  const handleClose = () => {
+    setSelectedRepoIds({});
+    onClose();
+  };
+
   const handleImportSelected = () => {
     const selected = repos.filter((r) => selectedRepoIds[r.id]);
     const payload = selected.map((r) => ({
@@ -101,43 +106,35 @@ export function GitHubSyncModal({
       status: selectedStatus[r.id] || "completed",
     }));
 
+    setSelectedRepoIds({});
     onImport(payload);
     onClose();
   };
 
-  if (!isOpen) return null;
+  const titleNode = (
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-800 dark:text-white">
+        <GitHubIcon className="h-5 w-5" />
+      </div>
+      <div>
+        <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          Sync GitHub Repositories
+        </h3>
+        <p className="text-xs text-slate-500 dark:text-neutral-400">
+          Import your public engineering projects directly into PrepOS
+        </p>
+      </div>
+    </div>
+  );
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#121212] shadow-2xl flex flex-col max-h-[85vh] text-slate-800 dark:text-neutral-200"
-        >
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] bg-slate-50 dark:bg-[#161616] px-6 py-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-800 dark:text-white">
-                <GitHubIcon className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  Sync GitHub Repositories
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-neutral-400">
-                  Import your public engineering projects directly into PrepOS
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-slate-400 hover:text-slate-700 dark:text-neutral-400 dark:hover:text-white p-1.5 rounded-lg bg-slate-100 dark:bg-neutral-800/60 hover:bg-slate-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={titleNode}
+      maxWidth="2xl"
+      className="max-h-[85vh] text-slate-800 dark:text-neutral-200"
+    >
 
           <div className="p-6 border-b border-slate-100 dark:border-white/[0.06] bg-white dark:bg-[#121212] space-y-3">
             <form onSubmit={fetchRepos} className="flex gap-2">
@@ -203,6 +200,7 @@ export function GitHubSyncModal({
                       type="checkbox"
                       disabled={isAlreadyAdded}
                       checked={isSelected || isAlreadyAdded}
+                      onClick={(e) => e.stopPropagation()}
                       onChange={() => !isAlreadyAdded && toggleSelect(repo.id)}
                       className="mt-1 rounded border-slate-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sky-500 focus:ring-0 shrink-0"
                     />
@@ -273,7 +271,7 @@ export function GitHubSyncModal({
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-transparent text-xs text-slate-600 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors cursor-pointer"
               >
                 Cancel
@@ -291,8 +289,6 @@ export function GitHubSyncModal({
               </button>
             </div>
           </div>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+    </Modal>
   );
 }

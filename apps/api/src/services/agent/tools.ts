@@ -1,11 +1,7 @@
-import { z } from "zod";
 import { Doubt } from "../../models/Doubt.js";
 import { User } from "../../models/User.js";
 import { RoadmapProgress } from "../../models/RoadmapProgress.js";
-import {
-  getLeetCodeUserData,
-  syncUserLeetCodeProfile,
-} from "../leetcodeService.js";
+import { syncUserLeetCodeProfile } from "../leetcodeService.js";
 
 export const createDoubtTool = {
   name: "createDoubt",
@@ -95,44 +91,13 @@ export const syncLeetCodeTool = {
 export const getUserProgressTool = {
   name: "getUserProgress",
   description:
-    "Retrieve a deep, comprehensive breakdown of the student's preparation: streak, freshly synced LeetCode stats, solved NeetCode problem IDs, completed vs pending CS roadmap topics, and active doubt titles/topics. Automatically triggers a real-time sync with LeetCode before returning telemetry.",
+    "Retrieve a breakdown of the student's preparation: streak, cached LeetCode stats, solved NeetCode problem IDs, completed vs pending CS roadmap topics, and active doubt titles/topics.",
   parameters: {
     type: "OBJECT",
-    properties: {
-      sync: {
-        type: "BOOLEAN",
-        description:
-          "Whether to trigger a fresh sync with LeetCode before returning progress (defaults to true).",
-      },
-    },
+    properties: {},
   },
-  execute: async (userId: string, args?: any) => {
-    let user = await User.findById(userId);
-
-    // Auto-sync latest LeetCode progress before inspecting stats
-    const shouldSync = args?.sync !== false;
-    let syncInfo: any = null;
-    const leetcodeUser = user?.leetcodeProfile?.username;
-
-    if (shouldSync && leetcodeUser) {
-      try {
-        const syncRes = await syncUserLeetCodeProfile(
-          userId,
-          leetcodeUser,
-          true,
-        );
-        if (syncRes.synced) {
-          syncInfo = {
-            syncedNow: true,
-            totalSolved: syncRes.profile.totalSolved,
-            syncedAt: new Date().toISOString(),
-          };
-          user = await User.findById(userId);
-        }
-      } catch (err: any) {
-        console.warn("[getUserProgressTool] Auto-sync failed:", err.message);
-      }
-    }
+  execute: async (userId: string) => {
+    const user = await User.findById(userId);
 
     const activeDoubts = await Doubt.find({
       userId,
@@ -162,11 +127,9 @@ export const getUserProgressTool = {
         longest: user?.longestStreak || 0,
       },
       leetcodeProfile: user?.leetcodeProfile || null,
-      leetcodeSyncStatus:
-        syncInfo ||
-        (user?.leetcodeProfile?.syncedAt
-          ? { syncedNow: false, syncedAt: user.leetcodeProfile.syncedAt }
-          : { syncedNow: false }),
+      leetcodeSyncStatus: user?.leetcodeProfile?.syncedAt
+        ? { syncedNow: false, syncedAt: user.leetcodeProfile.syncedAt }
+        : { syncedNow: false },
       neetcode: {
         totalSolved: user?.neetcodeProgress?.solved?.length || 0,
         solvedProblemsList: user?.neetcodeProgress?.solved || [],

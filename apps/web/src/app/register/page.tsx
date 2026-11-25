@@ -47,12 +47,15 @@ export default function RegisterPage() {
   useEffect(() => {
     if (clientValidation !== null) return;
 
+    let cancelled = false;
     const timer = setTimeout(async () => {
+      if (cancelled) return;
       setAsyncStatus({ status: "checking", msg: "Checking availability..." });
       try {
         const res = await apiFetch<{ available: boolean; message: string }>(
           `/api/auth/check-username?username=${encodeURIComponent(cleanUsername)}`,
         );
+        if (cancelled) return;
         if (res.available) {
           setAsyncStatus({
             status: "available",
@@ -65,11 +68,16 @@ export default function RegisterPage() {
           });
         }
       } catch {
-        setAsyncStatus({ status: "idle", msg: "" });
+        if (!cancelled) {
+          setAsyncStatus({ status: "idle", msg: "" });
+        }
       }
     }, 450);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [cleanUsername, clientValidation]);
 
   const handleSubmit = async (e: React.FormEvent) => {

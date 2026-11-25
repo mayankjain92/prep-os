@@ -4,11 +4,14 @@ import React, { useState } from "react";
 import { FolderKanban } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 
+import type { ProjectItem } from "../api";
+
 export interface ProjectFormData {
   name: string;
   repoUrl: string;
   notes: string;
   customTags: string[];
+  status: ProjectItem["status"];
 }
 
 export interface ProjectFormModalProps {
@@ -41,6 +44,9 @@ function ProjectFormInner({
     (initialData?.customTags || []).join(", ")
   );
   const [notes, setNotes] = useState(initialData?.notes || "");
+  const [status, setStatus] = useState<ProjectItem["status"]>(
+    initialData?.status || "in-progress"
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +62,7 @@ function ProjectFormInner({
       repoUrl: repoUrl.trim(),
       notes: notes.trim(),
       customTags,
+      status,
     });
   };
 
@@ -90,17 +97,34 @@ function ProjectFormInner({
           </div>
         </div>
 
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-neutral-300">
-            Tech Stack Tags (comma separated)
-          </label>
-          <input
-            type="text"
-            placeholder="Next.js, Node.js, Express, Redis, MongoDB"
-            value={techStackInput}
-            onChange={(e) => setTechStackInput(e.target.value)}
-            className="w-full h-10 bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-colors"
-          />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-neutral-300">
+              Tech Stack Tags (comma separated)
+            </label>
+            <input
+              type="text"
+              placeholder="Next.js, Node.js, Express, Redis, MongoDB"
+              value={techStackInput}
+              onChange={(e) => setTechStackInput(e.target.value)}
+              className="w-full h-10 bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs rounded-xl px-3.5 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-colors"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-neutral-300">
+              Project Status
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as ProjectItem["status"])}
+              className="w-full h-10 bg-slate-50 dark:bg-[#0e0e0e] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white text-xs rounded-xl px-3.5 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-colors"
+            >
+              <option value="planning">Planning</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
         </div>
 
         <div>

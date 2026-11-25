@@ -16,7 +16,10 @@ export const chatWithAgent = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("[agentController error]:", error);
     return res.status(500).json({
-      error: error.message || "Failed to process agent request.",
+      error:
+        process.env.NODE_ENV === "production"
+          ? "Failed to process agent request."
+          : error.message || "Failed to process agent request.",
     });
   }
 };

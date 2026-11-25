@@ -29,7 +29,6 @@ const sendTokenResponse = (
     .cookie("token", token, cookieOptions)
     .json({
       message,
-      token, // Temporary fallback for backward compatibility
       user: formatAuthUser(user),
     });
 };
@@ -73,30 +72,6 @@ export async function register(req: Request, res: Response) {
 
   const existingEmail = await User.findOne({ email: cleanEmail });
   if (existingEmail) {
-    if (
-      existingUsername &&
-      existingUsername._id.toString() !== existingEmail._id.toString()
-    ) {
-      return res.status(400).json({ error: "Username is already taken" });
-    }
-
-    // Account exists (e.g., via OAuth) without password set
-    if (!existingEmail.passwordHash) {
-      const salt = await bcrypt.genSalt(10);
-      existingEmail.passwordHash = await bcrypt.hash(password, salt);
-      existingEmail.username = cleanUsername;
-      await existingEmail.save();
-
-      const updatedUser = await recordDailyLogin(existingEmail);
-      const token = generateToken(updatedUser);
-
-      return res.status(200).json({
-        message: "Password linked to account successfully",
-        token,
-        user: formatAuthUser(updatedUser),
-      });
-    }
-
     return res
       .status(400)
       .json({ error: "Email is already registered. Please sign in." });
@@ -109,15 +84,24 @@ export async function register(req: Request, res: Response) {
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash(password, salt);
 
-  const createdUser = await User.create({
-    username: cleanUsername,
-    email: cleanEmail,
-    passwordHash,
-    authProvider: "email",
-  });
+  try {
+    const createdUser = await User.create({
+      username: cleanUsername,
+      email: cleanEmail,
+      passwordHash,
+      authProvider: "email",
+    });
 
-  const updatedUser = await recordDailyLogin(createdUser);
-  return sendTokenResponse(updatedUser, 201, res, "Registration successful");
+    const updatedUser = await recordDailyLogin(createdUser);
+    return sendTokenResponse(updatedUser, 201, res, "Registration successful");
+  } catch (error: any) {
+    if (error?.code === 11000) {
+      return res
+        .status(400)
+        .json({ error: "Email or username is already registered." });
+    }
+    throw error;
+  }
 }
 
 export async function login(req: Request, res: Response) {
@@ -197,9 +181,14 @@ export async function oauthLogin(req: Request, res: Response) {
     return sendTokenResponse(updatedUser, 200, res, "Google login successful");
   } catch (error: any) {
     console.error("OAuth error:", error);
-    res
-      .status(500)
-      .json({ error: error.message || "OAuth authentication failed." });
+    const isConfigError = error?.message?.includes("not configured");
+    return res
+      .status(isConfigError ? 500 : 401)
+      .json({
+        error: isConfigError
+          ? "Google OAuth is not configured on the server"
+          : "Invalid or expired Google credential",
+      });
   }
 }
 
@@ -260,7 +249,7 @@ export async function getProfile(req: Request, res: Response) {
           if (status === "done") {
             if (rp.roadmapKey === "prep_os_theory_roadmap") {
               theoryCompletedCount++;
-            } else {
+            } else if (rp.roadmapKey === "prep_os_dsa_roadmap_v2") {
               totalDoneNodes++;
             }
           }
@@ -278,21 +267,7 @@ export async function getProfile(req: Request, res: Response) {
 
     res.json({
       user: {
-        id: (updatedUser._id as any).toString(),
-        username: updatedUser.username || null,
-        email: updatedUser.email,
-        authProvider: updatedUser.authProvider,
-        avatarUrl: updatedUser.avatarUrl,
-        leetcodeProfile: updatedUser.leetcodeProfile,
-        neetcodeProgress: updatedUser.neetcodeProgress || {
-          solved: [],
-          starred: [],
-        },
-        loginDates: updatedUser.loginDates || [],
-        currentStreak: updatedUser.currentStreak || 0,
-        longestStreak: updatedUser.longestStreak || 0,
-        lastLoginDate: updatedUser.lastLoginDate || "",
-        createdAt: updatedUser.createdAt,
+        ...formatAuthUser(updatedUser),
         stats: {
           dsaSolved: totalDoneNodes,
           theoryCompleted: theoryCompletedCount,

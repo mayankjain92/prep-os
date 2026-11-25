@@ -48,7 +48,7 @@ app.use("/api/problems", authMiddleware, problemRoutes);
 app.use("/api/projects", authMiddleware, projectRoutes);
 app.use("/api/doubts", authMiddleware, doubtRoutes);
 app.use("/api/roadmaps", authMiddleware, roadmapRoutes);
-app.use("/api/agent", agentRoutes);
+app.use("/api/agent", authMiddleware, agentRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
@@ -57,7 +57,7 @@ app.use((req, res) => {
 })
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 4000;
+const PORT = env.PORT;
 
 
 async function startServer(): Promise<void>{

@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/AuthContext";
-import { Button } from "@/components/ui/button";
 import { ProfileDropdown } from "@/features/profile/components/ProfileDropdown";
 import { SetUsernameModal } from "@/features/profile/components/SetUsernameModal";
 import { Logo } from "@/components/shared/Logo";
@@ -106,29 +105,7 @@ export default function DashboardLayout({
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {user ? (
-              <ProfileDropdown />
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link href="/login">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-lg border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/[0.06]"
-                  >
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button
-                    size="sm"
-                    className="rounded-lg bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs px-4 shadow-sm shadow-sky-500/20"
-                  >
-                    Register
-                  </Button>
-                </Link>
-              </div>
-            )}
+            <ProfileDropdown />
 
             <button
               type="button"

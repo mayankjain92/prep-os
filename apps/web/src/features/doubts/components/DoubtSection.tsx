@@ -38,9 +38,13 @@ export function DoubtSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const handleAddDoubt = (data: DoubtFormData) => {
-    createMutation.mutate(data);
-    setIsFormOpen(false);
+  const handleAddDoubt = async (data: DoubtFormData) => {
+    try {
+      await createMutation.mutateAsync(data);
+      setIsFormOpen(false);
+    } catch (err) {
+      console.error("Failed to create doubt:", err);
+    }
   };
 
   const toggleResolved = (id: string, currentResolved: boolean) => {

@@ -42,36 +42,40 @@ export default function ProjectsDashboardPage() {
   const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
   const [githubModalOpen, setGithubModalOpen] = useState(false);
   const [importNotification, setImportNotification] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "in-progress" | "completed">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | ProjectItem["status"]>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleFormSubmit = (data: ProjectFormData) => {
-    if (editingProject) {
-      updateMutation.mutate({
-        id: editingProject._id,
-        data: {
+  const handleFormSubmit = async (data: ProjectFormData) => {
+    try {
+      if (editingProject) {
+        await updateMutation.mutateAsync({
+          id: editingProject._id,
+          data: {
+            name: data.name,
+            customTags: data.customTags,
+            status: data.status,
+            repoUrl: data.repoUrl,
+            notes: data.notes,
+          },
+        });
+        setEditingProject(null);
+      } else {
+        await createMutation.mutateAsync({
           name: data.name,
           customTags: data.customTags,
+          status: data.status,
           repoUrl: data.repoUrl,
           notes: data.notes,
-        },
-      });
-      setEditingProject(null);
-    } else {
-      createMutation.mutate({
-        name: data.name,
-        customTags: data.customTags,
-        status: "in-progress",
-        repoUrl: data.repoUrl,
-        notes: data.notes,
-      });
-      posthog.capture("project_created", {
-        has_repo_url: Boolean(data.repoUrl),
-        tag_count: data.customTags.length,
-      });
+        });
+        posthog.capture("project_created", {
+          has_repo_url: Boolean(data.repoUrl),
+          tag_count: data.customTags.length,
+        });
+      }
+      setDialogOpen(false);
+    } catch (err) {
+      console.error("Failed to save project:", err);
     }
-
-    setDialogOpen(false);
   };
 
   const handleAddInlineTag = (proj: ProjectItem, newTag: string) => {
@@ -84,36 +88,39 @@ export default function ProjectsDashboardPage() {
     }
   };
 
-  const handleGitHubImport = (
+  const handleGitHubImport = async (
     items: { repo: GitHubRepo; status: "in-progress" | "completed" }[],
   ) => {
-    let count = 0;
-    items.forEach(({ repo, status }) => {
-      const stackSet = new Set<string>();
-      if (repo.language) stackSet.add(repo.language);
-      if (repo.topics) {
-        repo.topics.forEach((t) =>
-          stackSet.add(t.charAt(0).toUpperCase() + t.slice(1)),
-        );
-      }
+    const results = await Promise.allSettled(
+      items.map(({ repo, status }) => {
+        const stackSet = new Set<string>();
+        if (repo.language) stackSet.add(repo.language);
+        if (repo.topics) {
+          repo.topics.forEach((t) =>
+            stackSet.add(t.charAt(0).toUpperCase() + t.slice(1)),
+          );
+        }
 
-      createMutation.mutate({
-        name: repo.name,
-        techStack: Array.from(stackSet),
-        status,
-        repoUrl: repo.html_url,
-        notes:
-          repo.description ||
-          `Synced public GitHub repository: ${repo.full_name}`,
-      });
-      count++;
-    });
-
-    posthog.capture("github_repos_imported", { count });
-    setImportNotification(
-      `Successfully imported ${count} GitHub repository project(s)!`,
+        return createMutation.mutateAsync({
+          name: repo.name,
+          techStack: Array.from(stackSet),
+          status,
+          repoUrl: repo.html_url,
+          notes:
+            repo.description ||
+            `Synced public GitHub repository: ${repo.full_name}`,
+        });
+      }),
     );
-    setTimeout(() => setImportNotification(""), 4000);
+
+    const succeeded = results.filter((r) => r.status === "fulfilled").length;
+    if (succeeded > 0) {
+      posthog.capture("github_repos_imported", { count: succeeded });
+      setImportNotification(
+        `Successfully imported ${succeeded} GitHub repository project(s)!`,
+      );
+      setTimeout(() => setImportNotification(""), 4000);
+    }
   };
 
   const existingRepoUrls = projects.map((p) => p.repoUrl).filter(Boolean);
@@ -184,16 +191,13 @@ export default function ProjectsDashboardPage() {
           data-purpose="projects-kpi-card"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:neutral-900 p-0.5 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+            <div className="w-12 h-12 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-neutral-900 p-0.5 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
               <FolderKanban className="h-6 w-6" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-base font-semibold text-slate-900 dark:text-white">
                   Engineering Showcase
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  GitHub Connected
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1">
@@ -347,6 +351,7 @@ export default function ProjectsDashboardPage() {
                   repoUrl: editingProject.repoUrl || "",
                   notes: editingProject.notes || "",
                   customTags: editingProject.customTags || [],
+                  status: editingProject.status,
                 }
               : undefined
           }

@@ -1,18 +1,39 @@
 import { Request, Response } from "express";
 import { User } from "../models/User.js";
 import {
-  getLeetCodeUserData,
-  invalidateLeetCodeCache,
   syncUserLeetCodeProfile,
+  invalidateLeetCodeCache,
 } from "../services/leetcodeService.js";
 
 export async function getLeetCodeProfile(req: Request, res: Response) {
   const userId = req.userId;
   const user = await User.findById(userId);
-  if (!user || !user.leetcodeProfile) {
+  if (!user || !user.leetcodeProfile?.username) {
     return res.json({ profile: null });
   }
   res.json({ profile: user.leetcodeProfile });
+}
+
+export async function disconnectLeetCodeProfile(req: Request, res: Response) {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (user?.leetcodeProfile?.username) {
+      await invalidateLeetCodeCache(userId, user.leetcodeProfile.username);
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $unset: { leetcodeProfile: 1 },
+    });
+
+    res.json({
+      message: "LeetCode profile disconnected successfully",
+      profile: null,
+    });
+  } catch (error: any) {
+    console.error("disconnectLeetCodeProfile error:", error);
+    res.status(500).json({ error: "Failed to disconnect LeetCode profile" });
+  }
 }
 
 export async function updateNeetcodeProgress(req: Request, res: Response) {
@@ -55,6 +76,12 @@ export async function syncLeetCodeProblems(req: Request, res: Response) {
   }
 
   const result = await syncUserLeetCodeProfile(userId, username, force);
+
+  if (!result.synced) {
+    return res.status(502).json({
+      error: result.error || `Failed to sync LeetCode profile for @${username}`,
+    });
+  }
 
   res.json({
     message: `Successfully synced LeetCode profile for @${username}`,

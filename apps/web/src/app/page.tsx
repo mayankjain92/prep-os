@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
@@ -31,9 +29,9 @@ export default function Home() {
       color: "text-sky-500 dark:text-sky-400",
     },
     {
-      value: "4",
+      value: "5",
       label: "Core CS Subjects",
-      detail: "OS, DBMS, Networks & System Design",
+      detail: "OS, DBMS, CN, OOP & Aptitude",
       color: "text-indigo-500 dark:text-indigo-400",
     },
     {
@@ -635,7 +633,7 @@ export default function Home() {
                     Theory Track
                   </span>
                   <span className="text-[11px] font-bold text-slate-500 dark:text-neutral-400">
-                    4 Core Subjects
+                    5 Core Subjects
                   </span>
                 </div>
                 <div className="space-y-1.5">
@@ -643,8 +641,8 @@ export default function Home() {
                     CS Theory Revision
                   </h3>
                   <p className="text-xs text-slate-600 dark:text-[#A1A1AA]">
-                    Operating Systems, DBMS & SQL, Computer Networks, and System
-                    Architecture.
+                    Operating Systems, DBMS & SQL, Computer Networks, OOP, and
+                    Aptitude.
                   </p>
                 </div>
                 <div className="w-full bg-slate-100 dark:bg-white/[0.08] h-1.5 rounded-full overflow-hidden">

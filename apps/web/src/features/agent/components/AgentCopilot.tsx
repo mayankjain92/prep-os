@@ -121,13 +121,14 @@ export function AgentCopilot() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [errorBanner, setErrorBanner] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+  }, [messages, isLoading, errorBanner]);
 
   const handleSend = async (textToSend?: string) => {
     const text = (textToSend || input).trim();
@@ -136,6 +137,7 @@ export function AgentCopilot() {
     const userMsg: ChatMessage = { role: "user", content: text };
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
+    setErrorBanner(null);
     setInput("");
     setIsLoading(true);
 
@@ -144,13 +146,7 @@ export function AgentCopilot() {
       setMessages([...newMessages, { role: "model", content: reply }]);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : "Failed to reach agent backend.";
-      setMessages([
-        ...newMessages,
-        {
-          role: "model",
-          content: `⚠️ Error: ${errorMsg}`,
-        },
-      ]);
+      setErrorBanner(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -380,21 +376,6 @@ export function AgentCopilot() {
                               hr: () => (
                                 <hr className="my-2.5 border-border" />
                               ),
-                              table: ({ children }) => (
-                                <div className="overflow-x-auto my-2 rounded-lg border border-border custom-scrollbar">
-                                  <table className="w-full text-[11px] text-left">{children}</table>
-                                </div>
-                              ),
-                              th: ({ children }) => (
-                                <th className="bg-secondary px-2.5 py-1.5 font-semibold text-foreground border-b border-border">
-                                  {children}
-                                </th>
-                              ),
-                              td: ({ children }) => (
-                                <td className="px-2.5 py-1.5 border-b border-border/50 text-foreground/90">
-                                  {children}
-                                </td>
-                              ),
                             }}
                           >
                             {formatMarkdownMath(msg.content)}
@@ -420,6 +401,11 @@ export function AgentCopilot() {
                     <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-500" />
                     <span>Analyzing preparation & reasoning...</span>
                   </div>
+                </div>
+              )}
+              {errorBanner && (
+                <div className="text-xs text-rose-600 dark:text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3 py-2 rounded-xl">
+                  {errorBanner}
                 </div>
               )}
               <div ref={messagesEndRef} />

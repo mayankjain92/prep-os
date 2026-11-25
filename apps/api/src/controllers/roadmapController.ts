@@ -30,25 +30,19 @@ export async function updateRoadmapProgress(req: Request, res: Response) {
       "pending" | "in-progress" | "done"
     >;
 
-    let progress = await RoadmapProgress.findOne({ userId: req.userId, roadmapKey: key });
-    
-    if (!progress) {
-      progress = new RoadmapProgress({
-        userId: req.userId,
-        roadmapKey: key,
-        nodeStatuses: incomingStatuses,
-      });
-      await progress.save();
-    } else {
-      for (const [nodeId, status] of Object.entries(incomingStatuses)) {
-        progress.nodeStatuses.set(nodeId, status);
-      }
-      progress.markModified("nodeStatuses");
-      await progress.save();
+    const setFields: Record<string, string> = {};
+    for (const [nodeId, status] of Object.entries(incomingStatuses)) {
+      setFields[`nodeStatuses.${nodeId}`] = status;
     }
 
+    const progress = await RoadmapProgress.findOneAndUpdate(
+      { userId: req.userId, roadmapKey: key },
+      { $set: setFields },
+      { upsert: true, new: true },
+    );
+
     const formattedStatuses: Record<string, string> = {};
-    progress.nodeStatuses.forEach((value, k) => {
+    progress?.nodeStatuses?.forEach((value, k) => {
       formattedStatuses[k] = value;
     });
 

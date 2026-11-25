@@ -14,6 +14,7 @@ import { DSA_ROADMAP_SECTIONS } from "@/data/dsa-roadmap";
 import { THEORY_ROADMAP_SECTIONS } from "@/data/theory-roadmap";
 import { getRoadmapMetrics } from "@/features/roadmap/tree-algorithms";
 import type { RoadmapNodeItem } from "@/features/roadmap/types";
+import { safeExternalUrl } from "@/lib/utils";
 import { AnimatedNumber } from "@/components/shared/AnimatedNumber";
 import { AnimatedProgressBar } from "@/components/shared/PageTransition";
 import {
@@ -23,6 +24,8 @@ import {
   FolderKanban,
   CheckCircle2,
   ExternalLink,
+  Code2,
+  X,
 } from "lucide-react";
 
 export default function UnifiedDashboardPage() {
@@ -37,6 +40,7 @@ export default function UnifiedDashboardPage() {
 
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const syncLeetcode = useSyncLeetCode();
 
   const { totalDsaNodes, doneDsaNodes, inProgressDsaNodes } = useMemo(() => {
@@ -170,6 +174,38 @@ export default function UnifiedDashboardPage() {
           </div>
         </section>
 
+        {!dbLeetcodeProfile?.username && !bannerDismissed && (
+          <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-slate-800 dark:text-neutral-200 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Code2 className="w-4 h-4 text-sky-500 shrink-0" />
+              <div className="text-xs">
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  LeetCode account not connected:
+                </span>{" "}
+                <span className="text-slate-600 dark:text-neutral-300">
+                  Link your LeetCode profile to track solved DSA problems and placement readiness.
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                href="/dashboard/profile#integrations"
+                className="px-2.5 py-1 text-xs font-medium bg-sky-500 text-white rounded-lg hover:bg-sky-400 transition-colors shadow-xs"
+              >
+                Connect LeetCode
+              </Link>
+              <button
+                type="button"
+                onClick={() => setBannerDismissed(true)}
+                className="p-1 text-slate-400 hover:text-slate-600 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors cursor-pointer"
+                title="Dismiss banner"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+
         <section
           aria-label="Key Performance Indicators"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
@@ -183,19 +219,31 @@ export default function UnifiedDashboardPage() {
                 <AnimatedNumber value={totalSolved} />
               </span>
             </div>
-            <div className="text-xs text-slate-500 dark:text-neutral-400 flex items-center space-x-1.5">
-              <span className="font-medium text-emerald-500 dark:text-emerald-400">
-                <AnimatedNumber value={easy} /> easy
-              </span>
-              <span className="text-slate-300 dark:text-neutral-600">·</span>
-              <span className="font-medium text-amber-500 dark:text-amber-400">
-                <AnimatedNumber value={medium} /> med
-              </span>
-              <span className="text-slate-300 dark:text-neutral-600">·</span>
-              <span className="font-medium text-rose-500 dark:text-rose-400">
-                <AnimatedNumber value={hard} /> hard
-              </span>
-            </div>
+            {dbLeetcodeProfile?.username ? (
+              <div className="text-xs text-slate-500 dark:text-neutral-400 flex items-center space-x-1.5">
+                <span className="font-medium text-emerald-500 dark:text-emerald-400">
+                  <AnimatedNumber value={easy} /> easy
+                </span>
+                <span className="text-slate-300 dark:text-neutral-600">·</span>
+                <span className="font-medium text-amber-500 dark:text-amber-400">
+                  <AnimatedNumber value={medium} /> med
+                </span>
+                <span className="text-slate-300 dark:text-neutral-600">·</span>
+                <span className="font-medium text-rose-500 dark:text-rose-400">
+                  <AnimatedNumber value={hard} /> hard
+                </span>
+              </div>
+            ) : (
+              <div className="text-xs">
+                <Link
+                  href="/dashboard/profile#integrations"
+                  className="text-sky-500 hover:text-sky-600 dark:hover:text-sky-400 inline-flex items-center gap-1 font-medium transition-colors"
+                >
+                  <span>Connect LeetCode</span>
+                  <ArrowUpRight className="w-3 h-3" />
+                </Link>
+              </div>
+            )}
           </div>
 
           <div className="p-5 bg-white dark:bg-[#121212] rounded-xl border border-slate-200 dark:border-white/[0.08] flex flex-col justify-between hover:border-slate-300 dark:hover:border-white/[0.14] transition-colors shadow-xs dark:shadow-none">
@@ -465,9 +513,9 @@ export default function UnifiedDashboardPage() {
                         </div>
                       </div>
 
-                      {doubt.url ? (
+                      {safeExternalUrl(doubt.url) ? (
                         <a
-                          href={doubt.url}
+                          href={safeExternalUrl(doubt.url)!}
                           target="_blank"
                           rel="noreferrer"
                           aria-label={`Open ${doubt.title}`}
@@ -567,9 +615,9 @@ export default function UnifiedDashboardPage() {
                             {proj.techStack?.join(", ")}
                           </p>
                         </div>
-                        {proj.repoUrl && (
+                        {safeExternalUrl(proj.repoUrl) && (
                           <a
-                            href={proj.repoUrl}
+                            href={safeExternalUrl(proj.repoUrl)!}
                             target="_blank"
                             rel="noreferrer"
                             className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300"

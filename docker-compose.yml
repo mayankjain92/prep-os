@@ -39,13 +39,12 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN: phc_urbbBTwB4aCZtjTcShe35WdTDbUjDLKssj2ejnnbN5Wt
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+        NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN: ${NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN:-}
     container_name: prep-os-web
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:4000
     depends_on:
       - api
 

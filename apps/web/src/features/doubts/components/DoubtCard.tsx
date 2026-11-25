@@ -2,6 +2,7 @@
 
 import React from "react";
 import { CheckCircle2, Trash2, ExternalLink, Code2, BookOpen } from "lucide-react";
+import { safeExternalUrl } from "@/lib/utils";
 import type { DoubtItem } from "../api";
 
 export interface DoubtCardProps {
@@ -100,9 +101,9 @@ export function DoubtCard({
       </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/[0.06] gap-2">
-        {doubt.url ? (
+        {safeExternalUrl(doubt.url) ? (
           <a
-            href={doubt.url}
+            href={safeExternalUrl(doubt.url)!}
             target="_blank"
             rel="noreferrer"
             className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 hover:underline flex items-center gap-1 font-semibold"

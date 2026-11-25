@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Types } from "mongoose";
 import { Doubt } from "../models/Doubt.js";
 
 export async function getDoubts(req: Request, res: Response) {
@@ -47,12 +48,15 @@ export async function createDoubt(req: Request, res: Response) {
 
 export async function updateDoubt(req: Request, res: Response) {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    if (!id || !Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ error: "Doubt not found" });
+    }
 
     const doubt = await Doubt.findOneAndUpdate(
       { _id: id, userId: req.userId },
       { $set: req.body },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!doubt) {
@@ -77,7 +81,10 @@ export async function updateDoubt(req: Request, res: Response) {
 
 export async function deleteDoubt(req: Request, res: Response) {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    if (!id || !Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ error: "Doubt not found" });
+    }
     const doubt = await Doubt.findOneAndDelete({ _id: id, userId: req.userId });
     if (!doubt) {
       return res.status(404).json({ error: "Doubt not found" });

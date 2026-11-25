@@ -49,10 +49,12 @@ export async function askAgent(
     throw new Error("Gemini API key is not configured on the server.");
   }
 
-  const formattedHistory = history.map((msg) => ({
-    role: msg.role === "user" ? "user" : "model",
-    parts: [{ text: msg.content }],
-  }));
+  const formattedHistory = history
+    .filter((msg) => msg.role === "user" || msg.role === "model")
+    .map((msg) => ({
+      role: msg.role,
+      parts: [{ text: msg.content }],
+    }));
 
   const chat = ai.chats.create({
     model: "gemini-3.5-flash-lite",
@@ -75,6 +77,10 @@ export async function askAgent(
   ) {
     turns++;
 
+    const functionResponses: Array<{
+      functionResponse: { name: string; response: { output: any } };
+    }> = [];
+
     for (const call of response.functionCalls) {
       const { name, args } = call;
       if (!name) continue;
@@ -91,17 +97,19 @@ export async function askAgent(
         result = { error: `Tool ${name} does not exist.` };
       }
 
-      response = await chat.sendMessage({
-        message: [
-          {
-            functionResponse: {
-              name,
-              response: { output: result },
-            },
-          },
-        ],
+      functionResponses.push({
+        functionResponse: {
+          name,
+          response: { output: result },
+        },
       });
     }
+
+    if (functionResponses.length === 0) break;
+
+    response = await chat.sendMessage({
+      message: functionResponses,
+    });
   }
 
   return response.text || "I have processed your request.";

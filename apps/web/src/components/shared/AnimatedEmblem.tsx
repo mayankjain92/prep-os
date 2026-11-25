@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useId } from "react";
 
 interface AnimatedEmblemProps {
   className?: string;
@@ -13,6 +13,10 @@ export function AnimatedEmblem({
   size,
   showBackground = false,
 }: AnimatedEmblemProps) {
+  const uid = useId().replace(/:/g, "");
+  const indigoGradId = `emblemIndigoGrad-${uid}`;
+  const glowGradId = `emblemGlowGrad-${uid}`;
+  const softGlowId = `emblemSoftGlow-${uid}`;
   const style = size ? { width: size, height: size } : undefined;
 
   return (
@@ -29,7 +33,7 @@ export function AnimatedEmblem({
       >
         <defs>
           <linearGradient
-            id="emblemIndigoGrad"
+            id={indigoGradId}
             x1="0%"
             x2="100%"
             y1="0%"
@@ -40,7 +44,7 @@ export function AnimatedEmblem({
             <stop offset="100%" stopColor="#4f46e5" />
           </linearGradient>
           <linearGradient
-            id="emblemGlowGrad"
+            id={glowGradId}
             x1="0%"
             x2="100%"
             y1="0%"
@@ -50,7 +54,7 @@ export function AnimatedEmblem({
             <stop offset="100%" stopColor="#6366f1" />
           </linearGradient>
           <filter
-            id="emblemSoftGlow"
+            id={softGlowId}
             x="-30%"
             y="-30%"
             width="160%"
@@ -203,12 +207,12 @@ export function AnimatedEmblem({
         <g className="emb-core">
           <path
             d="M 256 64 C 256 160 256 160 352 256 C 256 256 256 352 256 448 C 256 352 256 352 160 256 C 256 160 256 160 256 64 Z"
-            fill="url(#emblemIndigoGrad)"
+            fill={`url(#${indigoGradId})`}
           />
           <g className="emb-inner-spark">
             <path
               d="M 256 180 C 275 220 292 237 332 256 C 292 275 275 292 256 332 C 237 292 220 275 180 256 C 220 237 237 220 256 180 Z"
-              fill="url(#emblemGlowGrad)"
+              fill={`url(#${glowGradId})`}
               opacity="0.9"
             />
           </g>
@@ -226,7 +230,7 @@ export function AnimatedEmblem({
             cy="256"
             r="15"
             fill="#ffffff"
-            filter="url(#emblemSoftGlow)"
+            filter={`url(#${softGlowId})`}
           />
         </g>
       </svg>

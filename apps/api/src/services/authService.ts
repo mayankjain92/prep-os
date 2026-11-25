@@ -29,9 +29,12 @@ export function formatAuthUser(user: IUser) {
     email: user.email,
     authProvider: user.authProvider || "email",
     avatarUrl: user.avatarUrl || "",
+    leetcodeProfile: user.leetcodeProfile?.username ? user.leetcodeProfile : null,
+    neetcodeProgress: user.neetcodeProgress || { solved: [], starred: [] },
     loginDates: user.loginDates || [],
     currentStreak: user.currentStreak || 0,
     longestStreak: user.longestStreak || 0,
     lastLoginDate: user.lastLoginDate || "",
+    createdAt: user.createdAt,
   };
 }

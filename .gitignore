@@ -51,3 +51,5 @@ Thumbs.db
 
 # ☁️ Vercel / Deployment (if you deploy frontend here)
 .vercel/
+
+.ua/

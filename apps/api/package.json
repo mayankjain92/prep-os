@@ -7,7 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "tsx src/index.ts",
-    "test": "vitest run"
+    "test": "vitest run src"
   },
   "keywords": [],
   "author": "",
@@ -35,7 +35,6 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.19.43",
     "@types/supertest": "^7.2.1",
-    "nodemon": "^3.1.14",
     "supertest": "^7.2.2",
     "tsx": "^4.23.1",
     "typescript": "^5.9.3",

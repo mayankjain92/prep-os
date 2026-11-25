@@ -24,9 +24,11 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useRoadmapProgress } from "@/features/roadmap/useRoadmap";
+import { useAuth } from "@/features/auth/AuthContext";
 import posthog from "posthog-js";
 
 export default function DsaDashboardPage() {
+  const { user } = useAuth();
   const { data: dbLeetcodeProfile } = useLeetCodeProfile();
   const { data: dsaFlowchartStatus = {} } = useRoadmapProgress(
     "prep_os_dsa_roadmap_v2",
@@ -62,7 +64,7 @@ export default function DsaDashboardPage() {
     }
   };
 
-  const activeProfile = syncMutation.data?.profile || dbLeetcodeProfile;
+  const activeProfile = dbLeetcodeProfile;
 
   const triggerSync = (force = false) => {
     const handle = leetcodeUsername.trim();
@@ -123,7 +125,11 @@ export default function DsaDashboardPage() {
 
   const initials = leetcodeUsername
     ? leetcodeUsername.slice(0, 2).toUpperCase()
-    : "MJ";
+    : user?.username
+      ? user.username.slice(0, 2).toUpperCase()
+      : user?.email
+        ? user.email.slice(0, 2).toUpperCase()
+        : "U";
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0A0A0A] text-slate-800 dark:text-neutral-200 pb-28 transition-colors duration-200">
@@ -341,9 +347,15 @@ export default function DsaDashboardPage() {
                   <span className="text-xs font-semibold text-slate-900 dark:text-white truncate">
                     @{activeProfile?.username || leetcodeUsername || "Not linked"}
                   </span>
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    LeetCode Synced
-                  </span>
+                  {activeProfile?.username ? (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      LeetCode Synced
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 border border-slate-200 dark:border-white/[0.06]">
+                      Not Linked
+                    </span>
+                  )}
                   {activeProfile?.ranking && (
                     <>
                       <span className="text-slate-300 dark:text-neutral-700 hidden sm:inline">•</span>
@@ -372,22 +384,31 @@ export default function DsaDashboardPage() {
                   </span>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => triggerSync(false)}
-                  disabled={syncMutation.isPending}
-                  title="Quick Sync with LeetCode"
-                  className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0e0e0e] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-xs font-medium text-slate-700 dark:text-neutral-300 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
-                >
-                  <RotateCw
-                    className={`w-3.5 h-3.5 ${
-                      syncMutation.isPending ? "animate-spin text-sky-500" : ""
-                    }`}
-                  />
-                  <span className="hidden sm:inline">
-                    {syncMutation.isPending ? "Syncing..." : "Sync"}
-                  </span>
-                </button>
+                {activeProfile?.username ? (
+                  <button
+                    type="button"
+                    onClick={() => triggerSync(false)}
+                    disabled={syncMutation.isPending}
+                    title="Quick Sync with LeetCode"
+                    className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0e0e0e] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-xs font-medium text-slate-700 dark:text-neutral-300 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                  >
+                    <RotateCw
+                      className={`w-3.5 h-3.5 ${
+                        syncMutation.isPending ? "animate-spin text-sky-500" : ""
+                      }`}
+                    />
+                    <span className="hidden sm:inline">
+                      {syncMutation.isPending ? "Syncing..." : "Sync"}
+                    </span>
+                  </button>
+                ) : (
+                  <Link
+                    href="/dashboard/profile#integrations"
+                    className="px-2.5 py-1 rounded-lg border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-xs font-medium text-sky-600 dark:text-sky-400 transition-colors flex items-center gap-1.5"
+                  >
+                    <span>Connect LeetCode →</span>
+                  </Link>
+                )}
 
                 <Link
                   href="/dashboard/profile#integrations"

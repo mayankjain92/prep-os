@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@prep-os/shared": ["../../packages/shared/src/index.ts"]
     }
   },
   "include": [
